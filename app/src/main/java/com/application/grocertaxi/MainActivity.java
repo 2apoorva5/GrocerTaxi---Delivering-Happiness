@@ -587,7 +587,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             protected void onBindViewHolder(@NonNull FruitViewHolder holder, int position, @NonNull Product model) {
-                Glide.with(holder.fruitImage.getContext()).load(model.getProductImage()).centerCrop().into(holder.fruitImage);
+                Glide.with(holder.fruitImage.getContext()).load(model.getProductImage())
+                        .placeholder(R.drawable.thumbnail_product).centerCrop().into(holder.fruitImage);
 
                 holder.fruitTypeImage.setImageResource(R.drawable.ic_veg);
 
@@ -687,7 +688,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             protected void onBindViewHolder(@NonNull VegetableViewHolder holder, int position, @NonNull Product model) {
-                Glide.with(holder.vegetableImage.getContext()).load(model.getProductImage()).centerCrop().into(holder.vegetableImage);
+                Glide.with(holder.vegetableImage.getContext()).load(model.getProductImage())
+                        .placeholder(R.drawable.thumbnail_product).centerCrop().into(holder.vegetableImage);
 
                 holder.vegetableTypeImage.setImageResource(R.drawable.ic_veg);
 
@@ -787,7 +789,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             protected void onBindViewHolder(@NonNull FoodGrainViewHolder holder, int position, @NonNull Product model) {
-                Glide.with(holder.foodGrainImage.getContext()).load(model.getProductImage()).centerCrop().into(holder.foodGrainImage);
+                Glide.with(holder.foodGrainImage.getContext()).load(model.getProductImage())
+                        .placeholder(R.drawable.thumbnail_product).centerCrop().into(holder.foodGrainImage);
 
                 holder.foodGrainTypeImage.setImageResource(R.drawable.ic_veg);
 
@@ -887,7 +890,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             protected void onBindViewHolder(@NonNull PersonalCareViewHolder holder, int position, @NonNull Product model) {
-                Glide.with(holder.pCareImage.getContext()).load(model.getProductImage()).centerCrop().into(holder.pCareImage);
+                Glide.with(holder.pCareImage.getContext()).load(model.getProductImage())
+                        .placeholder(R.drawable.thumbnail_product).centerCrop().into(holder.pCareImage);
 
                 holder.pCareTypeImage.setVisibility(View.GONE);
 

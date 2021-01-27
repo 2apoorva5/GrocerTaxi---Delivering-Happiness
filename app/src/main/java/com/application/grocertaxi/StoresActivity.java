@@ -384,7 +384,8 @@ public class StoresActivity extends AppCompatActivity {
 
             @Override
             protected void onBindViewHolder(@NonNull StoreViewHolder holder, int position, @NonNull Store model) {
-                Glide.with(holder.storeImage.getContext()).load(model.getStoreImage()).centerCrop().into(holder.storeImage);
+                Glide.with(holder.storeImage.getContext()).load(model.getStoreImage())
+                        .placeholder(R.drawable.thumbnail_store).centerCrop().into(holder.storeImage);
 
                 holder.storeName.setText(model.getStoreName());
                 holder.storeAddress.setText(model.getStoreAddress());

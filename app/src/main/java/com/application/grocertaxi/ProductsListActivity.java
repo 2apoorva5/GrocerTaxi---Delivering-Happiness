@@ -383,7 +383,8 @@ public class ProductsListActivity extends AppCompatActivity {
 
             @Override
             protected void onBindViewHolder(@NonNull ProductViewHolder holder, int position, @NonNull Product model) {
-                Glide.with(holder.productImage.getContext()).load(model.getProductImage()).centerCrop().into(holder.productImage);
+                Glide.with(holder.productImage.getContext()).load(model.getProductImage())
+                        .placeholder(R.drawable.thumbnail_product).centerCrop().into(holder.productImage);
 
                 if (model.getProductCategory().equals("Baby Care") || model.getProductCategory().equals("Household") ||
                         model.getProductCategory().equals("Personal Care") || model.getProductCategory().equals("Stationary") ||
