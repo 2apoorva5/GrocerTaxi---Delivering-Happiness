@@ -7,8 +7,10 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Patterns;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -114,6 +116,14 @@ public class SignInActivity extends AppCompatActivity {
             signInProgressBar.setVisibility(View.GONE);
             signInBtnContainer.setVisibility(View.VISIBLE);
             signInBtn.setEnabled(true);
+        });
+
+        passwordField.getEditText().setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                signInBtn.performClick();
+                return true;
+            }
+            return false;
         });
 
         signInBtn.setOnClickListener(view -> {

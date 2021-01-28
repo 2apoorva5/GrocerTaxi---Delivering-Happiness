@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -194,8 +195,32 @@ public class ChooseLocalityActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {
+            public void afterTextChanged(Editable s) {
+                inputLocalitySearchField.setOnEditorActionListener((v, actionId, event) -> {
+                    if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                        UIUtil.hideKeyboard(ChooseLocalityActivity.this);
+                        Query updatedQuery;
+                        if (s.toString().isEmpty()) {
+                            updatedQuery = localitiesRef.orderBy("name", Query.Direction.ASCENDING);
+                        } else {
+                            updatedQuery = localitiesRef.orderBy("searchKeyword", Query.Direction.ASCENDING)
+                                    .startAt(s.toString().toLowerCase().trim()).endAt(s.toString().toLowerCase().trim() + "\uf8ff");
+                        }
 
+                        PagedList.Config updatedConfig = new PagedList.Config.Builder()
+                                .setInitialLoadSizeHint(8)
+                                .setPageSize(4)
+                                .build();
+
+                        FirestorePagingOptions<Locality> updatedOptions = new FirestorePagingOptions.Builder<Locality>()
+                                .setQuery(updatedQuery, updatedConfig, Locality.class)
+                                .build();
+
+                        localityAdapter.updateOptions(updatedOptions);
+                        return true;
+                    }
+                    return false;
+                });
             }
         });
     }

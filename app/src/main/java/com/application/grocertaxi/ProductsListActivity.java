@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -50,6 +51,7 @@ import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -117,6 +119,9 @@ public class ProductsListActivity extends AppCompatActivity {
                 showConnectToInternetDialog();
                 return;
             } else {
+                UIUtil.hideKeyboard(ProductsListActivity.this);
+                inputProductSearch.setText(null);
+                inputProductSearch.clearFocus();
                 loadProducts();
             }
         });
@@ -169,8 +174,10 @@ public class ProductsListActivity extends AppCompatActivity {
 
         if (preferenceManager.getString(Constants.KEY_CATEGORY).isEmpty() || preferenceManager.getString(Constants.KEY_CATEGORY).equals("")) {
             title.setText("All products");
+            inputProductSearch.setHint("Search product");
         } else {
             title.setText(preferenceManager.getString(Constants.KEY_CATEGORY));
+            inputProductSearch.setHint(String.format("Search in %s", preferenceManager.getString(Constants.KEY_CATEGORY)));
         }
 
         productsProgressBar.setVisibility(View.VISIBLE);
@@ -232,7 +239,32 @@ public class ProductsListActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                inputProductSearch.setOnEditorActionListener((v, actionId, event) -> {
+                    if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                        UIUtil.hideKeyboard(ProductsListActivity.this);
+                        Query updatedQuery;
+                        if (s.toString().isEmpty()) {
+                            updatedQuery = productsRef.orderBy(Constants.KEY_PRODUCT_NAME, Query.Direction.ASCENDING);
+                        } else {
+                            updatedQuery = productsRef.orderBy(Constants.KEY_PRODUCT_SEARCH_KEYWORD, Query.Direction.ASCENDING)
+                                    .startAt(s.toString().toLowerCase().trim()).endAt(s.toString().toLowerCase().trim() + "\uf8ff");
+                        }
 
+                        PagedList.Config updatedConfig = new PagedList.Config.Builder()
+                                .setInitialLoadSizeHint(8)
+                                .setPageSize(4)
+                                .build();
+
+                        FirestorePagingOptions<Product> updatedOptions = new FirestorePagingOptions.Builder<Product>()
+                                .setLifecycleOwner(ProductsListActivity.this)
+                                .setQuery(updatedQuery, updatedConfig, Product.class)
+                                .build();
+
+                        productAdapter.updateOptions(updatedOptions);
+                        return true;
+                    }
+                    return false;
+                });
             }
         });
 

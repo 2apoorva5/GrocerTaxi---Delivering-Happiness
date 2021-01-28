@@ -119,6 +119,7 @@
         app:itemHeight="52dp"
         app:itemRadius="8dp"
         app:itemWidth="44dp"
+        android:imeOptions="actionDone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/pattern" />

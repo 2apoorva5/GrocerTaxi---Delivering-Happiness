@@ -13,6 +13,8 @@
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowAllowEnterTransitionOverlap">true</item>
         <item name="android:windowAllowReturnTransitionOverlap">true</item>
+        <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
+        <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
 
         //Material Dialog
         <item name="material_dialog_background">@color/colorBackground</item>

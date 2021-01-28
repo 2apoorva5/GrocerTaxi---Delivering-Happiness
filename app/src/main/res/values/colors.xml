@@ -9,6 +9,7 @@
     <color name="colorOtpView">#E4A100</color>
     <color name="colorEditText">#E9E9F3</color>
     <color name="colorSearch">#E9E9F3</color>
+    <color name="colorOffer">#429DCA</color>
 
     <color name="errorColor">#B71C1C</color>
     <color name="infoColor">#0F4C81</color>

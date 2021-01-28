@@ -11,13 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.ScaleAnimation;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,11 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.widget.NestedScrollView;
-import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.application.grocertaxi.Model.Product;
 import com.application.grocertaxi.Model.Store;
@@ -39,9 +31,6 @@ import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
-import com.firebase.ui.firestore.paging.FirestorePagingOptions;
-import com.firebase.ui.firestore.paging.LoadingState;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -61,16 +50,15 @@ import maes.tech.intentanim.CustomIntent;
 public class MainActivity extends AppCompatActivity {
 
     private ImageView editLocationBtn, fruits, vegetables, foodGrains, dairy, bakery, beverages,
-            illustrationEmptyStores, illustrationEmptyFruits, illustrationEmptyVeg, illustrationEmptyFoodGrains, illustrationEmptyPCare, banner1,
-            menuHome, menuCategory, menuStore, menuProfile;
-    private TextView userLocation, greetings, viewAllStoresBtn, viewAllFruitsBtn, viewAllVegBtn, viewAllFoodGrainsBtn, viewAllPCareBtn,
-            textEmptyStores, textEmptyFruits, textEmptyVeg, textEmptyFoodGrains, textEmptyPCare;
+            banner1, menuHome, menuCategory, menuStore, menuProfile;
+    private TextView userLocation, greetings, viewAllStoresBtn, viewAllFruitsBtn, viewAllVegBtn, viewAllFoodGrainsBtn, viewAllPCareBtn;
     private CircleImageView userProfilePic;
     private SliderView bannerSlider;
     private RecyclerView recyclerStores, recyclerFruits, recyclerVegetables, recyclerFoodGrains, recyclerPCare;
     private ProgressBar storesProgressBar, fruitsProgressBar, vegProgressBar, foodGrainsProgressBar, pCareProgressBar;
     private ConstraintLayout productSearchBtn, categoryFruits, categoryVegetables, categoryFoodGrains,
-            categoryDairy, categoryBakery, categoryBeverages, viewAllCategoriesBtn;
+            categoryDairy, categoryBakery, categoryBeverages, viewAllCategoriesBtn,
+            layoutStores, layoutFruits, layoutVegetables, layoutFoodgrains, layoutPCare;
     private FloatingActionButton cartBtn;
     private PullRefreshLayout pullRefreshLayout;
 
@@ -131,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         pullRefreshLayout.setColor(getColor(R.color.colorAccent));
         pullRefreshLayout.setBackgroundColor(getColor(R.color.colorPrimary));
         pullRefreshLayout.setOnRefreshListener(() -> {
-            if(!isConnectedToInternet(MainActivity.this)) {
+            if (!isConnectedToInternet(MainActivity.this)) {
                 pullRefreshLayout.setRefreshing(false);
                 showConnectToInternetDialog();
                 return;
@@ -173,35 +161,30 @@ public class MainActivity extends AppCompatActivity {
         viewAllCategoriesBtn = findViewById(R.id.view_all_categories_btn);
 
         //Store
+        layoutStores = findViewById(R.id.layout_stores);
         viewAllStoresBtn = findViewById(R.id.view_all_stores_btn);
         recyclerStores = findViewById(R.id.recycler_stores);
         storesProgressBar = findViewById(R.id.stores_progress_bar);
-        illustrationEmptyStores = findViewById(R.id.illustration_empty_stores);
-        textEmptyStores = findViewById(R.id.text_empty_stores);
         //Fruits
+        layoutFruits = findViewById(R.id.layout_fruits);
         viewAllFruitsBtn = findViewById(R.id.view_all_fruits_btn);
         recyclerFruits = findViewById(R.id.recycler_fruits);
         fruitsProgressBar = findViewById(R.id.fruits_progress_bar);
-        illustrationEmptyFruits = findViewById(R.id.illustration_empty_fruits);
-        textEmptyFruits = findViewById(R.id.text_empty_fruits);
         //Vegetables
+        layoutVegetables = findViewById(R.id.layout_vegetables);
         viewAllVegBtn = findViewById(R.id.view_all_veg_btn);
         recyclerVegetables = findViewById(R.id.recycler_vegetables);
         vegProgressBar = findViewById(R.id.veg_progress_bar);
-        illustrationEmptyVeg = findViewById(R.id.illustration_empty_veg);
-        textEmptyVeg = findViewById(R.id.text_empty_veg);
         //Food Grains
+        layoutFoodgrains = findViewById(R.id.layout_foodgrains);
         viewAllFoodGrainsBtn = findViewById(R.id.view_all_foodgrains_btn);
         recyclerFoodGrains = findViewById(R.id.recycler_foodgrains);
         foodGrainsProgressBar = findViewById(R.id.foodgrains_progress_bar);
-        illustrationEmptyFoodGrains = findViewById(R.id.illustration_empty_foodgrains);
-        textEmptyFoodGrains = findViewById(R.id.text_empty_foodgrains);
         //Personal Care
+        layoutPCare = findViewById(R.id.layout_pcare);
         viewAllPCareBtn = findViewById(R.id.view_all_pcare_btn);
         recyclerPCare = findViewById(R.id.recycler_pcare);
         pCareProgressBar = findViewById(R.id.pcare_progress_bar);
-        illustrationEmptyPCare = findViewById(R.id.illustration_empty_pcare);
-        textEmptyPCare = findViewById(R.id.text_empty_pcare);
 
         banner1 = findViewById(R.id.banner_image1);
 
@@ -292,7 +275,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         productSearchBtn.setOnClickListener(view -> {
-
+            startActivity(new Intent(MainActivity.this, SearchProductActivity.class));
+            CustomIntent.customType(MainActivity.this, "bottom-to-up");
         });
 
         bannerSliderAdapter = new BannerSliderAdapter(banners);
@@ -495,7 +479,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             protected void onBindViewHolder(@NonNull StoreViewHolder holder, int position, @NonNull Store model) {
-                Glide.with(holder.storeImage.getContext()).load(model.getStoreImage()).centerCrop().into(holder.storeImage);
+                Glide.with(holder.storeImage.getContext()).load(model.getStoreImage())
+                        .placeholder(R.drawable.thumbnail_store).centerCrop().into(holder.storeImage);
 
                 holder.storeName.setText(model.getStoreName());
 
@@ -530,11 +515,9 @@ public class MainActivity extends AppCompatActivity {
                 storesProgressBar.setVisibility(View.GONE);
 
                 if (getItemCount() == 0) {
-                    illustrationEmptyStores.setVisibility(View.VISIBLE);
-                    textEmptyStores.setVisibility(View.VISIBLE);
+                    layoutStores.setVisibility(View.GONE);
                 } else {
-                    illustrationEmptyStores.setVisibility(View.GONE);
-                    textEmptyStores.setVisibility(View.GONE);
+                    layoutStores.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -631,11 +614,9 @@ public class MainActivity extends AppCompatActivity {
                 fruitsProgressBar.setVisibility(View.GONE);
 
                 if (getItemCount() == 0) {
-                    illustrationEmptyFruits.setVisibility(View.VISIBLE);
-                    textEmptyFruits.setVisibility(View.VISIBLE);
+                    layoutFruits.setVisibility(View.GONE);
                 } else {
-                    illustrationEmptyFruits.setVisibility(View.GONE);
-                    textEmptyFruits.setVisibility(View.GONE);
+                    layoutFruits.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -732,11 +713,9 @@ public class MainActivity extends AppCompatActivity {
                 vegProgressBar.setVisibility(View.GONE);
 
                 if (getItemCount() == 0) {
-                    illustrationEmptyVeg.setVisibility(View.VISIBLE);
-                    textEmptyVeg.setVisibility(View.VISIBLE);
+                    layoutVegetables.setVisibility(View.GONE);
                 } else {
-                    illustrationEmptyVeg.setVisibility(View.GONE);
-                    textEmptyVeg.setVisibility(View.GONE);
+                    layoutVegetables.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -833,11 +812,9 @@ public class MainActivity extends AppCompatActivity {
                 foodGrainsProgressBar.setVisibility(View.GONE);
 
                 if (getItemCount() == 0) {
-                    illustrationEmptyFoodGrains.setVisibility(View.VISIBLE);
-                    textEmptyFoodGrains.setVisibility(View.VISIBLE);
+                    layoutFoodgrains.setVisibility(View.GONE);
                 } else {
-                    illustrationEmptyFoodGrains.setVisibility(View.GONE);
-                    textEmptyFoodGrains.setVisibility(View.GONE);
+                    layoutFoodgrains.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -934,11 +911,9 @@ public class MainActivity extends AppCompatActivity {
                 pCareProgressBar.setVisibility(View.GONE);
 
                 if (getItemCount() == 0) {
-                    illustrationEmptyPCare.setVisibility(View.VISIBLE);
-                    textEmptyPCare.setVisibility(View.VISIBLE);
+                    layoutPCare.setVisibility(View.GONE);
                 } else {
-                    illustrationEmptyPCare.setVisibility(View.GONE);
-                    textEmptyPCare.setVisibility(View.GONE);
+                    layoutPCare.setVisibility(View.VISIBLE);
                 }
             }
 

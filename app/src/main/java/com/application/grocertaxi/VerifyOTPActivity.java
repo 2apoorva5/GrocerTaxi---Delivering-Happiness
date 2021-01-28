@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -164,6 +165,14 @@ public class VerifyOTPActivity extends AppCompatActivity {
                 });
             }
         }, 0, 1000);
+
+        otpPinView.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                verifyBtn.performClick();
+                return true;
+            }
+            return false;
+        });
 
         verifyBtn.setOnClickListener(view -> {
             if(!isConnectedToInternet(VerifyOTPActivity.this)) {

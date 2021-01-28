@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -117,6 +118,14 @@ public class UpdateAddressActivity extends AppCompatActivity {
         pinCode.getEditText().setText(preferenceManager.getString(Constants.KEY_PINCODE));
         city.getEditText().setText(preferenceManager.getString(Constants.KEY_CITY_NAME));
         state.getEditText().setText(preferenceManager.getString(Constants.KEY_STATE_NAME));
+
+        state.getEditText().setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                saveBtn.performClick();
+                return true;
+            }
+            return false;
+        });
 
         saveBtn.setOnClickListener(view -> {
             UIUtil.hideKeyboard(UpdateAddressActivity.this);

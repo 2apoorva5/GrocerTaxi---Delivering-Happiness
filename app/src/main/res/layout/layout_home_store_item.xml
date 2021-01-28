@@ -25,6 +25,7 @@
             android:scaleType="centerCrop"
             android:contentDescription="@string/app_name"
             android:adjustViewBounds="true"
+            android:src="@drawable/thumbnail_store"
             android:foreground="@drawable/store_image_foreground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

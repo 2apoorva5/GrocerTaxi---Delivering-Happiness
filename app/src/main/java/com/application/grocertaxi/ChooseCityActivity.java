@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -33,6 +34,7 @@ import android.widget.TextView;
 
 import com.application.grocertaxi.Interfaces.ICityLoadListener;
 import com.application.grocertaxi.Model.City;
+import com.application.grocertaxi.Model.Product;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
@@ -197,8 +199,33 @@ public class ChooseCityActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {
+            public void afterTextChanged(Editable s) {
+                inputCitySearchField.setOnEditorActionListener((v, actionId, event) -> {
+                    if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                        UIUtil.hideKeyboard(ChooseCityActivity.this);
+                        Query updatedQuery;
+                        if (s.toString().isEmpty()) {
+                            updatedQuery = citiesRef.orderBy("name", Query.Direction.ASCENDING);
+                        } else {
+                            updatedQuery = citiesRef.orderBy("searchKeyword", Query.Direction.ASCENDING)
+                                    .startAt(s.toString().toLowerCase().trim()).endAt(s.toString().toLowerCase().trim() + "\uf8ff");
+                        }
 
+                        PagedList.Config updatedConfig = new PagedList.Config.Builder()
+                                .setInitialLoadSizeHint(8)
+                                .setPageSize(4)
+                                .build();
+
+                        FirestorePagingOptions<City> updatedOptions = new FirestorePagingOptions.Builder<City>()
+                                .setLifecycleOwner(ChooseCityActivity.this)
+                                .setQuery(updatedQuery, updatedConfig, City.class)
+                                .build();
+
+                        cityAdapter.updateOptions(updatedOptions);
+                        return true;
+                    }
+                    return false;
+                });
             }
         });
     }

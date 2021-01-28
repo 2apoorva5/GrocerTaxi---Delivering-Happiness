@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,11 +11,11 @@
         android:id="@+id/pull_refresh_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:refreshType="smartisan"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:refreshType="smartisan">
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nested_scroll_view"
@@ -29,187 +28,190 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="144dp"
-                android:clipToPadding="false">
+                android:clipToPadding="false"
+                android:paddingBottom="144dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/header"
                     android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginBottom="24dp"
+                    android:layout_height="wrap_content"
                     android:background="@color/colorPrimary"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@id/product_search_btn_container"/>
-
-                <ImageView
-                    android:id="@+id/icon_location"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginStart="16dp"
-                    android:src="@drawable/ic_address"
-                    android:scaleType="centerCrop"
-                    android:contentDescription="@string/app_name"
-                    app:tint="@color/colorIconDark"
-                    app:layout_constraintTop_toTopOf="@+id/user_location"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@+id/user_location"/>
-
-                <TextView
-                    android:id="@+id/user_location"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="24dp"
-                    android:layout_marginEnd="16dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Locality, City"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="14sp"
-                    android:textStyle="normal"
-                    app:layout_constraintStart_toEndOf="@id/icon_location"
-                    app:layout_constraintEnd_toStartOf="@+id/edit_location_btn"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/edit_location_btn"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="12dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:scaleType="centerCrop"
-                    android:padding="6dp"
-                    android:src="@drawable/ic_edit"
-                    android:contentDescription="@string/app_name"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/user_location"
-                    app:layout_constraintBottom_toBottomOf="@+id/user_location"
-                    app:tint="@color/colorIconDark" />
-
-                <TextView
-                    android:id="@+id/greetings"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="32dp"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:includeFontPadding="false"
-                    android:text="Hey, Apoorva!"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="24sp"
-                    android:textStyle="normal"
-                    app:layout_constraintEnd_toStartOf="@+id/user_profile_pic"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_location_btn" />
-
-                <TextView
-                    android:id="@+id/greetings_secondary"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="12dp"
-                    android:alpha="0.5"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="How can we help you?"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
-                    android:textStyle="normal"
-                    app:layout_constraintEnd_toStartOf="@+id/user_profile_pic"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/greetings" />
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/user_profile_pic"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_marginEnd="16dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/illustration_user_avatar"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:civ_border_width="1dp"
-                    app:civ_border_color="@color/colorIconDark"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/greetings"
-                    app:layout_constraintBottom_toBottomOf="@+id/greetings_secondary"/>
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/product_search_btn_container"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="32dp"
-                    app:cardBackgroundColor="@color/colorSearch"
-                    app:cardCornerRadius="24dp"
-                    app:cardPreventCornerOverlap="true"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/user_profile_pic">
+                    app:layout_constraintTop_toTopOf="parent">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/product_search_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="?attr/selectableItemBackground"
+                    <ImageView
+                        android:id="@+id/icon_location"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="16dp"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_address"
+                        app:layout_constraintBottom_toBottomOf="@+id/user_location"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/user_location"
+                        app:tint="@color/colorIconDark" />
+
+                    <TextView
+                        android:id="@+id/user_location"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginEnd="16dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="Locality, City"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="14sp"
+                        android:textStyle="normal"
+                        app:layout_constraintEnd_toStartOf="@+id/edit_location_btn"
+                        app:layout_constraintStart_toEndOf="@id/icon_location"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/edit_location_btn"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:contentDescription="@string/app_name"
+                        android:focusable="true"
+                        android:padding="6dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_edit"
+                        app:layout_constraintBottom_toBottomOf="@+id/user_location"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/user_location"
+                        app:tint="@color/colorIconDark" />
 
-                        <TextView
-                            android:id="@+id/product_search"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="16dp"
-                            android:fontFamily="@font/montserrat"
-                            android:includeFontPadding="false"
-                            android:hint="Search products"
-                            android:paddingHorizontal="8dp"
-                            android:textAlignment="textStart"
-                            android:textAllCaps="false"
-                            android:textColor="@color/colorTextDark"
-                            android:textColorHint="@color/colorInactive"
-                            android:textSize="14sp"
-                            android:textStyle="normal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                    <TextView
+                        android:id="@+id/greetings"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="32dp"
+                        android:fontFamily="@font/montserrat_bold"
+                        android:includeFontPadding="false"
+                        android:text="Hey, Apoorva!"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="24sp"
+                        android:textStyle="normal"
+                        app:layout_constraintEnd_toStartOf="@+id/user_profile_pic"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/edit_location_btn" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/greetings_secondary"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="12dp"
+                        android:alpha="0.5"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="How can we help you?"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="16sp"
+                        android:textStyle="normal"
+                        app:layout_constraintEnd_toStartOf="@+id/user_profile_pic"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/greetings" />
 
-                </androidx.cardview.widget.CardView>
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/user_profile_pic"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/illustration_user_avatar"
+                        app:civ_border_color="@color/colorIconDark"
+                        app:civ_border_width="1dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/greetings_secondary"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/greetings" />
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/product_search_btn_container"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="32dp"
+                        android:layout_marginBottom="16dp"
+                        app:cardBackgroundColor="@color/colorBackground"
+                        app:cardCornerRadius="24dp"
+                        app:cardPreventCornerOverlap="true"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/user_profile_pic">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/product_search_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <TextView
+                                android:id="@+id/product_search"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="16dp"
+                                android:fontFamily="@font/montserrat"
+                                android:hint="Search product"
+                                android:includeFontPadding="false"
+                                android:paddingHorizontal="8dp"
+                                android:textAlignment="textStart"
+                                android:textAllCaps="false"
+                                android:textColor="@color/colorTextDark"
+                                android:textColorHint="@color/colorInactive"
+                                android:textSize="14sp"
+                                android:textStyle="normal"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.smarteist.autoimageslider.SliderView
                     android:id="@+id/banner_slider"
                     android:layout_width="0dp"
                     android:layout_height="210dp"
                     android:layout_marginTop="32dp"
-                    app:sliderScrollTimeInSec="3"
-                    app:sliderAutoCycleEnabled="true"
-                    app:sliderStartAutoCycle="true"
-                    app:sliderAutoCycleDirection="back_and_forth"
-                    app:sliderIndicatorEnabled="false"
-                    app:sliderAnimationDuration="1000"
-                    app:layout_constraintTop_toBottomOf="@+id/product_search_btn_container"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    app:layout_constraintTop_toBottomOf="@+id/header"
+                    app:sliderAnimationDuration="1000"
+                    app:sliderAutoCycleDirection="back_and_forth"
+                    app:sliderAutoCycleEnabled="true"
+                    app:sliderIndicatorEnabled="false"
+                    app:sliderScrollTimeInSec="3"
+                    app:sliderStartAutoCycle="true" />
 
                 <TextView
                     android:id="@+id/text1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="40dp"
                     android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="40dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
                     android:text="Explore by category"
@@ -218,9 +220,9 @@
                     android:textColor="@color/colorTextDark"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    app:layout_constraintTop_toBottomOf="@+id/banner_slider"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    app:layout_constraintTop_toBottomOf="@+id/banner_slider" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/category_fruits"
@@ -510,9 +512,9 @@
                     android:layout_height="32dp"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="32dp"
-                    app:cardElevation="8dp"
                     app:cardBackgroundColor="@color/colorPrimary"
                     app:cardCornerRadius="16dp"
+                    app:cardElevation="8dp"
                     app:cardPreventCornerOverlap="true"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -538,538 +540,423 @@
                             android:textColor="@color/colorTextDark"
                             android:textSize="12sp"
                             android:textStyle="normal"
-                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"/>
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </androidx.cardview.widget.CardView>
 
-                <TextView
-                    android:id="@+id/text2"
-                    android:layout_width="0dp"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_stores"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="40dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Top Stores"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@id/view_all_stores_btn"
-                    app:layout_constraintTop_toBottomOf="@+id/view_all_categories_btn_container"
-                    app:layout_constraintStart_toStartOf="parent"/>
-
-                <TextView
-                    android:id="@+id/view_all_stores_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="View All"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:padding="8dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:layout_constraintTop_toTopOf="@id/text2"
-                    app:layout_constraintBottom_toBottomOf="@id/text2"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_stores"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal"
-                    android:scrollbars="none"
-                    android:paddingEnd="16dp"
-                    android:clipToPadding="false"
-                    app:layout_constraintTop_toBottomOf="@id/text2"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    tools:ignore="RtlSymmetry" />
-
-                <ImageView
-                    android:id="@+id/illustration_empty_stores"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_marginBottom="16dp"
-                    android:contentDescription="@string/app_name"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/illustration_empty1"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/recycler_stores"
+                    android:layout_marginTop="32dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/recycler_stores" />
+                    app:layout_constraintTop_toBottomOf="@id/view_all_categories_btn_container">
 
-                <TextView
-                    android:id="@+id/text_empty_stores"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:alpha="0.5"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Nothing here"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="14sp"
-                    android:textStyle="normal"
-                    android:visibility="gone"
-                    app:layout_constraintTop_toBottomOf="@+id/illustration_empty_stores"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    <TextView
+                        android:id="@+id/text2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="Top Stores"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@id/view_all_stores_btn"
+                        app:layout_constraintEnd_toStartOf="@id/view_all_stores_btn"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/view_all_stores_btn" />
 
-                <ProgressBar
-                    android:id="@+id/stores_progress_bar"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:progressTint="@color/colorAccent"
-                    app:layout_constraintBottom_toBottomOf="@id/recycler_stores"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/recycler_stores"/>
+                    <TextView
+                        android:id="@+id/view_all_stores_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:padding="8dp"
+                        android:text="View All"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_stores"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:clipToPadding="false"
+                        android:orientation="horizontal"
+                        android:paddingEnd="16dp"
+                        android:scrollbars="none"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/view_all_stores_btn"
+                        tools:ignore="RtlSymmetry" />
+
+                    <ProgressBar
+                        android:id="@+id/stores_progress_bar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:progressTint="@color/colorAccent"
+                        app:layout_constraintBottom_toBottomOf="@id/recycler_stores"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/recycler_stores" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <ImageView
                     android:id="@+id/banner_image1"
                     android:layout_width="0dp"
                     android:layout_height="210dp"
-                    android:layout_marginTop="24dp"
-                    android:src="@drawable/banner3"
-                    android:scaleType="centerInside"
-                    android:contentDescription="@string/app_name"
+                    android:layout_marginTop="32dp"
                     android:adjustViewBounds="true"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/recycler_stores"/>
-
-                <TextView
-                    android:id="@+id/text3"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="40dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Fruits"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@id/view_all_fruits_btn"
-                    app:layout_constraintTop_toBottomOf="@+id/banner_image1"
-                    app:layout_constraintStart_toStartOf="parent"/>
-
-                <TextView
-                    android:id="@+id/view_all_fruits_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="View All"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:padding="8dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:layout_constraintTop_toTopOf="@id/text3"
-                    app:layout_constraintBottom_toBottomOf="@id/text3"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_fruits"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal"
-                    android:scrollbars="none"
-                    android:paddingEnd="16dp"
-                    android:clipToPadding="false"
-                    app:layout_constraintTop_toBottomOf="@id/text3"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    tools:ignore="RtlSymmetry" />
-
-                <ImageView
-                    android:id="@+id/illustration_empty_fruits"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_marginBottom="16dp"
                     android:contentDescription="@string/app_name"
                     android:scaleType="centerInside"
-                    android:src="@drawable/illustration_empty1"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/recycler_fruits"
+                    android:src="@drawable/banner3"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/recycler_fruits" />
+                    app:layout_constraintTop_toBottomOf="@id/layout_stores" />
 
-                <TextView
-                    android:id="@+id/text_empty_fruits"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:alpha="0.5"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Nothing here"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="14sp"
-                    android:textStyle="normal"
-                    android:visibility="gone"
-                    app:layout_constraintTop_toBottomOf="@+id/illustration_empty_fruits"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <ProgressBar
-                    android:id="@+id/fruits_progress_bar"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:progressTint="@color/colorAccent"
-                    app:layout_constraintBottom_toBottomOf="@id/recycler_fruits"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/recycler_fruits"/>
-
-                <TextView
-                    android:id="@+id/text4"
-                    android:layout_width="0dp"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_fruits"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Vegetables"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@id/view_all_veg_btn"
-                    app:layout_constraintTop_toBottomOf="@+id/recycler_fruits"
-                    app:layout_constraintStart_toStartOf="parent"/>
-
-                <TextView
-                    android:id="@+id/view_all_veg_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="View All"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:padding="8dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:layout_constraintTop_toTopOf="@id/text4"
-                    app:layout_constraintBottom_toBottomOf="@id/text4"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_vegetables"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal"
-                    android:scrollbars="none"
-                    android:paddingEnd="16dp"
-                    android:clipToPadding="false"
-                    app:layout_constraintTop_toBottomOf="@id/text4"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    tools:ignore="RtlSymmetry" />
-
-                <ImageView
-                    android:id="@+id/illustration_empty_veg"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_marginBottom="16dp"
-                    android:contentDescription="@string/app_name"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/illustration_empty1"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/recycler_vegetables"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/recycler_vegetables" />
+                    app:layout_constraintTop_toBottomOf="@id/banner_image1">
 
-                <TextView
-                    android:id="@+id/text_empty_veg"
-                    android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/text3"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="Fruits"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@id/view_all_fruits_btn"
+                        app:layout_constraintEnd_toStartOf="@id/view_all_fruits_btn"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/view_all_fruits_btn" />
+
+                    <TextView
+                        android:id="@+id/view_all_fruits_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:padding="8dp"
+                        android:text="View All"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_fruits"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:clipToPadding="false"
+                        android:orientation="horizontal"
+                        android:paddingEnd="16dp"
+                        android:scrollbars="none"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/view_all_fruits_btn"
+                        tools:ignore="RtlSymmetry" />
+
+                    <ProgressBar
+                        android:id="@+id/fruits_progress_bar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:progressTint="@color/colorAccent"
+                        app:layout_constraintBottom_toBottomOf="@id/recycler_fruits"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/recycler_fruits" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_vegetables"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:alpha="0.5"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Nothing here"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="14sp"
-                    android:textStyle="normal"
-                    android:visibility="gone"
-                    app:layout_constraintTop_toBottomOf="@+id/illustration_empty_veg"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <ProgressBar
-                    android:id="@+id/veg_progress_bar"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:progressTint="@color/colorAccent"
-                    app:layout_constraintBottom_toBottomOf="@id/recycler_vegetables"
+                    android:layout_marginTop="24dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/recycler_vegetables"/>
+                    app:layout_constraintTop_toBottomOf="@id/layout_fruits">
+
+                    <TextView
+                        android:id="@+id/text4"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="Vegetables"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@id/view_all_veg_btn"
+                        app:layout_constraintEnd_toStartOf="@id/view_all_veg_btn"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/view_all_veg_btn" />
+
+                    <TextView
+                        android:id="@+id/view_all_veg_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:padding="8dp"
+                        android:text="View All"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_vegetables"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:clipToPadding="false"
+                        android:orientation="horizontal"
+                        android:paddingEnd="16dp"
+                        android:scrollbars="none"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/view_all_veg_btn"
+                        tools:ignore="RtlSymmetry" />
+
+                    <ProgressBar
+                        android:id="@+id/veg_progress_bar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:progressTint="@color/colorAccent"
+                        app:layout_constraintBottom_toBottomOf="@id/recycler_vegetables"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/recycler_vegetables" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <ImageView
                     android:id="@+id/banner_image2"
                     android:layout_width="0dp"
                     android:layout_height="210dp"
-                    android:layout_marginTop="24dp"
-                    android:src="@drawable/banner4"
-                    android:scaleType="centerInside"
-                    android:contentDescription="@string/app_name"
+                    android:layout_marginTop="32dp"
                     android:adjustViewBounds="true"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/recycler_vegetables"/>
-
-                <TextView
-                    android:id="@+id/text5"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="40dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Food Grains &amp; Cereals"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@id/view_all_foodgrains_btn"
-                    app:layout_constraintTop_toBottomOf="@+id/banner_image2"
-                    app:layout_constraintStart_toStartOf="parent"/>
-
-                <TextView
-                    android:id="@+id/view_all_foodgrains_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="View All"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:padding="8dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:layout_constraintTop_toTopOf="@id/text5"
-                    app:layout_constraintBottom_toBottomOf="@id/text5"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_foodgrains"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal"
-                    android:scrollbars="none"
-                    android:paddingEnd="16dp"
-                    android:clipToPadding="false"
-                    app:layout_constraintTop_toBottomOf="@id/text5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    tools:ignore="RtlSymmetry" />
-
-                <ImageView
-                    android:id="@+id/illustration_empty_foodgrains"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_marginBottom="16dp"
                     android:contentDescription="@string/app_name"
                     android:scaleType="centerInside"
-                    android:src="@drawable/illustration_empty1"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/recycler_foodgrains"
+                    android:src="@drawable/banner4"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/recycler_foodgrains" />
+                    app:layout_constraintTop_toBottomOf="@id/layout_vegetables" />
 
-                <TextView
-                    android:id="@+id/text_empty_foodgrains"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:alpha="0.5"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Nothing here"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="14sp"
-                    android:textStyle="normal"
-                    android:visibility="gone"
-                    app:layout_constraintTop_toBottomOf="@+id/illustration_empty_foodgrains"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <ProgressBar
-                    android:id="@+id/foodgrains_progress_bar"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:progressTint="@color/colorAccent"
-                    app:layout_constraintBottom_toBottomOf="@id/recycler_foodgrains"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/recycler_foodgrains"/>
-
-                <TextView
-                    android:id="@+id/text6"
-                    android:layout_width="0dp"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_foodgrains"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Personal Care Products"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@id/view_all_pcare_btn"
-                    app:layout_constraintTop_toBottomOf="@+id/recycler_foodgrains"
-                    app:layout_constraintStart_toStartOf="parent"/>
-
-                <TextView
-                    android:id="@+id/view_all_pcare_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="View All"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:padding="8dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:layout_constraintTop_toTopOf="@id/text6"
-                    app:layout_constraintBottom_toBottomOf="@id/text6"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_pcare"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal"
-                    android:scrollbars="none"
-                    android:paddingEnd="16dp"
-                    android:clipToPadding="false"
-                    app:layout_constraintTop_toBottomOf="@id/text6"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    tools:ignore="RtlSymmetry" />
-
-                <ImageView
-                    android:id="@+id/illustration_empty_pcare"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_marginBottom="16dp"
-                    android:contentDescription="@string/app_name"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/illustration_empty1"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/recycler_pcare"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/recycler_pcare" />
+                    app:layout_constraintTop_toBottomOf="@id/banner_image2">
 
-                <TextView
-                    android:id="@+id/text_empty_pcare"
-                    android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/text5"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="Food Grains &amp; Cereals"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@id/view_all_foodgrains_btn"
+                        app:layout_constraintEnd_toStartOf="@id/view_all_foodgrains_btn"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/view_all_foodgrains_btn" />
+
+                    <TextView
+                        android:id="@+id/view_all_foodgrains_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:padding="8dp"
+                        android:text="View All"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_foodgrains"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:clipToPadding="false"
+                        android:orientation="horizontal"
+                        android:paddingEnd="16dp"
+                        android:scrollbars="none"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/view_all_foodgrains_btn"
+                        tools:ignore="RtlSymmetry" />
+
+                    <ProgressBar
+                        android:id="@+id/foodgrains_progress_bar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:progressTint="@color/colorAccent"
+                        app:layout_constraintBottom_toBottomOf="@id/recycler_foodgrains"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/recycler_foodgrains" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_pcare"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:alpha="0.5"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Nothing here"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="14sp"
-                    android:textStyle="normal"
-                    android:visibility="gone"
-                    app:layout_constraintTop_toBottomOf="@+id/illustration_empty_pcare"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <ProgressBar
-                    android:id="@+id/pcare_progress_bar"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:progressTint="@color/colorAccent"
-                    app:layout_constraintBottom_toBottomOf="@id/recycler_pcare"
+                    android:layout_marginTop="24dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/recycler_pcare"/>
+                    app:layout_constraintTop_toBottomOf="@id/layout_foodgrains">
+
+                    <TextView
+                        android:id="@+id/text6"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="Personal Care Products"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@id/view_all_pcare_btn"
+                        app:layout_constraintEnd_toStartOf="@id/view_all_pcare_btn"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/view_all_pcare_btn" />
+
+                    <TextView
+                        android:id="@+id/view_all_pcare_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:padding="8dp"
+                        android:text="View All"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_pcare"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:clipToPadding="false"
+                        android:orientation="horizontal"
+                        android:paddingEnd="16dp"
+                        android:scrollbars="none"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/view_all_pcare_btn"
+                        tools:ignore="RtlSymmetry" />
+
+                    <ProgressBar
+                        android:id="@+id/pcare_progress_bar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:progressTint="@color/colorAccent"
+                        app:layout_constraintBottom_toBottomOf="@id/recycler_pcare"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/recycler_pcare" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <ImageView
                     android:id="@+id/banner_image3"
                     android:layout_width="0dp"
                     android:layout_height="210dp"
-                    android:layout_marginTop="24dp"
-                    android:src="@drawable/banner5"
-                    android:scaleType="centerInside"
-                    android:contentDescription="@string/app_name"
+                    android:layout_marginTop="32dp"
                     android:adjustViewBounds="true"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:contentDescription="@string/app_name"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/banner5"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/recycler_pcare"/>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/layout_pcare" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -1082,49 +969,49 @@
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_marginBottom="48dp"
+        android:contentDescription="@string/app_name"
+        android:elevation="16dp"
         android:src="@drawable/ic_cart"
         app:backgroundTint="@color/colorIconDark"
-        app:tint="@color/colorIconLight"
-        app:maxImageSize="32dp"
-        android:elevation="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/bottom_bar_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/bottom_bar_container"
-        app:layout_constraintBottom_toBottomOf="@+id/bottom_bar_container"
-        android:contentDescription="@string/app_name" />
+        app:maxImageSize="32dp"
+        app:tint="@color/colorIconLight" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_bar_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
             android:id="@+id/bottom_bar"
             android:layout_width="0dp"
             android:layout_height="64dp"
-            android:src="@drawable/pattern3"
-            android:scaleType="fitXY"
             android:contentDescription="@string/app_name"
             android:rotation="180"
+            android:scaleType="fitXY"
+            android:src="@drawable/pattern3"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
             android:id="@+id/bottom_bar_secondary"
             android:layout_width="0dp"
             android:layout_height="72dp"
-            android:src="@drawable/pattern3"
-            android:scaleType="fitXY"
             android:alpha="0.5"
             android:contentDescription="@string/app_name"
             android:rotation="180"
+            android:scaleType="fitXY"
+            android:src="@drawable/pattern3"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
             android:id="@+id/menu_home"
@@ -1133,15 +1020,15 @@
             android:layout_marginStart="24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
+            android:contentDescription="@string/app_name"
             android:focusable="true"
+            android:padding="4dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_menu_home"
-            android:contentDescription="@string/app_name"
-            app:tint="@color/colorIconDark"
-            android:padding="4dp"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
+            app:tint="@color/colorIconDark" />
 
         <ImageView
             android:id="@+id/menu_category"
@@ -1186,18 +1073,18 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="24dp"
+            android:alpha="0.5"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
+            android:contentDescription="@string/app_name"
             android:focusable="true"
+            android:padding="8dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_menu_profile"
-            android:contentDescription="@string/app_name"
-            app:tint="@color/colorIconDark"
-            android:padding="8dp"
-            android:alpha="0.5"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
+            app:tint="@color/colorIconDark" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

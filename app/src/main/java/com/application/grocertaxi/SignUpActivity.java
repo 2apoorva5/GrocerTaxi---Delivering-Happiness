@@ -11,6 +11,7 @@ import android.provider.Settings;
 import android.util.Patterns;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -140,6 +141,14 @@ public class SignUpActivity extends AppCompatActivity {
             signUpProgressBar.setVisibility(View.GONE);
             sendOtpBtnContainer.setVisibility(View.VISIBLE);
             sendOtpBtn.setEnabled(true);
+        });
+
+        confirmPasswordField.getEditText().setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                sendOtpBtn.performClick();
+                return true;
+            }
+            return false;
         });
 
         sendOtpBtn.setOnClickListener(view -> {

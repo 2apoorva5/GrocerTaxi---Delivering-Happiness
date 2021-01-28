@@ -19,12 +19,14 @@ import android.provider.Settings;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -48,6 +50,7 @@ import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -116,6 +119,9 @@ public class StoresActivity extends AppCompatActivity {
                 showConnectToInternetDialog();
                 return;
             } else {
+                UIUtil.hideKeyboard(StoresActivity.this);
+                inputStoreSearch.setText(null);
+                inputStoreSearch.clearFocus();
                 loadStores();
             }
         });
@@ -224,7 +230,32 @@ public class StoresActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                inputStoreSearch.setOnEditorActionListener((v, actionId, event) -> {
+                    if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                        UIUtil.hideKeyboard(StoresActivity.this);
+                        Query updatedQuery;
+                        if (s.toString().isEmpty()) {
+                            updatedQuery = storesRef.orderBy(Constants.KEY_STORE_NAME, Query.Direction.ASCENDING);
+                        } else {
+                            updatedQuery = storesRef.orderBy(Constants.KEY_STORE_SEARCH_KEYWORD, Query.Direction.ASCENDING)
+                                    .startAt(s.toString().toLowerCase().trim()).endAt(s.toString().toLowerCase().trim() + "\uf8ff");
+                        }
 
+                        PagedList.Config updatedConfig = new PagedList.Config.Builder()
+                                .setInitialLoadSizeHint(8)
+                                .setPageSize(4)
+                                .build();
+
+                        FirestorePagingOptions<Store> updatedOptions = new FirestorePagingOptions.Builder<Store>()
+                                .setLifecycleOwner(StoresActivity.this)
+                                .setQuery(updatedQuery, updatedConfig, Store.class)
+                                .build();
+
+                        storeAdapter.updateOptions(updatedOptions);
+                        return true;
+                    }
+                    return false;
+                });
             }
         });
 

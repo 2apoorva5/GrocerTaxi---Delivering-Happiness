@@ -36,7 +36,8 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:icon, android:allowBackup"
         tools:targetApi="q">
-        <activity android:name=".ProductDetailsActivity"></activity>
+        <activity android:name=".SearchProductActivity"></activity>
+        <activity android:name=".ProductDetailsActivity" />
         <activity android:name=".ProductsListActivity" />
         <activity
             android:name=".UpdateAddressActivity"

@@ -78,6 +78,8 @@
                 android:textSize="14sp"
                 android:textStyle="normal"
                 android:importantForAutofill="no"
+                android:maxLines="1"
+                android:singleLine="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/speech_to_text"
                 app:layout_constraintStart_toStartOf="parent"
