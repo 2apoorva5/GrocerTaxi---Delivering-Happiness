@@ -3,12 +3,11 @@ package com.application.grocertaxi;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.paging.PagedList;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -28,7 +27,6 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -36,7 +34,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.application.grocertaxi.Model.Product;
-import com.application.grocertaxi.Model.Store;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.baoyz.widget.PullRefreshLayout;
@@ -109,22 +106,6 @@ public class ProductsListActivity extends AppCompatActivity {
         initViews();
         initFirebase();
         setActionOnViews();
-
-        loadProducts();
-
-        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
-        pullRefreshLayout.setOnRefreshListener(() -> {
-            if(!isConnectedToInternet(ProductsListActivity.this)) {
-                pullRefreshLayout.setRefreshing(false);
-                showConnectToInternetDialog();
-                return;
-            } else {
-                UIUtil.hideKeyboard(ProductsListActivity.this);
-                inputProductSearch.setText(null);
-                inputProductSearch.clearFocus();
-                loadProducts();
-            }
-        });
     }
 
     private void initViews() {
@@ -416,7 +397,7 @@ public class ProductsListActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull ProductViewHolder holder, int position, @NonNull Product model) {
                 Glide.with(holder.productImage.getContext()).load(model.getProductImage())
-                        .placeholder(R.drawable.thumbnail_product).centerCrop().into(holder.productImage);
+                        .placeholder(R.drawable.thumbnail).centerCrop().into(holder.productImage);
 
                 if (model.getProductCategory().equals("Baby Care") || model.getProductCategory().equals("Household") ||
                         model.getProductCategory().equals("Personal Care") || model.getProductCategory().equals("Stationary") ||
@@ -450,9 +431,25 @@ public class ProductsListActivity extends AppCompatActivity {
                 holder.clickListener.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        preferenceManager.putString(Constants.KEY_PRODUCT, model.getProductID());
+                        startActivity(new Intent(ProductsListActivity.this, ProductDetailsActivity.class));
+                        CustomIntent.customType(ProductsListActivity.this, "bottom-to-up");
                     }
                 });
+
+                if(model.isProductInStock()) {
+                    holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
+                    holder.addToCartBtn.setEnabled(true);
+                    holder.addToCartBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                        }
+                    });
+                } else {
+                    holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
+                    holder.addToCartBtn.setEnabled(false);
+                }
 
                 setAnimation(holder.itemView, position);
             }
@@ -520,7 +517,8 @@ public class ProductsListActivity extends AppCompatActivity {
 
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
 
-        ConstraintLayout clickListener;
+        CardView addToCartBtnContainer;
+        ConstraintLayout clickListener, addToCartBtn;
         ImageView productImage, productTypeImage;
         TextView productName, productPrice, productMRP, productOffer, productUnit;
 
@@ -529,6 +527,8 @@ public class ProductsListActivity extends AppCompatActivity {
 
             clickListener = itemView.findViewById(R.id.click_listener);
             productImage = itemView.findViewById(R.id.product_image);
+            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
+            addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
             productTypeImage = itemView.findViewById(R.id.product_type_image);
             productName = itemView.findViewById(R.id.product_name);
             productPrice = itemView.findViewById(R.id.product_price);
@@ -563,6 +563,27 @@ public class ProductsListActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
         materialDialog.show();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        loadProducts();
+
+        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
+        pullRefreshLayout.setOnRefreshListener(() -> {
+            if(!isConnectedToInternet(ProductsListActivity.this)) {
+                pullRefreshLayout.setRefreshing(false);
+                showConnectToInternetDialog();
+                return;
+            } else {
+                UIUtil.hideKeyboard(ProductsListActivity.this);
+                inputProductSearch.setText(null);
+                inputProductSearch.clearFocus();
+                loadProducts();
+            }
+        });
     }
 
     @Override

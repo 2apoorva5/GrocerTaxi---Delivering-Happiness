@@ -233,7 +233,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         menuStore.setOnClickListener(view -> {
-            startActivity(new Intent(ProfileActivity.this, StoresActivity.class));
+            startActivity(new Intent(ProfileActivity.this, StoresListActivity.class));
             CustomIntent.customType(ProfileActivity.this, "fadein-to-fadeout");
         });
 

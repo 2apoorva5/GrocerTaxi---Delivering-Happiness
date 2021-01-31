@@ -7,7 +7,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -19,7 +18,6 @@ import android.provider.Settings;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,7 +55,7 @@ import java.util.Locale;
 
 import maes.tech.intentanim.CustomIntent;
 
-public class StoresActivity extends AppCompatActivity {
+public class StoresListActivity extends AppCompatActivity {
 
     private ImageView backBtn, speechToText, illustrationEmpty, menuHome, menuCategory, menuStore, menuProfile;
     private EditText inputStoreSearch;
@@ -77,15 +75,15 @@ public class StoresActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_stores);
+        setContentView(R.layout.activity_stores_list);
 
         preferenceManager = new PreferenceManager(getApplicationContext());
 
         if (!preferenceManager.getBoolean(Constants.KEY_IS_SIGNED_IN)) {
-            Intent intent = new Intent(StoresActivity.this, WelcomeActivity.class);
+            Intent intent = new Intent(StoresListActivity.this, WelcomeActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            CustomIntent.customType(StoresActivity.this, "fadein-to-fadeout");
+            CustomIntent.customType(StoresListActivity.this, "fadein-to-fadeout");
             finish();
         } else if (preferenceManager.getString(Constants.KEY_CITY).equals("") ||
                 preferenceManager.getString(Constants.KEY_CITY) == null ||
@@ -95,10 +93,10 @@ public class StoresActivity extends AppCompatActivity {
                 preferenceManager.getString(Constants.KEY_LOCALITY) == null ||
                 preferenceManager.getString(Constants.KEY_LOCALITY).length() == 0 ||
                 preferenceManager.getString(Constants.KEY_LOCALITY).isEmpty()) {
-            Intent intent = new Intent(StoresActivity.this, ChooseCityActivity.class);
+            Intent intent = new Intent(StoresListActivity.this, ChooseCityActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            CustomIntent.customType(StoresActivity.this, "fadein-to-fadeout");
+            CustomIntent.customType(StoresListActivity.this, "fadein-to-fadeout");
             finish();
         }
 
@@ -109,22 +107,6 @@ public class StoresActivity extends AppCompatActivity {
         initViews();
         initFirebase();
         setActionOnViews();
-
-        loadStores();
-
-        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
-        pullRefreshLayout.setOnRefreshListener(() -> {
-            if(!isConnectedToInternet(StoresActivity.this)) {
-                pullRefreshLayout.setRefreshing(false);
-                showConnectToInternetDialog();
-                return;
-            } else {
-                UIUtil.hideKeyboard(StoresActivity.this);
-                inputStoreSearch.setText(null);
-                inputStoreSearch.clearFocus();
-                loadStores();
-            }
-        });
     }
 
     private void initViews() {
@@ -160,7 +142,7 @@ public class StoresActivity extends AppCompatActivity {
             finish();
         });
 
-        KeyboardVisibilityEvent.setEventListener(StoresActivity.this, isOpen -> {
+        KeyboardVisibilityEvent.setEventListener(StoresListActivity.this, isOpen -> {
             if (!isOpen) {
                 inputStoreSearch.clearFocus();
                 bottomBarContainer.setVisibility(View.VISIBLE);
@@ -183,7 +165,7 @@ public class StoresActivity extends AppCompatActivity {
             try {
                 startActivityForResult(intent, 123);
             } catch (ActivityNotFoundException e) {
-                Alerter.create(StoresActivity.this)
+                Alerter.create(StoresListActivity.this)
                         .setText("Whoa! Something broke. Try again!")
                         .setTextAppearance(R.style.AlertText)
                         .setBackgroundColorRes(R.color.errorColor)
@@ -221,7 +203,6 @@ public class StoresActivity extends AppCompatActivity {
                         .build();
 
                 FirestorePagingOptions<Store> updatedOptions = new FirestorePagingOptions.Builder<Store>()
-                        .setLifecycleOwner(StoresActivity.this)
                         .setQuery(updatedQuery, updatedConfig, Store.class)
                         .build();
 
@@ -232,7 +213,7 @@ public class StoresActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 inputStoreSearch.setOnEditorActionListener((v, actionId, event) -> {
                     if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                        UIUtil.hideKeyboard(StoresActivity.this);
+                        UIUtil.hideKeyboard(StoresListActivity.this);
                         Query updatedQuery;
                         if (s.toString().isEmpty()) {
                             updatedQuery = storesRef.orderBy(Constants.KEY_STORE_NAME, Query.Direction.ASCENDING);
@@ -247,7 +228,7 @@ public class StoresActivity extends AppCompatActivity {
                                 .build();
 
                         FirestorePagingOptions<Store> updatedOptions = new FirestorePagingOptions.Builder<Store>()
-                                .setLifecycleOwner(StoresActivity.this)
+                                .setLifecycleOwner(StoresListActivity.this)
                                 .setQuery(updatedQuery, updatedConfig, Store.class)
                                 .build();
 
@@ -276,7 +257,7 @@ public class StoresActivity extends AppCompatActivity {
                                 .build();
 
                         updatedOptions = new FirestorePagingOptions.Builder<Store>()
-                                .setLifecycleOwner(StoresActivity.this)
+                                .setLifecycleOwner(StoresListActivity.this)
                                 .setQuery(updatedQuery, updatedConfig, Store.class)
                                 .build();
 
@@ -291,7 +272,7 @@ public class StoresActivity extends AppCompatActivity {
                                 .build();
 
                         updatedOptions = new FirestorePagingOptions.Builder<Store>()
-                                .setLifecycleOwner(StoresActivity.this)
+                                .setLifecycleOwner(StoresListActivity.this)
                                 .setQuery(updatedQuery, updatedConfig, Store.class)
                                 .build();
 
@@ -306,7 +287,7 @@ public class StoresActivity extends AppCompatActivity {
                                 .build();
 
                         updatedOptions = new FirestorePagingOptions.Builder<Store>()
-                                .setLifecycleOwner(StoresActivity.this)
+                                .setLifecycleOwner(StoresListActivity.this)
                                 .setQuery(updatedQuery, updatedConfig, Store.class)
                                 .build();
 
@@ -321,7 +302,7 @@ public class StoresActivity extends AppCompatActivity {
                                 .build();
 
                         updatedOptions = new FirestorePagingOptions.Builder<Store>()
-                                .setLifecycleOwner(StoresActivity.this)
+                                .setLifecycleOwner(StoresListActivity.this)
                                 .setQuery(updatedQuery, updatedConfig, Store.class)
                                 .build();
 
@@ -337,7 +318,7 @@ public class StoresActivity extends AppCompatActivity {
                                 .build();
 
                         updatedOptions = new FirestorePagingOptions.Builder<Store>()
-                                .setLifecycleOwner(StoresActivity.this)
+                                .setLifecycleOwner(StoresListActivity.this)
                                 .setQuery(updatedQuery, updatedConfig, Store.class)
                                 .build();
 
@@ -352,14 +333,14 @@ public class StoresActivity extends AppCompatActivity {
         });
 
         menuHome.setOnClickListener(view -> {
-            startActivity(new Intent(StoresActivity.this, MainActivity.class));
-            CustomIntent.customType(StoresActivity.this, "fadein-to-fadeout");
+            startActivity(new Intent(StoresListActivity.this, MainActivity.class));
+            CustomIntent.customType(StoresListActivity.this, "fadein-to-fadeout");
             finish();
         });
 
         menuCategory.setOnClickListener(view -> {
-            startActivity(new Intent(StoresActivity.this, CategoriesActivity.class));
-            CustomIntent.customType(StoresActivity.this, "fadein-to-fadeout");
+            startActivity(new Intent(StoresListActivity.this, CategoriesActivity.class));
+            CustomIntent.customType(StoresListActivity.this, "fadein-to-fadeout");
         });
 
         menuStore.setOnClickListener(view -> {
@@ -367,8 +348,8 @@ public class StoresActivity extends AppCompatActivity {
         });
 
         menuProfile.setOnClickListener(view -> {
-            startActivity(new Intent(StoresActivity.this, ProfileActivity.class));
-            CustomIntent.customType(StoresActivity.this, "fadein-to-fadeout");
+            startActivity(new Intent(StoresListActivity.this, ProfileActivity.class));
+            CustomIntent.customType(StoresListActivity.this, "fadein-to-fadeout");
         });
 
         cartBtn.setOnClickListener(v -> {
@@ -400,7 +381,7 @@ public class StoresActivity extends AppCompatActivity {
                 .build();
 
         FirestorePagingOptions<Store> options = new FirestorePagingOptions.Builder<Store>()
-                .setLifecycleOwner(StoresActivity.this)
+                .setLifecycleOwner(StoresListActivity.this)
                 .setQuery(query, config, Store.class)
                 .build();
 
@@ -416,7 +397,7 @@ public class StoresActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull StoreViewHolder holder, int position, @NonNull Store model) {
                 Glide.with(holder.storeImage.getContext()).load(model.getStoreImage())
-                        .placeholder(R.drawable.thumbnail_store).centerCrop().into(holder.storeImage);
+                        .placeholder(R.drawable.thumbnail).centerCrop().into(holder.storeImage);
 
                 holder.storeName.setText(model.getStoreName());
                 holder.storeAddress.setText(model.getStoreAddress());
@@ -485,7 +466,7 @@ public class StoresActivity extends AppCompatActivity {
                         break;
                     case ERROR:
                         pullRefreshLayout.setRefreshing(false);
-                        Alerter.create(StoresActivity.this)
+                        Alerter.create(StoresListActivity.this)
                                 .setText("Whoa! Something Broke. Try again!")
                                 .setTextAppearance(R.style.AlertText)
                                 .setBackgroundColorRes(R.color.errorColor)
@@ -505,7 +486,7 @@ public class StoresActivity extends AppCompatActivity {
         storeAdapter.notifyDataSetChanged();
 
         recyclerStores.setHasFixedSize(true);
-        recyclerStores.setLayoutManager(new LinearLayoutManager(StoresActivity.this));
+        recyclerStores.setLayoutManager(new LinearLayoutManager(StoresListActivity.this));
         recyclerStores.setAdapter(storeAdapter);
     }
 
@@ -529,8 +510,8 @@ public class StoresActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isConnectedToInternet(StoresActivity storesActivity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) storesActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+    private boolean isConnectedToInternet(StoresListActivity storesListActivity) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) storesListActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
@@ -543,7 +524,7 @@ public class StoresActivity extends AppCompatActivity {
     }
 
     private void showConnectToInternetDialog() {
-        MaterialDialog materialDialog = new MaterialDialog.Builder(StoresActivity.this)
+        MaterialDialog materialDialog = new MaterialDialog.Builder(StoresListActivity.this)
                 .setTitle("No Internet Connection!")
                 .setMessage("Please connect to a network first to proceed from here!")
                 .setCancelable(false)
@@ -557,6 +538,27 @@ public class StoresActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        loadStores();
+
+        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
+        pullRefreshLayout.setOnRefreshListener(() -> {
+            if(!isConnectedToInternet(StoresListActivity.this)) {
+                pullRefreshLayout.setRefreshing(false);
+                showConnectToInternetDialog();
+                return;
+            } else {
+                UIUtil.hideKeyboard(StoresListActivity.this);
+                inputStoreSearch.setText(null);
+                inputStoreSearch.clearFocus();
+                loadStores();
+            }
+        });
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
     }
@@ -564,6 +566,6 @@ public class StoresActivity extends AppCompatActivity {
     @Override
     public void finish() {
         super.finish();
-        CustomIntent.customType(StoresActivity.this, "fadein-to-fadeout");
+        CustomIntent.customType(StoresListActivity.this, "fadein-to-fadeout");
     }
 }

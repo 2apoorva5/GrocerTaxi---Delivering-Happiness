@@ -324,7 +324,7 @@ public class CategoriesActivity extends AppCompatActivity {
         });
 
         menuStore.setOnClickListener(view -> {
-            startActivity(new Intent(CategoriesActivity.this, StoresActivity.class));
+            startActivity(new Intent(CategoriesActivity.this, StoresListActivity.class));
             CustomIntent.customType(CategoriesActivity.this, "fadein-to-fadeout");
         });
 

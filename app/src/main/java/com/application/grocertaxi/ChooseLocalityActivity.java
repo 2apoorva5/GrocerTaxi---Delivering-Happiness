@@ -94,8 +94,6 @@ public class ChooseLocalityActivity extends AppCompatActivity {
         initViews();
         initFirebase();
         setActionOnViews();
-
-        loadLocalities();
     }
 
     private void initViews() {
@@ -346,6 +344,13 @@ public class ChooseLocalityActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         CustomIntent.customType(ChooseLocalityActivity.this, "right-to-left");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        loadLocalities();
     }
 
     @Override

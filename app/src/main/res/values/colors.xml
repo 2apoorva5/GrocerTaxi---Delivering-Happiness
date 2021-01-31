@@ -25,6 +25,8 @@
     <color name="colorTextDark">@android:color/black</color>
     <color name="colorTextLight">@android:color/white</color>
 
+    <color name="colorExploreCategory">#EE4E4E</color>
+    <color name="colorExploreProducts">#39B87D</color>
 
     <!-- Categories Colors -->
     <color name="category1">#FFE400</color>

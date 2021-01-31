@@ -110,28 +110,6 @@ public class MainActivity extends AppCompatActivity {
         initFirebase();
         setActionOnViews();
 
-        loadStores();
-        loadFruits();
-        loadVegetables();
-        loadFoodGrains();
-        loadPersonalCareProducts();
-
-        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
-        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorPrimary));
-        pullRefreshLayout.setOnRefreshListener(() -> {
-            if (!isConnectedToInternet(MainActivity.this)) {
-                pullRefreshLayout.setRefreshing(false);
-                showConnectToInternetDialog();
-                return;
-            } else {
-                loadStores();
-                loadFruits();
-                loadVegetables();
-                loadFoodGrains();
-                loadPersonalCareProducts();
-            }
-        });
-
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 sendFCMTokenToDatabase(task.getResult().getToken());
@@ -340,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         viewAllStoresBtn.setOnClickListener(view -> {
-            startActivity(new Intent(MainActivity.this, StoresActivity.class));
+            startActivity(new Intent(MainActivity.this, StoresListActivity.class));
             CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
         });
 
@@ -384,7 +362,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         menuStore.setOnClickListener(view -> {
-            startActivity(new Intent(MainActivity.this, StoresActivity.class));
+            startActivity(new Intent(MainActivity.this, StoresListActivity.class));
             CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
         });
 
@@ -421,7 +399,7 @@ public class MainActivity extends AppCompatActivity {
             viewHolder.bannerImage.setImageResource(banners[position]);
             viewHolder.itemView.setOnClickListener(v -> {
                 if (position == 0) {
-                    startActivity(new Intent(MainActivity.this, StoresActivity.class));
+                    startActivity(new Intent(MainActivity.this, StoresListActivity.class));
                     CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
                 } else if (position == 1) {
                     startActivity(new Intent(MainActivity.this, ProfileActivity.class));
@@ -480,7 +458,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull StoreViewHolder holder, int position, @NonNull Store model) {
                 Glide.with(holder.storeImage.getContext()).load(model.getStoreImage())
-                        .placeholder(R.drawable.thumbnail_store).centerCrop().into(holder.storeImage);
+                        .placeholder(R.drawable.thumbnail).centerCrop().into(holder.storeImage);
 
                 holder.storeName.setText(model.getStoreName());
 
@@ -571,7 +549,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull FruitViewHolder holder, int position, @NonNull Product model) {
                 Glide.with(holder.fruitImage.getContext()).load(model.getProductImage())
-                        .placeholder(R.drawable.thumbnail_product).centerCrop().into(holder.fruitImage);
+                        .placeholder(R.drawable.thumbnail).centerCrop().into(holder.fruitImage);
 
                 holder.fruitTypeImage.setImageResource(R.drawable.ic_veg);
 
@@ -594,16 +572,25 @@ public class MainActivity extends AppCompatActivity {
                 holder.clickListenerFruit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        preferenceManager.putString(Constants.KEY_PRODUCT, model.getProductID());
+                        startActivity(new Intent(MainActivity.this, ProductDetailsActivity.class));
+                        CustomIntent.customType(MainActivity.this, "bottom-to-up");
                     }
                 });
 
-                holder.addToCartBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                if (model.isProductInStock()) {
+                    holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
+                    holder.addToCartBtn.setEnabled(true);
+                    holder.addToCartBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
 
-                    }
-                });
+                        }
+                    });
+                } else {
+                    holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
+                    holder.addToCartBtn.setEnabled(false);
+                }
             }
 
             @Override
@@ -670,7 +657,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull VegetableViewHolder holder, int position, @NonNull Product model) {
                 Glide.with(holder.vegetableImage.getContext()).load(model.getProductImage())
-                        .placeholder(R.drawable.thumbnail_product).centerCrop().into(holder.vegetableImage);
+                        .placeholder(R.drawable.thumbnail).centerCrop().into(holder.vegetableImage);
 
                 holder.vegetableTypeImage.setImageResource(R.drawable.ic_veg);
 
@@ -693,16 +680,25 @@ public class MainActivity extends AppCompatActivity {
                 holder.clickListenerVegetable.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        preferenceManager.putString(Constants.KEY_PRODUCT, model.getProductID());
+                        startActivity(new Intent(MainActivity.this, ProductDetailsActivity.class));
+                        CustomIntent.customType(MainActivity.this, "bottom-to-up");
                     }
                 });
 
-                holder.addToCartBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                if (model.isProductInStock()) {
+                    holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
+                    holder.addToCartBtn.setEnabled(true);
+                    holder.addToCartBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
 
-                    }
-                });
+                        }
+                    });
+                } else {
+                    holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
+                    holder.addToCartBtn.setEnabled(false);
+                }
             }
 
             @Override
@@ -769,7 +765,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull FoodGrainViewHolder holder, int position, @NonNull Product model) {
                 Glide.with(holder.foodGrainImage.getContext()).load(model.getProductImage())
-                        .placeholder(R.drawable.thumbnail_product).centerCrop().into(holder.foodGrainImage);
+                        .placeholder(R.drawable.thumbnail).centerCrop().into(holder.foodGrainImage);
 
                 holder.foodGrainTypeImage.setImageResource(R.drawable.ic_veg);
 
@@ -792,16 +788,25 @@ public class MainActivity extends AppCompatActivity {
                 holder.clickListenerFoodGrain.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        preferenceManager.putString(Constants.KEY_PRODUCT, model.getProductID());
+                        startActivity(new Intent(MainActivity.this, ProductDetailsActivity.class));
+                        CustomIntent.customType(MainActivity.this, "bottom-to-up");
                     }
                 });
 
-                holder.addToCartBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                if (model.isProductInStock()) {
+                    holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
+                    holder.addToCartBtn.setEnabled(true);
+                    holder.addToCartBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
 
-                    }
-                });
+                        }
+                    });
+                } else {
+                    holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
+                    holder.addToCartBtn.setEnabled(false);
+                }
             }
 
             @Override
@@ -868,7 +873,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull PersonalCareViewHolder holder, int position, @NonNull Product model) {
                 Glide.with(holder.pCareImage.getContext()).load(model.getProductImage())
-                        .placeholder(R.drawable.thumbnail_product).centerCrop().into(holder.pCareImage);
+                        .placeholder(R.drawable.thumbnail).centerCrop().into(holder.pCareImage);
 
                 holder.pCareTypeImage.setVisibility(View.GONE);
 
@@ -891,16 +896,25 @@ public class MainActivity extends AppCompatActivity {
                 holder.clickListenerPCare.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        preferenceManager.putString(Constants.KEY_PRODUCT, model.getProductID());
+                        startActivity(new Intent(MainActivity.this, ProductDetailsActivity.class));
+                        CustomIntent.customType(MainActivity.this, "bottom-to-up");
                     }
                 });
 
-                holder.addToCartBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                if (model.isProductInStock()) {
+                    holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
+                    holder.addToCartBtn.setEnabled(true);
+                    holder.addToCartBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
 
-                    }
-                });
+                        }
+                    });
+                } else {
+                    holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
+                    holder.addToCartBtn.setEnabled(false);
+                }
             }
 
             @Override
@@ -971,6 +985,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static class FruitViewHolder extends RecyclerView.ViewHolder {
 
+        CardView addToCartBtnContainer;
         ConstraintLayout clickListenerFruit, addToCartBtn;
         ImageView fruitImage, fruitTypeImage;
         TextView fruitName, fruitPrice, fruitMRP, fruitOffer,
@@ -979,6 +994,7 @@ public class MainActivity extends AppCompatActivity {
         public FruitViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
             clickListenerFruit = itemView.findViewById(R.id.click_listener_product);
             addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
             fruitImage = itemView.findViewById(R.id.product_image);
@@ -996,6 +1012,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static class VegetableViewHolder extends RecyclerView.ViewHolder {
 
+        CardView addToCartBtnContainer;
         ConstraintLayout clickListenerVegetable, addToCartBtn;
         ImageView vegetableImage, vegetableTypeImage;
         TextView vegetableName, vegetablePrice, vegetableMRP, vegetableOffer,
@@ -1004,6 +1021,7 @@ public class MainActivity extends AppCompatActivity {
         public VegetableViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
             clickListenerVegetable = itemView.findViewById(R.id.click_listener_product);
             addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
             vegetableImage = itemView.findViewById(R.id.product_image);
@@ -1021,6 +1039,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static class FoodGrainViewHolder extends RecyclerView.ViewHolder {
 
+        CardView addToCartBtnContainer;
         ConstraintLayout clickListenerFoodGrain, addToCartBtn;
         ImageView foodGrainImage, foodGrainTypeImage;
         TextView foodGrainName, foodGrainPrice, foodGrainMRP, foodGrainOffer,
@@ -1029,6 +1048,7 @@ public class MainActivity extends AppCompatActivity {
         public FoodGrainViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
             clickListenerFoodGrain = itemView.findViewById(R.id.click_listener_product);
             addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
             foodGrainImage = itemView.findViewById(R.id.product_image);
@@ -1046,6 +1066,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static class PersonalCareViewHolder extends RecyclerView.ViewHolder {
 
+        CardView addToCartBtnContainer;
         ConstraintLayout clickListenerPCare, addToCartBtn;
         ImageView pCareImage, pCareTypeImage;
         TextView pCareName, pCarePrice, pCareMRP, pCareOffer,
@@ -1054,6 +1075,7 @@ public class MainActivity extends AppCompatActivity {
         public PersonalCareViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
             clickListenerPCare = itemView.findViewById(R.id.click_listener_product);
             addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
             pCareImage = itemView.findViewById(R.id.product_image);
@@ -1102,6 +1124,33 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
         materialDialog.show();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        loadStores();
+        loadFruits();
+        loadVegetables();
+        loadFoodGrains();
+        loadPersonalCareProducts();
+
+        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
+        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorPrimary));
+        pullRefreshLayout.setOnRefreshListener(() -> {
+            if (!isConnectedToInternet(MainActivity.this)) {
+                pullRefreshLayout.setRefreshing(false);
+                showConnectToInternetDialog();
+                return;
+            } else {
+                loadStores();
+                loadFruits();
+                loadVegetables();
+                loadFoodGrains();
+                loadPersonalCareProducts();
+            }
+        });
     }
 
     @Override

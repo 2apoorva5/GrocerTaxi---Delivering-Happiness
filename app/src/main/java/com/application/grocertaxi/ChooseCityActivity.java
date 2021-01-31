@@ -98,8 +98,6 @@ public class ChooseCityActivity extends AppCompatActivity {
         initViews();
         initFirebase();
         setActionOnViews();
-
-        loadCities();
     }
 
     private void initViews() {
@@ -344,6 +342,13 @@ public class ChooseCityActivity extends AppCompatActivity {
             clickListener = itemView.findViewById(R.id.click_listener);
             cityName = itemView.findViewById(R.id.item_city_name);
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        loadCities();
     }
 
     @Override

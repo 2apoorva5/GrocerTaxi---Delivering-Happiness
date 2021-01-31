@@ -3,22 +3,17 @@ package com.application.grocertaxi;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.paging.PagedList;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.speech.RecognizerIntent;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,16 +29,13 @@ import android.widget.TextView;
 import com.application.grocertaxi.Model.Product;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
-import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
 import com.firebase.ui.firestore.paging.LoadingState;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -234,7 +226,7 @@ public class SearchProductActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull ProductViewHolder holder, int position, @NonNull Product model) {
                 Glide.with(holder.productImage.getContext()).load(model.getProductImage())
-                        .placeholder(R.drawable.thumbnail_product).centerCrop().into(holder.productImage);
+                        .placeholder(R.drawable.thumbnail).centerCrop().into(holder.productImage);
 
                 if (model.getProductCategory().equals("Baby Care") || model.getProductCategory().equals("Household") ||
                         model.getProductCategory().equals("Personal Care") || model.getProductCategory().equals("Stationary") ||
@@ -268,9 +260,25 @@ public class SearchProductActivity extends AppCompatActivity {
                 holder.clickListener.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        preferenceManager.putString(Constants.KEY_PRODUCT, model.getProductID());
+                        startActivity(new Intent(SearchProductActivity.this, ProductDetailsActivity.class));
+                        CustomIntent.customType(SearchProductActivity.this, "bottom-to-up");
                     }
                 });
+
+                if(model.isProductInStock()) {
+                    holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
+                    holder.addToCartBtn.setEnabled(true);
+                    holder.addToCartBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                        }
+                    });
+                } else {
+                    holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
+                    holder.addToCartBtn.setEnabled(false);
+                }
 
                 setAnimation(holder.itemView, position);
             }
@@ -338,7 +346,8 @@ public class SearchProductActivity extends AppCompatActivity {
 
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
 
-        ConstraintLayout clickListener;
+        CardView addToCartBtnContainer;
+        ConstraintLayout clickListener, addToCartBtn;
         ImageView productImage, productTypeImage;
         TextView productName, productPrice, productMRP, productOffer, productUnit;
 
@@ -349,6 +358,8 @@ public class SearchProductActivity extends AppCompatActivity {
             productImage = itemView.findViewById(R.id.product_image);
             productTypeImage = itemView.findViewById(R.id.product_type_image);
             productName = itemView.findViewById(R.id.product_name);
+            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
+            addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
             productPrice = itemView.findViewById(R.id.product_price);
             productMRP = itemView.findViewById(R.id.product_mrp);
             productOffer = itemView.findViewById(R.id.product_offer);

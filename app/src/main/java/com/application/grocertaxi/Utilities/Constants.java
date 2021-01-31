@@ -16,6 +16,8 @@ public class Constants {
     public static final String KEY_CITY = "City";
     public static final String KEY_LOCALITY = "Locality";
     public static final String KEY_CATEGORY = "Category";
+    public static final String KEY_PRODUCT = "Product";
+    public static final String KEY_STORE = "Store";
 
     public static final String KEY_UID = "UID";
     public static final String KEY_FCM_TOKEN = "FCMToken";

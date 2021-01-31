@@ -4,18 +4,18 @@ import com.google.firebase.Timestamp;
 
 public class Store {
     private String storeID, storeName, storeOwner, storeEmail, storeMobile, storeAddress,
-            storeTiming, storeDeliveryCharges, storeImage, storeSearchKeyword;
+            storeTiming, storeImage, storeSearchKeyword;
     private Timestamp storeTimestamp;
     private boolean storeStatus;
-    private double storeAverageRating, storeTotalRating;
+    private double storeDeliveryCharges, storeAverageRating, storeTotalRating;
 
     public Store() {
     }
 
-    public Store(String storeID, String storeName, String storeOwner, String storeEmail,
-                 String storeMobile, String storeAddress, String storeTiming, String storeDeliveryCharges,
-                 String storeImage, String storeSearchKeyword, Timestamp storeTimestamp, boolean storeStatus,
-                 double storeAverageRating, double storeTotalRating) {
+    public Store(String storeID, String storeName, String storeOwner, String storeEmail, String storeMobile,
+                 String storeAddress, String storeTiming, String storeImage, String storeSearchKeyword,
+                 Timestamp storeTimestamp, boolean storeStatus, double storeDeliveryCharges, double storeAverageRating,
+                 double storeTotalRating) {
         this.storeID = storeID;
         this.storeName = storeName;
         this.storeOwner = storeOwner;
@@ -23,11 +23,11 @@ public class Store {
         this.storeMobile = storeMobile;
         this.storeAddress = storeAddress;
         this.storeTiming = storeTiming;
-        this.storeDeliveryCharges = storeDeliveryCharges;
         this.storeImage = storeImage;
         this.storeSearchKeyword = storeSearchKeyword;
         this.storeTimestamp = storeTimestamp;
         this.storeStatus = storeStatus;
+        this.storeDeliveryCharges = storeDeliveryCharges;
         this.storeAverageRating = storeAverageRating;
         this.storeTotalRating = storeTotalRating;
     }
@@ -88,14 +88,6 @@ public class Store {
         this.storeTiming = storeTiming;
     }
 
-    public String getStoreDeliveryCharges() {
-        return storeDeliveryCharges;
-    }
-
-    public void setStoreDeliveryCharges(String storeDeliveryCharges) {
-        this.storeDeliveryCharges = storeDeliveryCharges;
-    }
-
     public String getStoreImage() {
         return storeImage;
     }
@@ -126,6 +118,14 @@ public class Store {
 
     public void setStoreStatus(boolean storeStatus) {
         this.storeStatus = storeStatus;
+    }
+
+    public double getStoreDeliveryCharges() {
+        return storeDeliveryCharges;
+    }
+
+    public void setStoreDeliveryCharges(double storeDeliveryCharges) {
+        this.storeDeliveryCharges = storeDeliveryCharges;
     }
 
     public double getStoreAverageRating() {
