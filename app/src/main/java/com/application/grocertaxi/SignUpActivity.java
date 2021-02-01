@@ -143,14 +143,6 @@ public class SignUpActivity extends AppCompatActivity {
             sendOtpBtn.setEnabled(true);
         });
 
-        confirmPasswordField.getEditText().setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                sendOtpBtn.performClick();
-                return true;
-            }
-            return false;
-        });
-
         sendOtpBtn.setOnClickListener(view -> {
             UIUtil.hideKeyboard(SignUpActivity.this);
 

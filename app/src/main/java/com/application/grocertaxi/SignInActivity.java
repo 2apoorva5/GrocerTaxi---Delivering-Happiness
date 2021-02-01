@@ -118,14 +118,6 @@ public class SignInActivity extends AppCompatActivity {
             signInBtn.setEnabled(true);
         });
 
-        passwordField.getEditText().setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                signInBtn.performClick();
-                return true;
-            }
-            return false;
-        });
-
         signInBtn.setOnClickListener(view -> {
             UIUtil.hideKeyboard(SignInActivity.this);
 

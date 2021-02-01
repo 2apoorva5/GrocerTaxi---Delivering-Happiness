@@ -139,6 +139,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
         final DocumentReference productDocumentRef = productsRef.document(preferenceManager.getString(Constants.KEY_PRODUCT));
         productDocumentRef.addSnapshotListener((documentSnapshot, error) -> {
             if (error != null) {
+                pullRefreshLayout.setRefreshing(false);
                 Alerter.create(ProductDetailsActivity.this)
                         .setText("Whoa! Something broke. Try again!")
                         .setTextAppearance(R.style.AlertText)
@@ -153,6 +154,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                         .show();
                 return;
             } else {
+                pullRefreshLayout.setRefreshing(false);
                 if (documentSnapshot != null && documentSnapshot.exists()) {
                     Uri product_img = Uri.parse(documentSnapshot.getString(Constants.KEY_PRODUCT_IMAGE));
                     boolean product_type = documentSnapshot.getBoolean(Constants.KEY_PRODUCT_IS_VEG);
@@ -325,7 +327,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
         loadProductDetails();
 
-        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
+        pullRefreshLayout.setColor(getColor(R.color.colorBackground));
+        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorAccent));
         pullRefreshLayout.setOnRefreshListener(() -> {
             if (!isConnectedToInternet(ProductDetailsActivity.this)) {
                 pullRefreshLayout.setRefreshing(false);
