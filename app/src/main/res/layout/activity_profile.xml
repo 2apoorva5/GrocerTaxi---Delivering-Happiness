@@ -229,6 +229,18 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cart_indicator2"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    app:cardBackgroundColor="@color/colorPrimary"
+                    app:cardCornerRadius="5dp"
+                    app:cardElevation="8dp"
+                    android:visibility="gone"
+                    app:cardPreventCornerOverlap="true"
+                    app:layout_constraintStart_toStartOf="@id/img_cart"
+                    app:layout_constraintTop_toTopOf="@id/img_cart" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -862,13 +874,27 @@
         android:src="@drawable/ic_cart"
         app:backgroundTint="@color/colorIconDark"
         app:tint="@color/colorIconLight"
-        app:maxImageSize="32dp"
+        app:maxImageSize="24dp"
         android:elevation="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/bottom_bar_container"
         app:layout_constraintBottom_toBottomOf="@+id/bottom_bar_container"
         android:contentDescription="@string/app_name" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cart_indicator"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        app:cardBackgroundColor="@color/colorIconLight"
+        app:cardCornerRadius="6dp"
+        app:cardElevation="8dp"
+        android:visibility="gone"
+        app:cardPreventCornerOverlap="true"
+        app:layout_constraintTop_toBottomOf="@id/cart_btn"
+        app:layout_constraintEnd_toEndOf="@id/cart_btn"
+        app:layout_constraintStart_toStartOf="@id/cart_btn"
+        app:layout_constraintBottom_toBottomOf="@id/cart_btn"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_bar_container"

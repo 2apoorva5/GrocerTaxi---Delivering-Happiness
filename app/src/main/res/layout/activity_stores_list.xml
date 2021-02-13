@@ -175,8 +175,8 @@
 
         <ImageView
             android:id="@+id/illustration_empty"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
             android:layout_marginBottom="64dp"
             android:contentDescription="@string/app_name"
             android:scaleType="centerInside"
@@ -196,7 +196,7 @@
             android:alpha="0.5"
             android:fontFamily="@font/montserrat"
             android:includeFontPadding="false"
-            android:text="No stores"
+            android:text="No stores here yet"
             android:textAlignment="center"
             android:textAllCaps="false"
             android:textColor="@color/colorTextDark"
@@ -208,9 +208,10 @@
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <ProgressBar
-            android:id="@+id/stores_progress_bar"
+            android:id="@+id/progress_bar"
             android:layout_width="56dp"
             android:layout_height="56dp"
+            android:visibility="gone"
             android:progressTint="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -227,13 +228,27 @@
         android:src="@drawable/ic_cart"
         app:backgroundTint="@color/colorIconDark"
         app:tint="@color/colorIconLight"
-        app:maxImageSize="32dp"
+        app:maxImageSize="24dp"
         android:elevation="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/bottom_bar_container"
         app:layout_constraintBottom_toBottomOf="@+id/bottom_bar_container"
         android:contentDescription="@string/app_name" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cart_indicator"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        app:cardBackgroundColor="@color/colorIconLight"
+        app:cardCornerRadius="6dp"
+        app:cardElevation="8dp"
+        android:visibility="gone"
+        app:cardPreventCornerOverlap="true"
+        app:layout_constraintTop_toBottomOf="@id/cart_btn"
+        app:layout_constraintEnd_toEndOf="@id/cart_btn"
+        app:layout_constraintStart_toStartOf="@id/cart_btn"
+        app:layout_constraintBottom_toBottomOf="@id/cart_btn"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_bar_container"

@@ -1,6 +1,7 @@
 package com.application.grocertaxi;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
@@ -13,6 +14,9 @@ import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.tapadoo.alerter.Alerter;
 
 import maes.tech.intentanim.CustomIntent;
 
@@ -27,7 +31,11 @@ public class CategoriesActivity extends AppCompatActivity {
             categorySweets, categoryBabyCare, categoryHousehold, categoryPersonalCare, categoryPetCare, categoryStationary,
             categoryHardware, categoryMedical, categorySports;
     private FloatingActionButton cartBtn;
+    private CardView cartIndicator;
 
+    private CollectionReference cartRef;
+
+    private String cart_location;
     private PreferenceManager preferenceManager;
 
     @Override
@@ -43,14 +51,14 @@ public class CategoriesActivity extends AppCompatActivity {
             startActivity(intent);
             CustomIntent.customType(CategoriesActivity.this, "fadein-to-fadeout");
             finish();
-        } else if (preferenceManager.getString(Constants.KEY_CITY).equals("") ||
-                preferenceManager.getString(Constants.KEY_CITY) == null ||
-                preferenceManager.getString(Constants.KEY_CITY).length() == 0 ||
-                preferenceManager.getString(Constants.KEY_CITY).isEmpty() ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).equals("") ||
-                preferenceManager.getString(Constants.KEY_LOCALITY) == null ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).length() == 0 ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).isEmpty()) {
+        } else if (preferenceManager.getString(Constants.KEY_USER_CITY).equals("") ||
+                preferenceManager.getString(Constants.KEY_USER_CITY) == null ||
+                preferenceManager.getString(Constants.KEY_USER_CITY).length() == 0 ||
+                preferenceManager.getString(Constants.KEY_USER_CITY).isEmpty() ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).equals("") ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY) == null ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).length() == 0 ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).isEmpty()) {
             Intent intent = new Intent(CategoriesActivity.this, ChooseCityActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -62,7 +70,10 @@ public class CategoriesActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
+        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
+
         initViews();
+        initFirebase();
         setActionOnViews();
     }
 
@@ -117,6 +128,13 @@ public class CategoriesActivity extends AppCompatActivity {
         menuStore = findViewById(R.id.menu_store);
         menuProfile = findViewById(R.id.menu_profile);
         cartBtn = findViewById(R.id.cart_btn);
+        cartIndicator = findViewById(R.id.cart_indicator);
+    }
+
+    private void initFirebase() {
+        cartRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS)
+                .document(preferenceManager.getString(Constants.KEY_USER_ID))
+                .collection(Constants.KEY_COLLECTION_CART);
     }
 
     private void setActionOnViews() {
@@ -334,7 +352,35 @@ public class CategoriesActivity extends AppCompatActivity {
         });
 
         cartBtn.setOnClickListener(v -> {
+            startActivity(new Intent(getApplicationContext(), CartActivity.class));
+            CustomIntent.customType(CategoriesActivity.this, "bottom-to-up");
+        });
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (queryDocumentSnapshots.size() == 0) {
+                cartIndicator.setVisibility(View.GONE);
+            } else {
+                cartIndicator.setVisibility(View.VISIBLE);
+            }
+        }).addOnFailureListener(e -> {
+            Alerter.create(CategoriesActivity.this)
+                    .setText("Whoa! Something Broke. Try again!")
+                    .setTextAppearance(R.style.AlertText)
+                    .setBackgroundColorRes(R.color.errorColor)
+                    .setIcon(R.drawable.ic_error)
+                    .setDuration(3000)
+                    .enableIconPulse(true)
+                    .enableVibration(true)
+                    .disableOutsideTouch()
+                    .enableProgress(true)
+                    .setProgressColorInt(getColor(android.R.color.white))
+                    .show();
+            return;
         });
     }
 

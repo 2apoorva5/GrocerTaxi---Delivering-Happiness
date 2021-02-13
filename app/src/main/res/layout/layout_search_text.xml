@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fontFamily="@font/montserrat"
+    android:includeFontPadding="false"
+    android:text="Search Text"
+    android:textAlignment="textStart"
+    android:textAllCaps="false"
+    android:textColor="@color/colorTextDark"
+    android:textSize="14sp"
+    android:textStyle="normal"
+    android:padding="16dp"
+    android:maxLines="1"
+    android:singleLine="true"
+    android:background="@color/colorSearch"
+    android:drawableEnd="@drawable/ic_choose_search_text"
+    android:drawablePadding="16dp"
+    android:drawableTint="@color/colorInactive">
+
+</TextView>

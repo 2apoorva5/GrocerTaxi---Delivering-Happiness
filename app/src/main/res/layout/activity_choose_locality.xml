@@ -151,9 +151,10 @@
         app:layout_constraintTop_toBottomOf="@+id/choose_locality_gif" />
 
     <ProgressBar
-        android:id="@+id/choose_locality_progress_bar"
+        android:id="@+id/progress_bar"
         android:layout_width="56dp"
         android:layout_height="56dp"
+        android:visibility="gone"
         android:progressTint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

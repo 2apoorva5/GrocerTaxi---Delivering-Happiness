@@ -16,7 +16,6 @@ import maes.tech.intentanim.CustomIntent;
 
 public class WelcomeActivity extends AppCompatActivity {
 
-    private ImageView closeBtn;
     private ConstraintLayout signUpBtn, signInBtn;
 
     @Override
@@ -43,14 +42,11 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        closeBtn = findViewById(R.id.close_btn);
         signUpBtn = findViewById(R.id.sign_up_btn);
         signInBtn = findViewById(R.id.sign_in_btn);
     }
 
     private void setActionOnViews() {
-        closeBtn.setOnClickListener(view -> onBackPressed());
-
         signUpBtn.setOnClickListener(view -> {
             startActivity(new Intent(WelcomeActivity.this, SignUpActivity.class));
             CustomIntent.customType(WelcomeActivity.this, "bottom-to-up");

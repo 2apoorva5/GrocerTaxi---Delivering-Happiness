@@ -29,13 +29,13 @@ import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import maes.tech.intentanim.CustomIntent;
 
-public class UpdateAddressActivity extends AppCompatActivity {
+public class DeliveryAddressActivity extends AppCompatActivity {
 
     private ImageView closeBtn;
     private TextInputLayout addressLine1, addressLine2, landmark, pinCode, city, state;
     private CardView saveBtnContainer;
     private ConstraintLayout saveBtn;
-    private ProgressBar updateAddressProgressBar;
+    private ProgressBar progressBar;
 
     private PreferenceManager preferenceManager;
 
@@ -44,28 +44,28 @@ public class UpdateAddressActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_update_address);
+        setContentView(R.layout.activity_delivery_address);
 
         preferenceManager = new PreferenceManager(getApplicationContext());
 
         if (!preferenceManager.getBoolean(Constants.KEY_IS_SIGNED_IN)) {
-            Intent intent = new Intent(UpdateAddressActivity.this, WelcomeActivity.class);
+            Intent intent = new Intent(DeliveryAddressActivity.this, WelcomeActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            CustomIntent.customType(UpdateAddressActivity.this, "fadein-to-fadeout");
+            CustomIntent.customType(DeliveryAddressActivity.this, "fadein-to-fadeout");
             finish();
-        } else if(preferenceManager.getString(Constants.KEY_CITY).equals("") ||
-                preferenceManager.getString(Constants.KEY_CITY) == null ||
-                preferenceManager.getString(Constants.KEY_CITY).length() == 0 ||
-                preferenceManager.getString(Constants.KEY_CITY).isEmpty() ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).equals("") ||
-                preferenceManager.getString(Constants.KEY_LOCALITY) == null ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).length() == 0 ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).isEmpty()) {
-            Intent intent = new Intent(UpdateAddressActivity.this, ChooseCityActivity.class);
+        } else if(preferenceManager.getString(Constants.KEY_USER_CITY).equals("") ||
+                preferenceManager.getString(Constants.KEY_USER_CITY) == null ||
+                preferenceManager.getString(Constants.KEY_USER_CITY).length() == 0 ||
+                preferenceManager.getString(Constants.KEY_USER_CITY).isEmpty() ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).equals("") ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY) == null ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).length() == 0 ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).isEmpty()) {
+            Intent intent = new Intent(DeliveryAddressActivity.this, ChooseCityActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            CustomIntent.customType(UpdateAddressActivity.this, "fadein-to-fadeout");
+            CustomIntent.customType(DeliveryAddressActivity.this, "fadein-to-fadeout");
             finish();
         }
 
@@ -88,7 +88,7 @@ public class UpdateAddressActivity extends AppCompatActivity {
         state = findViewById(R.id.state);
         saveBtnContainer = findViewById(R.id.save_btn_container);
         saveBtn = findViewById(R.id.save_btn);
-        updateAddressProgressBar = findViewById(R.id.update_address_progress_bar);
+        progressBar = findViewById(R.id.progress_bar);
     }
 
     private void initFirebase(){
@@ -101,7 +101,7 @@ public class UpdateAddressActivity extends AppCompatActivity {
             finish();
         });
 
-        KeyboardVisibilityEvent.setEventListener(UpdateAddressActivity.this, isOpen -> {
+        KeyboardVisibilityEvent.setEventListener(DeliveryAddressActivity.this, isOpen -> {
             if (!isOpen) {
                 addressLine1.clearFocus();
                 addressLine2.clearFocus();
@@ -112,13 +112,6 @@ public class UpdateAddressActivity extends AppCompatActivity {
             }
         });
 
-        addressLine1.getEditText().setText(preferenceManager.getString(Constants.KEY_ADDRESS_LINE1));
-        addressLine2.getEditText().setText(preferenceManager.getString(Constants.KEY_ADDRESS_LINE2));
-        landmark.getEditText().setText(preferenceManager.getString(Constants.KEY_LANDMARK));
-        pinCode.getEditText().setText(preferenceManager.getString(Constants.KEY_PINCODE));
-        city.getEditText().setText(preferenceManager.getString(Constants.KEY_CITY_NAME));
-        state.getEditText().setText(preferenceManager.getString(Constants.KEY_STATE_NAME));
-
         state.getEditText().setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 saveBtn.performClick();
@@ -128,7 +121,7 @@ public class UpdateAddressActivity extends AppCompatActivity {
         });
 
         saveBtn.setOnClickListener(view -> {
-            UIUtil.hideKeyboard(UpdateAddressActivity.this);
+            UIUtil.hideKeyboard(DeliveryAddressActivity.this);
 
             final String address_line1 = addressLine1.getEditText().getText().toString().trim();
             final String address_line2 = addressLine2.getEditText().getText().toString().trim();
@@ -142,37 +135,31 @@ public class UpdateAddressActivity extends AppCompatActivity {
             if (!validateAddressLine() | !validatePinCode() | !validateCity() | !validateState()) {
                 return;
             } else {
-                if (!isConnectedToInternet(UpdateAddressActivity.this)) {
+                if (!isConnectedToInternet(DeliveryAddressActivity.this)) {
                     showConnectToInternetDialog();
                     return;
                 } else {
                     saveBtnContainer.setVisibility(View.INVISIBLE);
                     saveBtn.setEnabled(false);
-                    updateAddressProgressBar.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.VISIBLE);
 
                     userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
                             .update(Constants.KEY_USER_ADDRESS, delivery_address)
                             .addOnSuccessListener(aVoid -> {
-                                updateAddressProgressBar.setVisibility(View.GONE);
+                                progressBar.setVisibility(View.GONE);
                                 saveBtnContainer.setVisibility(View.VISIBLE);
                                 saveBtn.setEnabled(true);
 
                                 preferenceManager.putString(Constants.KEY_USER_ADDRESS, delivery_address);
-                                preferenceManager.putString(Constants.KEY_ADDRESS_LINE1, address_line1);
-                                preferenceManager.putString(Constants.KEY_ADDRESS_LINE2, address_line2);
-                                preferenceManager.putString(Constants.KEY_LANDMARK, landmark_loc);
-                                preferenceManager.putString(Constants.KEY_PINCODE, pin_code);
-                                preferenceManager.putString(Constants.KEY_CITY_NAME, city_name);
-                                preferenceManager.putString(Constants.KEY_STATE_NAME, state_name);
 
                                 onBackPressed();
                             })
                             .addOnFailureListener(e -> {
-                                updateAddressProgressBar.setVisibility(View.GONE);
+                                progressBar.setVisibility(View.GONE);
                                 saveBtnContainer.setVisibility(View.VISIBLE);
                                 saveBtn.setEnabled(true);
 
-                                Alerter.create(UpdateAddressActivity.this)
+                                Alerter.create(DeliveryAddressActivity.this)
                                         .setText("Whoa! Something broke. Try again!")
                                         .setTextAppearance(R.style.AlertText)
                                         .setBackgroundColorRes(R.color.errorColor)
@@ -251,8 +238,8 @@ public class UpdateAddressActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isConnectedToInternet(UpdateAddressActivity updateAddressActivity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) updateAddressActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+    private boolean isConnectedToInternet(DeliveryAddressActivity deliveryAddressActivity) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) deliveryAddressActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
@@ -265,7 +252,7 @@ public class UpdateAddressActivity extends AppCompatActivity {
     }
 
     private void showConnectToInternetDialog() {
-        MaterialDialog materialDialog = new MaterialDialog.Builder(UpdateAddressActivity.this)
+        MaterialDialog materialDialog = new MaterialDialog.Builder(DeliveryAddressActivity.this)
                 .setTitle("No Internet Connection!")
                 .setMessage("Please connect to a network first to proceed from here!")
                 .setCancelable(false)
@@ -281,6 +268,6 @@ public class UpdateAddressActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        CustomIntent.customType(UpdateAddressActivity.this, "up-to-bottom");
+        CustomIntent.customType(DeliveryAddressActivity.this, "up-to-bottom");
     }
 }

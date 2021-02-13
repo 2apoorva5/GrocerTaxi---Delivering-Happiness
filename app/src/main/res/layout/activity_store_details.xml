@@ -29,9 +29,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingBottom="48dp">
+                android:layout_height="wrap_content">
 
                 <ImageView
                     android:id="@+id/store_image"
@@ -61,6 +59,77 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:tint="@color/colorIconLight" />
 
+                <ImageView
+                    android:id="@+id/cart_btn"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="48dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:contentDescription="@string/app_name"
+                    android:focusable="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_cart"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/colorIconLight" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cart_indicator"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    app:cardBackgroundColor="@color/colorPrimary"
+                    app:cardCornerRadius="6dp"
+                    app:cardElevation="8dp"
+                    android:visibility="gone"
+                    app:cardPreventCornerOverlap="true"
+                    app:layout_constraintEnd_toEndOf="@id/cart_btn"
+                    app:layout_constraintTop_toTopOf="@id/cart_btn" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/store_status_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="16dp"
+                    app:cardElevation="8dp"
+                    app:cardBackgroundColor="@color/successColor"
+                    app:cardCornerRadius="8dp"
+                    app:cardPreventCornerOverlap="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/store_image">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <TextView
+                            android:id="@+id/store_status1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginVertical="8dp"
+                            android:layout_marginHorizontal="20dp"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:text="Open"
+                            android:textAlignment="center"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorTextLight"
+                            android:textSize="14sp"
+                            android:textStyle="normal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </androidx.cardview.widget.CardView>
+
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/email_btn"
                     android:layout_width="56dp"
@@ -68,27 +137,27 @@
                     android:layout_marginEnd="16dp"
                     android:contentDescription="@string/app_name"
                     android:elevation="16dp"
-                    android:src="@drawable/ic_email"
+                    android:src="@drawable/ic_email_filled"
                     app:backgroundTint="@color/colorPrimary"
                     app:layout_constraintBottom_toBottomOf="@id/store_image"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/store_image"
-                    app:maxImageSize="32dp"
+                    app:maxImageSize="24dp"
                     app:tint="@color/colorIconDark" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/call_btn"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
-                    android:layout_marginEnd="24dp"
+                    android:layout_marginEnd="16dp"
                     android:contentDescription="@string/app_name"
                     android:elevation="16dp"
-                    android:src="@drawable/ic_phone"
+                    android:src="@drawable/ic_phone_filled"
                     app:backgroundTint="@color/colorPrimary"
                     app:layout_constraintBottom_toBottomOf="@id/store_image"
                     app:layout_constraintEnd_toStartOf="@id/email_btn"
                     app:layout_constraintTop_toBottomOf="@id/store_image"
-                    app:maxImageSize="32dp"
+                    app:maxImageSize="24dp"
                     app:tint="@color/colorIconDark" />
 
                 <TextView
@@ -328,7 +397,7 @@
                     app:layout_constraintTop_toBottomOf="@id/store_mobile" />
 
                 <TextView
-                    android:id="@+id/text1"
+                    android:id="@+id/text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
@@ -349,12 +418,25 @@
                     android:id="@+id/recycler_categories"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="16dp"
+                    android:nestedScrollingEnabled="false"
                     android:orientation="vertical"
                     android:scrollbars="none"
-                    app:layout_constraintTop_toBottomOf="@id/text1"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    app:layout_constraintTop_toBottomOf="@+id/text" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:visibility="gone"
+                    android:progressTint="@color/colorAccent"
+                    app:layout_constraintBottom_toBottomOf="@+id/recycler_categories"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/recycler_categories"/>
 
                 <View
                     android:id="@+id/divider3"
@@ -403,6 +485,23 @@
                     app:layout_constraintStart_toStartOf="parent"/>
 
                 <TextView
+                    android:id="@+id/store_status2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="Store's open"
+                    android:textColor="@color/successColor"
+                    android:textAllCaps="false"
+                    android:textStyle="bold"
+                    android:textAlignment="textStart"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/montserrat"
+                    android:includeFontPadding="false"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/store_timing"
+                    app:layout_constraintBottom_toBottomOf="@id/store_timing"/>
+
+                <TextView
                     android:id="@+id/text_delivery_charges"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -423,11 +522,11 @@
 
                 <TextView
                     android:id="@+id/store_delivery_charges"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="8dp"
-                    android:text="₹ 150"
+                    android:text="₹ 0.00"
                     android:textAlignment="textStart"
                     android:textColor="@color/colorTextDark"
                     android:textAllCaps="false"
@@ -435,19 +534,120 @@
                     android:textStyle="normal"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/text_delivery_charges"
                     app:layout_constraintStart_toStartOf="parent"/>
 
-                <View
-                    android:id="@+id/divider4"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
-                    android:background="@color/colorInactive"
+                    android:background="@color/colorAccent"
                     app:layout_constraintTop_toBottomOf="@id/store_delivery_charges"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <ImageView
+                        android:id="@+id/img_quality_products"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="40dp"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="centerCrop"
+                        app:tint="@color/colorIconLight"
+                        android:src="@drawable/ic_quality_products"
+                        app:layout_constraintEnd_toStartOf="@id/img_social_distance"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/text_quality_products"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="40dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="Quality Products"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextLight"
+                        android:textSize="11sp"
+                        android:textStyle="normal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@id/img_quality_products"
+                        app:layout_constraintStart_toStartOf="@id/img_quality_products"
+                        app:layout_constraintTop_toBottomOf="@+id/img_quality_products"
+                        tools:ignore="SmallSp" />
+
+                    <ImageView
+                        android:id="@+id/img_social_distance"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginHorizontal="40dp"
+                        android:layout_marginTop="40dp"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="centerCrop"
+                        app:tint="@color/colorIconLight"
+                        android:src="@drawable/ic_social_distance"
+                        app:layout_constraintEnd_toStartOf="@id/img_secure_payments"
+                        app:layout_constraintStart_toEndOf="@id/img_quality_products"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/text_social_distance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="40dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="Contactless Delivery"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextLight"
+                        android:textSize="11sp"
+                        android:textStyle="normal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@id/img_social_distance"
+                        app:layout_constraintStart_toStartOf="@id/img_social_distance"
+                        app:layout_constraintTop_toBottomOf="@+id/img_social_distance"
+                        tools:ignore="SmallSp" />
+
+                    <ImageView
+                        android:id="@+id/img_secure_payments"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="40dp"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="centerCrop"
+                        app:tint="@color/colorIconLight"
+                        android:src="@drawable/ic_secure_payment"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/img_social_distance"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/text_secure_payments"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="40dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="Secure Payments"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextLight"
+                        android:textSize="11sp"
+                        android:textStyle="normal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@id/img_secure_payments"
+                        app:layout_constraintStart_toStartOf="@id/img_secure_payments"
+                        app:layout_constraintTop_toBottomOf="@+id/img_secure_payments"
+                        tools:ignore="SmallSp" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

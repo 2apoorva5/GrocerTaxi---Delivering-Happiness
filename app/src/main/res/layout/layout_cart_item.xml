@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/click_listener"
+    android:background="?attr/selectableItemBackground"
+    android:focusable="true"
+    android:clickable="true">
+
+    <ImageView
+        android:id="@+id/remove_btn"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_dialog_remove"
+        android:scaleType="centerCrop"
+        app:tint="@color/errorColor"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="@string/app_name"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/cart_item_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:textSize="14sp"
+        android:textAlignment="textStart"
+        android:textStyle="normal"
+        android:textAllCaps="false"
+        android:text="ITEM-00000000"
+        android:textColor="@color/colorTextDark"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/remove_btn"
+        app:layout_constraintBottom_toBottomOf="@id/remove_btn"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cart_product_image_container"
+        android:layout_width="128dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardCornerRadius="16dp"
+        app:layout_constraintBottom_toBottomOf="@id/cart_product_price"
+        app:layout_constraintTop_toTopOf="@id/cart_product_name"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/cart_product_image"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/app_name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <com.romainpiel.shimmer.ShimmerTextView
+                android:id="@+id/cart_product_offer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="20% off"
+                android:textColor="@color/colorIconLight"
+                android:textAllCaps="false"
+                android:textStyle="normal"
+                android:textAlignment="center"
+                android:textSize="12sp"
+                android:fontFamily="@font/montserrat"
+                android:includeFontPadding="false"
+                android:background="@color/successColor"
+                android:paddingVertical="4dp"
+                android:paddingHorizontal="12dp"
+                app:reflectionColor="@color/colorAccent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/cart_product_image"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/cart_product_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp"
+        android:text="Product Name"
+        android:textColor="@color/colorTextDark"
+        android:textAllCaps="false"
+        android:textStyle="normal"
+        android:textAlignment="textStart"
+        android:textSize="14sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        app:layout_constraintStart_toEndOf="@id/cart_product_image_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/remove_btn"/>
+
+    <TextView
+        android:id="@+id/cart_product_unit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"
+        android:text="5 kilograms"
+        android:textColor="@color/colorTextDark"
+        android:textAllCaps="false"
+        android:textStyle="italic"
+        android:textAlignment="textStart"
+        android:textSize="11sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:alpha="0.5"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/cart_product_image_container"
+        app:layout_constraintTop_toBottomOf="@id/cart_product_name"
+        tools:ignore="SmallSp" />
+
+    <TextView
+        android:id="@+id/text_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"
+        android:text="Category : "
+        android:textColor="@color/colorTextDark"
+        android:textAllCaps="false"
+        android:textStyle="normal"
+        android:textAlignment="textStart"
+        android:textSize="12sp"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        app:layout_constraintStart_toEndOf="@id/cart_product_image_container"
+        app:layout_constraintTop_toBottomOf="@id/cart_product_unit"/>
+
+    <TextView
+        android:id="@+id/cart_product_category"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="Product Category"
+        android:textColor="@color/infoColor"
+        android:textAllCaps="false"
+        android:textStyle="normal"
+        android:textAlignment="textStart"
+        android:textSize="12sp"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/text_category"
+        app:layout_constraintBottom_toBottomOf="@id/text_category"
+        app:layout_constraintTop_toTopOf="@id/text_category"/>
+
+    <TextView
+        android:id="@+id/text_sold_by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="16dp"
+        android:text="Sold by : "
+        android:textColor="@color/colorTextDark"
+        android:textAllCaps="false"
+        android:textStyle="normal"
+        android:textAlignment="textStart"
+        android:textSize="12sp"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        app:layout_constraintStart_toEndOf="@id/cart_product_image_container"
+        app:layout_constraintTop_toBottomOf="@id/text_category"/>
+
+    <TextView
+        android:id="@+id/cart_product_store_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="Store Name"
+        android:textColor="@color/infoColor"
+        android:textAllCaps="false"
+        android:textStyle="normal"
+        android:textAlignment="textStart"
+        android:textSize="12sp"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/text_sold_by"
+        app:layout_constraintBottom_toBottomOf="@id/text_sold_by"
+        app:layout_constraintTop_toTopOf="@id/text_sold_by"/>
+
+    <TextView
+        android:id="@+id/cart_product_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="16dp"
+        android:text="₹ 200"
+        android:textColor="@color/colorTextDark"
+        android:textAllCaps="false"
+        android:textStyle="bold"
+        android:textAlignment="textStart"
+        android:textSize="16sp"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        app:layout_constraintStart_toEndOf="@id/cart_product_image_container"
+        app:layout_constraintTop_toBottomOf="@id/text_sold_by"/>
+
+    <TextView
+        android:id="@+id/cart_product_mrp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:text="₹ 240"
+        android:textColor="@color/errorColor"
+        android:textAllCaps="false"
+        android:textStyle="normal"
+        android:textAlignment="textStart"
+        android:textSize="11sp"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        app:layout_constraintStart_toEndOf="@id/cart_product_price"
+        app:layout_constraintBottom_toBottomOf="@id/cart_product_price"
+        app:layout_constraintTop_toTopOf="@id/cart_product_price"
+        tools:ignore="SmallSp" />
+
+    <View
+        android:id="@+id/divider1"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="24dp"
+        android:background="@color/colorInactive"
+        app:layout_constraintTop_toBottomOf="@id/cart_product_price"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/cart_item_total_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="₹ 200"
+        android:textColor="@color/colorTextDark"
+        android:textAllCaps="false"
+        android:textStyle="bold"
+        android:textAlignment="textStart"
+        android:textSize="18sp"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/decrement_btn_container"
+        app:layout_constraintBottom_toBottomOf="@id/decrement_btn_container"/>
+
+    <TextView
+        android:id="@+id/cart_item_total_mrp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:text="₹ 240"
+        android:textColor="@color/errorColor"
+        android:textAllCaps="false"
+        android:textStyle="normal"
+        android:textAlignment="textStart"
+        android:textSize="11sp"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        app:layout_constraintStart_toEndOf="@id/cart_item_total_price"
+        app:layout_constraintBottom_toBottomOf="@id/cart_item_total_price"
+        app:layout_constraintTop_toTopOf="@id/cart_item_total_price"
+        tools:ignore="SmallSp" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/decrement_btn_container"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardBackgroundColor="@color/colorAccent"
+        app:layout_constraintTop_toBottomOf="@id/divider1"
+        app:layout_constraintEnd_toStartOf="@id/cart_product_quantity">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/decrement_btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackground"
+            android:focusable="true"
+            android:clickable="true">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_minus"
+                android:scaleType="centerCrop"
+                app:tint="@color/colorIconLight"
+                android:contentDescription="@string/app_name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/cart_product_quantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textColor="@color/colorTextDark"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        android:text="00"
+        app:layout_constraintBottom_toBottomOf="@id/increment_btn_container"
+        app:layout_constraintEnd_toStartOf="@id/increment_btn_container"
+        app:layout_constraintTop_toTopOf="@id/increment_btn_container" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/increment_btn_container"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardBackgroundColor="@color/colorAccent"
+        app:layout_constraintTop_toBottomOf="@id/divider1"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/increment_btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackground"
+            android:focusable="true"
+            android:clickable="true">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_add"
+                android:scaleType="centerCrop"
+                app:tint="@color/colorIconLight"
+                android:contentDescription="@string/app_name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="12dp"
+        android:background="@color/colorInactive"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/increment_btn_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

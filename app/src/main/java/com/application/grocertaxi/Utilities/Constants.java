@@ -12,12 +12,16 @@ public class Constants {
     public static final String KEY_COLLECTION_LOCALITIES = "Localities";
     public static final String KEY_COLLECTION_CATEGORIES = "Categories";
     public static final String KEY_COLLECTION_PRODUCTS = "Products";
+    public static final String KEY_COLLECTION_CART = "Cart";
+    public static final String KEY_COLLECTION_PENDING_ORDERS = "PendingOrders";
+    public static final String KEY_COLLECTION_COMPLETED_ORDERS = "CompletedOrders";
+    public static final String KEY_COLLECTION_CANCELLED_ORDERS = "CancelledOrders";
+    public static final String KEY_COLLECTION_ORDER_ITEMS = "OrderItems";
 
-    public static final String KEY_CITY = "City";
-    public static final String KEY_LOCALITY = "Locality";
     public static final String KEY_CATEGORY = "Category";
     public static final String KEY_PRODUCT = "Product";
     public static final String KEY_STORE = "Store";
+    public static final String KEY_STORE_CATEGORY = "StoreCategory";
 
     public static final String KEY_UID = "UID";
     public static final String KEY_FCM_TOKEN = "FCMToken";
@@ -29,16 +33,11 @@ public class Constants {
     public static final String KEY_USER_MOBILE = "userMobile";
     public static final String KEY_USER_IMAGE = "userImage";
     public static final String KEY_USER_ADDRESS = "userAddress";
+    public static final String KEY_USER_CITY = "userCity";
+    public static final String KEY_USER_LOCALITY = "userLocality";
     public static final String KEY_USER_TIMESTAMP = "userTimestamp";
     public static final String KEY_USER_SEARCH_KEYWORD = "userSearchKeyword";
     public static final String KEY_USER_FIRST_ORDER = "userFirstOrder";
-
-    public static final String KEY_ADDRESS_LINE1 = "AddressLine1";
-    public static final String KEY_ADDRESS_LINE2 = "AddressLine2";
-    public static final String KEY_LANDMARK = "Landmark";
-    public static final String KEY_PINCODE = "PinCode";
-    public static final String KEY_CITY_NAME = "CityName";
-    public static final String KEY_STATE_NAME = "StateName";
 
     //Store Constants
     public static final String KEY_STORE_ID = "storeID";
@@ -77,4 +76,53 @@ public class Constants {
     public static final String KEY_PRODUCT_MFG_DATE = "productMFGDate";
     public static final String KEY_PRODUCT_EXPIRY_TIME = "productExpiryTime";
     public static final String KEY_PRODUCT_SEARCH_KEYWORD = "productSearchKeyword";
+
+    //Cart Constants
+    public static final String KEY_CART_ITEM_ID = "cartItemID";
+    public static final String KEY_CART_ITEM_TIMESTAMP = "cartItemTimestamp";
+    public static final String KEY_CART_ITEM_LOCATION = "cartItemLocation";
+    public static final String KEY_CART_ITEM_PRODUCT_ID = "cartItemProductID";
+    public static final String KEY_CART_ITEM_PRODUCT_STORE_ID = "cartItemProductStoreID";
+    public static final String KEY_CART_ITEM_PRODUCT_STORE_NAME = "cartItemProductStoreName";
+    public static final String KEY_CART_ITEM_PRODUCT_CATEGORY = "cartItemProductCategory";
+    public static final String KEY_CART_ITEM_PRODUCT_IMAGE = "cartItemProductImage";
+    public static final String KEY_CART_ITEM_PRODUCT_NAME = "cartItemProductName";
+    public static final String KEY_CART_ITEM_PRODUCT_UNIT = "cartItemProductUnit";
+    public static final String KEY_CART_ITEM_PRODUCT_MRP = "cartItemProductMRP";
+    public static final String KEY_CART_ITEM_PRODUCT_RETAIL_PRICE = "cartItemProductRetailPrice";
+    public static final String KEY_CART_ITEM_PRODUCT_QUANTITY = "cartItemProductQuantity";
+
+    //Order Constants
+    public static final String KEY_ORDER_ID = "orderID";
+    public static final String KEY_ORDER_BY_USERID = "orderByUserID";
+    public static final String KEY_ORDER_BY_USERNAME = "orderByUserName";
+    public static final String KEY_ORDER_CUSTOMER_NAME = "orderCustomerName";
+    public static final String KEY_ORDER_CUSTOMER_ADDRESS = "orderCustomerAddress";
+    public static final String KEY_ORDER_CUSTOMER_MOBILE = "orderCustomerMobile";
+    public static final String KEY_ORDER_NUMBER_OF_ITEMS = "orderNumberOfItems";
+    public static final String KEY_ORDER_TOTAL_MRP = "orderTotalMRP";
+    public static final String KEY_ORDER_TOTAL_DISCOUNT = "orderTotalDiscount";
+    public static final String KEY_ORDER_TOTAL_AMOUNT = "orderTotalAmount";
+    public static final String KEY_ORDER_CONVENIENCE_FEE = "orderConvenienceFee";
+    public static final String KEY_ORDER_DELIVERY_CHARGES = "orderDeliveryCharges";
+    public static final String KEY_ORDER_TOTAL_PAYABLE = "orderTotalPayable";
+    public static final String KEY_ORDER_PAYMENT_MODE = "orderPaymentMode";
+    public static final String KEY_ORDER_STATUS = "orderStatus";
+    public static final String KEY_ORDER_PLACED_DATE = "orderPlacedDate";
+    public static final String KEY_ORDER_COMPLETION_DATE = "orderCompletionDate";
+    public static final String KEY_ORDER_TIMESTAMP = "orderTimestamp";
+
+    //OrderItems Constants
+    public static final String KEY_ORDER_ITEM_ID = "orderItemID";
+    public static final String KEY_ORDER_ITEM_TIMESTAMP = "orderItemTimestamp";
+    public static final String KEY_ORDER_ITEM_PRODUCT_ID = "orderItemProductID";
+    public static final String KEY_ORDER_ITEM_PRODUCT_STORE_ID = "orderItemProductStoreID";
+    public static final String KEY_ORDER_ITEM_PRODUCT_STORE_NAME = "orderItemProductStoreName";
+    public static final String KEY_ORDER_ITEM_PRODUCT_CATEGORY = "orderItemProductCategory";
+    public static final String KEY_ORDER_ITEM_PRODUCT_IMAGE = "orderItemProductImage";
+    public static final String KEY_ORDER_ITEM_PRODUCT_NAME = "orderItemProductName";
+    public static final String KEY_ORDER_ITEM_PRODUCT_UNIT = "orderItemProductUnit";
+    public static final String KEY_ORDER_ITEM_PRODUCT_MRP = "orderItemProductMRP";
+    public static final String KEY_ORDER_ITEM_PRODUCT_RETAIL_PRICE = "orderItemProductRetailPrice";
+    public static final String KEY_ORDER_ITEM_PRODUCT_QUANTITY = "orderItemProductQuantity";
 }

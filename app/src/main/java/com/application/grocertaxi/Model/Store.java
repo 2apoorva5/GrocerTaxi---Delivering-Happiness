@@ -14,8 +14,8 @@ public class Store {
 
     public Store(String storeID, String storeName, String storeOwner, String storeEmail, String storeMobile,
                  String storeAddress, String storeTiming, String storeImage, String storeSearchKeyword,
-                 Timestamp storeTimestamp, boolean storeStatus, double storeDeliveryCharges, double storeAverageRating,
-                 double storeTotalRating) {
+                 Timestamp storeTimestamp, boolean storeStatus, double storeDeliveryCharges,
+                 double storeAverageRating, double storeTotalRating) {
         this.storeID = storeID;
         this.storeName = storeName;
         this.storeOwner = storeOwner;

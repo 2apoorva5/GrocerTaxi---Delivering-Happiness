@@ -64,9 +64,9 @@ public class ChooseLocalityActivity extends AppCompatActivity {
     private GifImageView chooseLocalityGif;
     private EditText inputLocalitySearchField;
     private RecyclerView recyclerLocality;
-    private ProgressBar chooseLocalityProgressBar;
+    private ProgressBar progressBar;
 
-    private CollectionReference localitiesRef;
+    private CollectionReference localitiesRef, userRef;
     private FirestorePagingAdapter<Locality, LocalityViewHolder> localityAdapter;
 
     private PreferenceManager preferenceManager;
@@ -104,13 +104,14 @@ public class ChooseLocalityActivity extends AppCompatActivity {
         inputLocalitySearchField = findViewById(R.id.input_locality_search_field);
         speechToText = findViewById(R.id.speech_to_text);
         recyclerLocality = findViewById(R.id.recycler_locality);
-        chooseLocalityProgressBar = findViewById(R.id.choose_locality_progress_bar);
+        progressBar = findViewById(R.id.progress_bar);
     }
 
     private void initFirebase() {
         localitiesRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_CITIES)
-                .document(preferenceManager.getString(Constants.KEY_CITY))
+                .document(preferenceManager.getString(Constants.KEY_USER_CITY))
                 .collection(Constants.KEY_COLLECTION_LOCALITIES);
+        userRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS);
     }
 
     private void setActionOnViews() {
@@ -120,7 +121,7 @@ public class ChooseLocalityActivity extends AppCompatActivity {
         String[] splitName = name.split(" ", 2);
 
         chooseLocalityTitle.setText(String.format("Well, %s", splitName[0]));
-        chooseLocalitySubtitle.setText(String.format("Where in %s?", preferenceManager.getString(Constants.KEY_CITY)));
+        chooseLocalitySubtitle.setText(String.format("Where in %s?", preferenceManager.getString(Constants.KEY_USER_CITY)));
 
         KeyboardVisibilityEvent.setEventListener(ChooseLocalityActivity.this, isOpen -> {
             if (!isOpen) {
@@ -128,14 +129,14 @@ public class ChooseLocalityActivity extends AppCompatActivity {
             }
         });
 
-        chooseLocalityProgressBar.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
 
         speechToText.setOnClickListener(view -> {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                     RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, String.format("Well, %s! Where in %s?", splitName[0], preferenceManager.getString(Constants.KEY_CITY)));
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, String.format("Well, %s! Where in %s?", splitName[0], preferenceManager.getString(Constants.KEY_USER_CITY)));
 
             try {
                 startActivityForResult(intent, 123);
@@ -267,12 +268,35 @@ public class ChooseLocalityActivity extends AppCompatActivity {
                 holder.clickListener.setOnClickListener(view -> {
                     UIUtil.hideKeyboard(ChooseLocalityActivity.this);
                     notifyDataSetChanged();
+                    progressBar.setVisibility(View.VISIBLE);
 
-                    preferenceManager.putString(Constants.KEY_LOCALITY, model.getName());
+                    userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
+                            .update(Constants.KEY_USER_LOCALITY, model.getName())
+                            .addOnSuccessListener(aVoid -> {
+                                progressBar.setVisibility(View.GONE);
 
-                    startActivity(new Intent(ChooseLocalityActivity.this, MainActivity.class));
-                    CustomIntent.customType(ChooseLocalityActivity.this, "fadein-to-fadeout");
-                    finish();
+                                preferenceManager.putString(Constants.KEY_USER_LOCALITY, model.getName());
+
+                                startActivity(new Intent(ChooseLocalityActivity.this, MainActivity.class));
+                                CustomIntent.customType(ChooseLocalityActivity.this, "fadein-to-fadeout");
+                                finish();
+
+                            }).addOnFailureListener(e -> {
+                        progressBar.setVisibility(View.GONE);
+                        Alerter.create(ChooseLocalityActivity.this)
+                                .setText("Whoa! Something broke. Try again!")
+                                .setTextAppearance(R.style.AlertText)
+                                .setBackgroundColorRes(R.color.errorColor)
+                                .setIcon(R.drawable.ic_error)
+                                .setDuration(3000)
+                                .enableIconPulse(true)
+                                .enableVibration(true)
+                                .disableOutsideTouch()
+                                .enableProgress(true)
+                                .setProgressColorInt(getColor(android.R.color.white))
+                                .show();
+                        return;
+                    });
                 });
 
                 setAnimation(holder.itemView, position);
@@ -296,11 +320,11 @@ public class ChooseLocalityActivity extends AppCompatActivity {
                 switch (state) {
                     case LOADING_INITIAL:
                     case LOADING_MORE:
-                        chooseLocalityProgressBar.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.VISIBLE);
                         break;
                     case LOADED:
                     case FINISHED:
-                        chooseLocalityProgressBar.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.GONE);
                         break;
                     case ERROR:
                         Alerter.create(ChooseLocalityActivity.this)

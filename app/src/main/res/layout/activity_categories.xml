@@ -1257,13 +1257,27 @@
         android:src="@drawable/ic_cart"
         app:backgroundTint="@color/colorIconDark"
         app:tint="@color/colorIconLight"
-        app:maxImageSize="32dp"
+        app:maxImageSize="24dp"
         android:elevation="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/bottom_bar_container"
         app:layout_constraintBottom_toBottomOf="@+id/bottom_bar_container"
         android:contentDescription="@string/app_name" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cart_indicator"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        app:cardBackgroundColor="@color/colorIconLight"
+        app:cardCornerRadius="6dp"
+        app:cardElevation="8dp"
+        android:visibility="gone"
+        app:cardPreventCornerOverlap="true"
+        app:layout_constraintTop_toBottomOf="@id/cart_btn"
+        app:layout_constraintEnd_toEndOf="@id/cart_btn"
+        app:layout_constraintStart_toStartOf="@id/cart_btn"
+        app:layout_constraintBottom_toBottomOf="@id/cart_btn"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_bar_container"

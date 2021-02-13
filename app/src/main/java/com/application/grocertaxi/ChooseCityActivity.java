@@ -37,15 +37,19 @@ import com.application.grocertaxi.Model.City;
 import com.application.grocertaxi.Model.Product;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
 import com.firebase.ui.firestore.paging.LoadingState;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -58,6 +62,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import de.mateware.snacky.Snacky;
 import maes.tech.intentanim.CustomIntent;
 import pl.droidsonroids.gif.GifImageView;
 
@@ -68,10 +73,10 @@ public class ChooseCityActivity extends AppCompatActivity {
     private GifImageView chooseCityGif;
     private EditText inputCitySearchField;
     private RecyclerView recyclerCity;
-    private ProgressBar chooseCityProgressBar;
+    private ProgressBar progressBar;
 
-    private CollectionReference citiesRef;
-    private FirestorePagingAdapter<City, CityViewHolder> cityAdapter;
+    private CollectionReference citiesRef, userRef;
+    private FirestoreRecyclerAdapter<City, CityViewHolder> cityAdapter;
 
     private PreferenceManager preferenceManager;
     private static int LAST_POSITION = -1;
@@ -107,11 +112,12 @@ public class ChooseCityActivity extends AppCompatActivity {
         inputCitySearchField = findViewById(R.id.input_city_search_field);
         speechToText = findViewById(R.id.speech_to_text);
         recyclerCity = findViewById(R.id.recycler_city);
-        chooseCityProgressBar = findViewById(R.id.choose_city_progress_bar);
+        progressBar = findViewById(R.id.progress_bar);
     }
 
     private void initFirebase() {
         citiesRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_CITIES);
+        userRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS);
     }
 
     private void setActionOnViews() {
@@ -131,7 +137,7 @@ public class ChooseCityActivity extends AppCompatActivity {
             }
         });
 
-        chooseCityProgressBar.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
 
         speechToText.setOnClickListener(view -> {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -183,14 +189,9 @@ public class ChooseCityActivity extends AppCompatActivity {
                             .startAt(s.toString().toLowerCase().trim()).endAt(s.toString().toLowerCase().trim() + "\uf8ff");
                 }
 
-                PagedList.Config updatedConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(8)
-                        .setPageSize(4)
-                        .build();
-
-                FirestorePagingOptions<City> updatedOptions = new FirestorePagingOptions.Builder<City>()
+                FirestoreRecyclerOptions<City> updatedOptions = new FirestoreRecyclerOptions.Builder<City>()
                         .setLifecycleOwner(ChooseCityActivity.this)
-                        .setQuery(updatedQuery, updatedConfig, City.class)
+                        .setQuery(updatedQuery, City.class)
                         .build();
 
                 cityAdapter.updateOptions(updatedOptions);
@@ -209,14 +210,9 @@ public class ChooseCityActivity extends AppCompatActivity {
                                     .startAt(s.toString().toLowerCase().trim()).endAt(s.toString().toLowerCase().trim() + "\uf8ff");
                         }
 
-                        PagedList.Config updatedConfig = new PagedList.Config.Builder()
-                                .setInitialLoadSizeHint(8)
-                                .setPageSize(4)
-                                .build();
-
-                        FirestorePagingOptions<City> updatedOptions = new FirestorePagingOptions.Builder<City>()
+                        FirestoreRecyclerOptions<City> updatedOptions = new FirestoreRecyclerOptions.Builder<City>()
                                 .setLifecycleOwner(ChooseCityActivity.this)
-                                .setQuery(updatedQuery, updatedConfig, City.class)
+                                .setQuery(updatedQuery, City.class)
                                 .build();
 
                         cityAdapter.updateOptions(updatedOptions);
@@ -246,17 +242,12 @@ public class ChooseCityActivity extends AppCompatActivity {
     private void loadCities() {
         Query query = citiesRef.orderBy("name", Query.Direction.ASCENDING);
 
-        PagedList.Config config = new PagedList.Config.Builder()
-                .setInitialLoadSizeHint(8)
-                .setPageSize(4)
-                .build();
-
-        FirestorePagingOptions<City> options = new FirestorePagingOptions.Builder<City>()
+        FirestoreRecyclerOptions<City> options = new FirestoreRecyclerOptions.Builder<City>()
                 .setLifecycleOwner(ChooseCityActivity.this)
-                .setQuery(query, config, City.class)
+                .setQuery(query, City.class)
                 .build();
 
-        cityAdapter = new FirestorePagingAdapter<City, CityViewHolder>(options) {
+        cityAdapter = new FirestoreRecyclerAdapter<City, CityViewHolder>(options) {
 
             @NonNull
             @Override
@@ -272,11 +263,33 @@ public class ChooseCityActivity extends AppCompatActivity {
                 holder.clickListener.setOnClickListener(view -> {
                     UIUtil.hideKeyboard(ChooseCityActivity.this);
                     notifyDataSetChanged();
+                    progressBar.setVisibility(View.VISIBLE);
 
-                    preferenceManager.putString(Constants.KEY_CITY, model.getName());
+                    userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
+                            .update(Constants.KEY_USER_CITY, model.getName())
+                            .addOnSuccessListener(aVoid -> {
+                                progressBar.setVisibility(View.GONE);
 
-                    startActivity(new Intent(ChooseCityActivity.this, ChooseLocalityActivity.class));
-                    CustomIntent.customType(ChooseCityActivity.this, "left-to-right");
+                                preferenceManager.putString(Constants.KEY_USER_CITY, model.getName());
+
+                                startActivity(new Intent(ChooseCityActivity.this, ChooseLocalityActivity.class));
+                                CustomIntent.customType(ChooseCityActivity.this, "left-to-right");
+                            }).addOnFailureListener(e -> {
+                                progressBar.setVisibility(View.GONE);
+                                Alerter.create(ChooseCityActivity.this)
+                                        .setText("Whoa! Something broke. Try again!")
+                                        .setTextAppearance(R.style.AlertText)
+                                        .setBackgroundColorRes(R.color.errorColor)
+                                        .setIcon(R.drawable.ic_error)
+                                        .setDuration(3000)
+                                        .enableIconPulse(true)
+                                        .enableVibration(true)
+                                        .disableOutsideTouch()
+                                        .enableProgress(true)
+                                        .setProgressColorInt(getColor(android.R.color.white))
+                                        .show();
+                                return;
+                            });
                 });
 
                 setAnimation(holder.itemView, position);
@@ -295,32 +308,33 @@ public class ChooseCityActivity extends AppCompatActivity {
             }
 
             @Override
-            protected void onLoadingStateChanged(@NonNull LoadingState state) {
-                super.onLoadingStateChanged(state);
-                switch (state) {
-                    case LOADING_INITIAL:
-                    case LOADING_MORE:
-                        chooseCityProgressBar.setVisibility(View.VISIBLE);
-                        break;
-                    case LOADED:
-                    case FINISHED:
-                        chooseCityProgressBar.setVisibility(View.GONE);
-                        break;
-                    case ERROR:
-                        Alerter.create(ChooseCityActivity.this)
-                                .setText("Whoa! Something Broke. Try again!")
-                                .setTextAppearance(R.style.AlertText)
-                                .setBackgroundColorRes(R.color.errorColor)
-                                .setIcon(R.drawable.ic_error)
-                                .setDuration(3000)
-                                .enableIconPulse(true)
-                                .enableVibration(true)
-                                .disableOutsideTouch()
-                                .enableProgress(true)
-                                .setProgressColorInt(getColor(android.R.color.white))
-                                .show();
-                        break;
-                }
+            public void onDataChanged() {
+                super.onDataChanged();
+
+                progressBar.setVisibility(View.GONE);
+                Snacky.builder()
+                        .setActivity(ChooseCityActivity.this)
+                        .setText(String.format("We're currently servicing in %d cities.", getItemCount()))
+                        .setDuration(Snacky.LENGTH_INDEFINITE)
+                        .info()
+                        .show();
+            }
+
+            @Override
+            public void onError(@NonNull FirebaseFirestoreException e) {
+                super.onError(e);
+                Alerter.create(ChooseCityActivity.this)
+                        .setText("Whoa! Something Broke. Try again!")
+                        .setTextAppearance(R.style.AlertText)
+                        .setBackgroundColorRes(R.color.errorColor)
+                        .setIcon(R.drawable.ic_error)
+                        .setDuration(3000)
+                        .enableIconPulse(true)
+                        .enableVibration(true)
+                        .disableOutsideTouch()
+                        .enableProgress(true)
+                        .setProgressColorInt(getColor(android.R.color.white))
+                        .show();
             }
         };
 

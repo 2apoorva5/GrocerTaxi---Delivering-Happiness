@@ -143,7 +143,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:orientation="vertical"
-        android:paddingBottom="48dp"
+        android:paddingBottom="72dp"
         android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -151,9 +151,10 @@
         app:layout_constraintTop_toBottomOf="@+id/choose_city_gif" />
 
     <ProgressBar
-        android:id="@+id/choose_city_progress_bar"
+        android:id="@+id/progress_bar"
         android:layout_width="56dp"
         android:layout_height="56dp"
+        android:visibility="gone"
         android:progressTint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

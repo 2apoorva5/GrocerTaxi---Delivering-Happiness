@@ -303,14 +303,8 @@ public class SignInActivity extends AppCompatActivity {
                                         preferenceManager.putString(Constants.KEY_USER_MOBILE, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_MOBILE));
                                         preferenceManager.putString(Constants.KEY_USER_IMAGE, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_IMAGE));
                                         preferenceManager.putString(Constants.KEY_USER_ADDRESS, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_ADDRESS));
-                                        preferenceManager.putString(Constants.KEY_CITY, "");
-                                        preferenceManager.putString(Constants.KEY_LOCALITY, "");
-                                        preferenceManager.putString(Constants.KEY_ADDRESS_LINE1, "");
-                                        preferenceManager.putString(Constants.KEY_ADDRESS_LINE2, "");
-                                        preferenceManager.putString(Constants.KEY_LANDMARK, "");
-                                        preferenceManager.putString(Constants.KEY_PINCODE, "");
-                                        preferenceManager.putString(Constants.KEY_CITY_NAME, "");
-                                        preferenceManager.putString(Constants.KEY_STATE_NAME, "");
+                                        preferenceManager.putString(Constants.KEY_USER_CITY, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_CITY));
+                                        preferenceManager.putString(Constants.KEY_USER_LOCALITY, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_LOCALITY));
 
                                         Intent intent = new Intent(getApplicationContext(), ChooseCityActivity.class);
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

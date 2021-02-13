@@ -1,13 +1,5 @@
 package com.application.grocertaxi;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.paging.PagedList;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -31,6 +23,15 @@ import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.paging.PagedList;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.grocertaxi.Model.Store;
 import com.application.grocertaxi.Utilities.Constants;
@@ -61,14 +62,16 @@ public class StoresListActivity extends AppCompatActivity {
     private EditText inputStoreSearch;
     private RecyclerView recyclerStores;
     private TextView textEmpty;
-    private ProgressBar storesProgressBar;
+    private ProgressBar progressBar;
     private FloatingActionButton cartBtn;
+    private CardView cartIndicator;
     private ConstraintLayout bottomBarContainer, sortBtn;
     private PullRefreshLayout pullRefreshLayout;
 
-    private CollectionReference storesRef;
+    private CollectionReference storesRef, cartRef;
     private FirestorePagingAdapter<Store, StoreViewHolder> storeAdapter;
 
+    private String cart_location;
     private PreferenceManager preferenceManager;
     private static int LAST_POSITION = -1;
 
@@ -85,14 +88,14 @@ public class StoresListActivity extends AppCompatActivity {
             startActivity(intent);
             CustomIntent.customType(StoresListActivity.this, "fadein-to-fadeout");
             finish();
-        } else if (preferenceManager.getString(Constants.KEY_CITY).equals("") ||
-                preferenceManager.getString(Constants.KEY_CITY) == null ||
-                preferenceManager.getString(Constants.KEY_CITY).length() == 0 ||
-                preferenceManager.getString(Constants.KEY_CITY).isEmpty() ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).equals("") ||
-                preferenceManager.getString(Constants.KEY_LOCALITY) == null ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).length() == 0 ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).isEmpty()) {
+        } else if (preferenceManager.getString(Constants.KEY_USER_CITY).equals("") ||
+                preferenceManager.getString(Constants.KEY_USER_CITY) == null ||
+                preferenceManager.getString(Constants.KEY_USER_CITY).length() == 0 ||
+                preferenceManager.getString(Constants.KEY_USER_CITY).isEmpty() ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).equals("") ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY) == null ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).length() == 0 ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).isEmpty()) {
             Intent intent = new Intent(StoresListActivity.this, ChooseCityActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -103,6 +106,8 @@ public class StoresListActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
+        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
 
         initViews();
         initFirebase();
@@ -117,12 +122,13 @@ public class StoresListActivity extends AppCompatActivity {
         inputStoreSearch = findViewById(R.id.input_store_search_field);
         recyclerStores = findViewById(R.id.recycler_stores);
         textEmpty = findViewById(R.id.text_empty);
-        storesProgressBar = findViewById(R.id.stores_progress_bar);
+        progressBar = findViewById(R.id.progress_bar);
         menuHome = findViewById(R.id.menu_home);
         menuCategory = findViewById(R.id.menu_category);
         menuStore = findViewById(R.id.menu_store);
         menuProfile = findViewById(R.id.menu_profile);
         cartBtn = findViewById(R.id.cart_btn);
+        cartIndicator = findViewById(R.id.cart_indicator);
         bottomBarContainer = findViewById(R.id.bottom_bar_container);
         pullRefreshLayout = findViewById(R.id.pull_refresh_layout);
     }
@@ -130,10 +136,13 @@ public class StoresListActivity extends AppCompatActivity {
     private void initFirebase() {
         storesRef = FirebaseFirestore.getInstance()
                 .collection(Constants.KEY_COLLECTION_CITIES)
-                .document(preferenceManager.getString(Constants.KEY_CITY))
+                .document(preferenceManager.getString(Constants.KEY_USER_CITY))
                 .collection(Constants.KEY_COLLECTION_LOCALITIES)
-                .document(preferenceManager.getString(Constants.KEY_LOCALITY))
+                .document(preferenceManager.getString(Constants.KEY_USER_LOCALITY))
                 .collection(Constants.KEY_COLLECTION_STORES);
+        cartRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS)
+                .document(preferenceManager.getString(Constants.KEY_USER_ID))
+                .collection(Constants.KEY_COLLECTION_CART);
     }
 
     private void setActionOnViews() {
@@ -153,7 +162,7 @@ public class StoresListActivity extends AppCompatActivity {
             }
         });
 
-        storesProgressBar.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
 
         speechToText.setOnClickListener(view -> {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -353,7 +362,8 @@ public class StoresListActivity extends AppCompatActivity {
         });
 
         cartBtn.setOnClickListener(v -> {
-
+            startActivity(new Intent(getApplicationContext(), CartActivity.class));
+            CustomIntent.customType(StoresListActivity.this, "bottom-to-up");
         });
     }
 
@@ -416,14 +426,14 @@ public class StoresListActivity extends AppCompatActivity {
                 } else {
                     holder.storeRating.setVisibility(View.VISIBLE);
                     holder.storeRating.setText(String.valueOf(model.getStoreAverageRating()));
+                    holder.storeRatingBar.setVisibility(View.VISIBLE);
                     holder.storeRatingBar.setRating((float) model.getStoreAverageRating());
                 }
 
-                holder.clickListener.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
+                holder.clickListener.setOnClickListener(v -> {
+                    preferenceManager.putString(Constants.KEY_STORE, model.getStoreID());
+                    startActivity(new Intent(StoresListActivity.this, StoreDetailsActivity.class));
+                    CustomIntent.customType(StoresListActivity.this, "bottom-to-up");
                 });
 
                 setAnimation(holder.itemView, position);
@@ -447,14 +457,14 @@ public class StoresListActivity extends AppCompatActivity {
                 switch (state) {
                     case LOADING_INITIAL:
                     case LOADING_MORE:
-                        storesProgressBar.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.VISIBLE);
                         illustrationEmpty.setVisibility(View.GONE);
                         textEmpty.setVisibility(View.GONE);
                         break;
                     case LOADED:
                     case FINISHED:
                         pullRefreshLayout.setRefreshing(false);
-                        storesProgressBar.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.GONE);
 
                         if (getItemCount() == 0) {
                             illustrationEmpty.setVisibility(View.VISIBLE);
@@ -542,10 +552,31 @@ public class StoresListActivity extends AppCompatActivity {
         super.onStart();
 
         loadStores();
+        cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (queryDocumentSnapshots.size() == 0) {
+                cartIndicator.setVisibility(View.GONE);
+            } else {
+                cartIndicator.setVisibility(View.VISIBLE);
+            }
+        }).addOnFailureListener(e -> {
+            Alerter.create(StoresListActivity.this)
+                    .setText("Whoa! Something Broke. Try again!")
+                    .setTextAppearance(R.style.AlertText)
+                    .setBackgroundColorRes(R.color.errorColor)
+                    .setIcon(R.drawable.ic_error)
+                    .setDuration(3000)
+                    .enableIconPulse(true)
+                    .enableVibration(true)
+                    .disableOutsideTouch()
+                    .enableProgress(true)
+                    .setProgressColorInt(getColor(android.R.color.white))
+                    .show();
+            return;
+        });
 
         pullRefreshLayout.setColor(getColor(R.color.colorAccent));
         pullRefreshLayout.setOnRefreshListener(() -> {
-            if(!isConnectedToInternet(StoresListActivity.this)) {
+            if (!isConnectedToInternet(StoresListActivity.this)) {
                 pullRefreshLayout.setRefreshing(false);
                 showConnectToInternetDialog();
                 return;
@@ -554,6 +585,27 @@ public class StoresListActivity extends AppCompatActivity {
                 inputStoreSearch.setText(null);
                 inputStoreSearch.clearFocus();
                 loadStores();
+                cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.size() == 0) {
+                        cartIndicator.setVisibility(View.GONE);
+                    } else {
+                        cartIndicator.setVisibility(View.VISIBLE);
+                    }
+                }).addOnFailureListener(e -> {
+                    Alerter.create(StoresListActivity.this)
+                            .setText("Whoa! Something Broke. Try again!")
+                            .setTextAppearance(R.style.AlertText)
+                            .setBackgroundColorRes(R.color.errorColor)
+                            .setIcon(R.drawable.ic_error)
+                            .setDuration(3000)
+                            .enableIconPulse(true)
+                            .enableVibration(true)
+                            .disableOutsideTouch()
+                            .enableProgress(true)
+                            .setProgressColorInt(getColor(android.R.color.white))
+                            .show();
+                    return;
+                });
             }
         });
     }

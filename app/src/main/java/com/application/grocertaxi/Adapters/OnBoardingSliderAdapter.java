@@ -25,21 +25,24 @@ public class OnBoardingSliderAdapter extends PagerAdapter {
             R.drawable.illustration_onboarding1,
             R.drawable.illustration_onboarding2,
             R.drawable.illustration_onboarding3,
-            R.drawable.illustration_onboarding4
+            R.drawable.illustration_onboarding4,
+            R.drawable.illustration_onboarding5
     };
 
     int titles[] = {
             R.string.onboarding_title1,
             R.string.onboarding_title2,
             R.string.onboarding_title3,
-            R.string.onboarding_title4
+            R.string.onboarding_title4,
+            R.string.onboarding_title5
     };
 
     int descriptions[] = {
             R.string.onboarding_description1,
             R.string.onboarding_description2,
             R.string.onboarding_description3,
-            R.string.onboarding_description4
+            R.string.onboarding_description4,
+            R.string.onboarding_description5
     };
 
     @Override

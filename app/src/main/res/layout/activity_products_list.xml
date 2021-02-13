@@ -23,6 +23,34 @@
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/colorIconDark" />
 
+    <ImageView
+        android:id="@+id/cart_btn"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="@string/app_name"
+        android:focusable="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_cart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/colorIconDark" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cart_indicator"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardCornerRadius="6dp"
+        app:cardElevation="8dp"
+        android:visibility="gone"
+        app:cardPreventCornerOverlap="true"
+        app:layout_constraintEnd_toEndOf="@id/cart_btn"
+        app:layout_constraintTop_toTopOf="@id/cart_btn"/>
+
     <TextView
         android:id="@+id/products_list_title"
         android:layout_width="0dp"
@@ -177,8 +205,8 @@
 
         <ImageView
             android:id="@+id/illustration_empty"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
             android:layout_marginBottom="64dp"
             android:contentDescription="@string/app_name"
             android:scaleType="centerInside"
@@ -198,7 +226,7 @@
             android:alpha="0.5"
             android:fontFamily="@font/montserrat"
             android:includeFontPadding="false"
-            android:text="Nothing here"
+            android:text="No products here yet"
             android:textAlignment="center"
             android:textAllCaps="false"
             android:textColor="@color/colorTextDark"
@@ -210,9 +238,10 @@
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <ProgressBar
-            android:id="@+id/products_progress_bar"
+            android:id="@+id/progress_bar"
             android:layout_width="56dp"
             android:layout_height="56dp"
+            android:visibility="gone"
             android:progressTint="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

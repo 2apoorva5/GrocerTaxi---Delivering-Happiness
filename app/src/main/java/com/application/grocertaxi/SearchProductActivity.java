@@ -1,18 +1,14 @@
 package com.application.grocertaxi;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.paging.PagedList;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.speech.RecognizerIntent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,10 +17,20 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.paging.PagedList;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.grocertaxi.Model.Product;
 import com.application.grocertaxi.Utilities.Constants;
@@ -34,31 +40,43 @@ import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
 import com.firebase.ui.firestore.paging.LoadingState;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.romainpiel.shimmer.Shimmer;
+import com.romainpiel.shimmer.ShimmerTextView;
+import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
+import dmax.dialog.SpotsDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class SearchProductActivity extends AppCompatActivity {
 
     private ImageView actionBtn, speechToText, illustrationSearch;
-    private EditText inputProductSearch;
+    private AutoCompleteTextView inputProductSearch;
     private RecyclerView recyclerProducts;
     private TextView textSearch;
-    private ProgressBar productsProgressBar;
+    private ProgressBar progressBar;
 
-    private CollectionReference productsRef;
+    private CollectionReference productsRef, cartRef;
     private FirestorePagingAdapter<Product, ProductViewHolder> productAdapter;
+    List<String> productsList;
 
+    private String cart_location;
+    private Shimmer shimmer;
     private PreferenceManager preferenceManager;
     private static int LAST_POSITION = -1;
+    private AlertDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,14 +91,14 @@ public class SearchProductActivity extends AppCompatActivity {
             startActivity(intent);
             CustomIntent.customType(SearchProductActivity.this, "fadein-to-fadeout");
             finish();
-        } else if (preferenceManager.getString(Constants.KEY_CITY).equals("") ||
-                preferenceManager.getString(Constants.KEY_CITY) == null ||
-                preferenceManager.getString(Constants.KEY_CITY).length() == 0 ||
-                preferenceManager.getString(Constants.KEY_CITY).isEmpty() ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).equals("") ||
-                preferenceManager.getString(Constants.KEY_LOCALITY) == null ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).length() == 0 ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).isEmpty()) {
+        } else if (preferenceManager.getString(Constants.KEY_USER_CITY).equals("") ||
+                preferenceManager.getString(Constants.KEY_USER_CITY) == null ||
+                preferenceManager.getString(Constants.KEY_USER_CITY).length() == 0 ||
+                preferenceManager.getString(Constants.KEY_USER_CITY).isEmpty() ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).equals("") ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY) == null ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).length() == 0 ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).isEmpty()) {
             Intent intent = new Intent(SearchProductActivity.this, ChooseCityActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -91,6 +109,14 @@ public class SearchProductActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         getWindow().setStatusBarColor(getColor(R.color.colorSearch));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
+        progressDialog = new SpotsDialog.Builder().setContext(SearchProductActivity.this)
+                .setMessage("Adding item to cart...")
+                .setCancelable(false)
+                .setTheme(R.style.SpotsDialog)
+                .build();
+
+        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
 
         initViews();
         initFirebase();
@@ -104,16 +130,20 @@ public class SearchProductActivity extends AppCompatActivity {
         inputProductSearch = findViewById(R.id.input_product_search_field);
         recyclerProducts = findViewById(R.id.recycler_products);
         textSearch = findViewById(R.id.text_search);
-        productsProgressBar = findViewById(R.id.products_progress_bar);
+        progressBar = findViewById(R.id.progress_bar);
     }
 
     private void initFirebase() {
         productsRef = FirebaseFirestore.getInstance()
                 .collection(Constants.KEY_COLLECTION_CITIES)
-                .document(preferenceManager.getString(Constants.KEY_CITY))
+                .document(preferenceManager.getString(Constants.KEY_USER_CITY))
                 .collection(Constants.KEY_COLLECTION_LOCALITIES)
-                .document(preferenceManager.getString(Constants.KEY_LOCALITY))
+                .document(preferenceManager.getString(Constants.KEY_USER_LOCALITY))
                 .collection(Constants.KEY_COLLECTION_PRODUCTS);
+
+        cartRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS)
+                .document(preferenceManager.getString(Constants.KEY_USER_ID))
+                .collection(Constants.KEY_COLLECTION_CART);
     }
 
     private void setActionOnViews() {
@@ -161,6 +191,30 @@ public class SearchProductActivity extends AppCompatActivity {
             }
         });
 
+        productsList = new ArrayList<>();
+        productsRef.get().addOnSuccessListener(queryDocumentSnapshots -> {
+            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                productsList.add(documentSnapshot.getString(Constants.KEY_PRODUCT_NAME));
+            }
+        }).addOnFailureListener(e -> {
+            Alerter.create(SearchProductActivity.this)
+                    .setText("Whoa! Something broke. Try again!")
+                    .setTextAppearance(R.style.AlertText)
+                    .setBackgroundColorRes(R.color.errorColor)
+                    .setIcon(R.drawable.ic_error)
+                    .setDuration(3000)
+                    .enableIconPulse(true)
+                    .enableVibration(true)
+                    .disableOutsideTouch()
+                    .enableProgress(true)
+                    .setProgressColorInt(getColor(android.R.color.white))
+                    .show();
+            return;
+        });
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(SearchProductActivity.this, R.layout.layout_search_text, productsList);
+        inputProductSearch.setAdapter(adapter);
+
         inputProductSearch.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 if (inputProductSearch.getText().toString().isEmpty()) {
@@ -172,7 +226,7 @@ public class SearchProductActivity extends AppCompatActivity {
 
                     illustrationSearch.setVisibility(View.VISIBLE);
                     textSearch.setVisibility(View.VISIBLE);
-                    productsProgressBar.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.GONE);
                     Alerter.create(SearchProductActivity.this)
                             .setText("Type something in the search bar")
                             .setTextAppearance(R.style.AlertText)
@@ -189,7 +243,7 @@ public class SearchProductActivity extends AppCompatActivity {
                     UIUtil.hideKeyboard(SearchProductActivity.this);
                     illustrationSearch.setVisibility(View.GONE);
                     textSearch.setVisibility(View.GONE);
-                    productsProgressBar.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.VISIBLE);
 
                     Query query = productsRef.orderBy(Constants.KEY_PRODUCT_SEARCH_KEYWORD, Query.Direction.ASCENDING)
                             .startAt(inputProductSearch.getText().toString().toLowerCase().trim())
@@ -243,39 +297,256 @@ public class SearchProductActivity extends AppCompatActivity {
 
                 holder.productName.setText(model.getProductName());
                 holder.productUnit.setText(model.getProductUnit());
+                holder.productCategory.setText(model.getProductCategory());
+                holder.productPrice.setText(String.format("₹ %s", model.getProductRetailPrice()));
 
                 if (model.getProductRetailPrice() == model.getProductMRP()) {
                     holder.productMRP.setVisibility(View.GONE);
                     holder.productOffer.setVisibility(View.GONE);
                 } else {
+                    holder.productMRP.setVisibility(View.VISIBLE);
+                    holder.productOffer.setVisibility(View.VISIBLE);
+                    shimmer = new Shimmer();
                     holder.productMRP.setText(String.format("₹ %s", model.getProductMRP()));
                     holder.productMRP.setPaintFlags(holder.productMRP.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     float offer = (float) (((model.getProductMRP() - model.getProductRetailPrice()) / model.getProductMRP()) * 100);
                     String offer_value = ((int) offer) + "% off";
                     holder.productOffer.setText(offer_value);
+                    shimmer.start(holder.productOffer);
                 }
 
-                holder.productPrice.setText(String.format("₹ %s", model.getProductRetailPrice()));
-
-                holder.clickListener.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        preferenceManager.putString(Constants.KEY_PRODUCT, model.getProductID());
-                        startActivity(new Intent(SearchProductActivity.this, ProductDetailsActivity.class));
-                        CustomIntent.customType(SearchProductActivity.this, "bottom-to-up");
-                    }
+                holder.clickListener.setOnClickListener(v -> {
+                    preferenceManager.putString(Constants.KEY_PRODUCT, model.getProductID());
+                    startActivity(new Intent(SearchProductActivity.this, ProductDetailsActivity.class));
+                    CustomIntent.customType(SearchProductActivity.this, "bottom-to-up");
                 });
 
-                if(model.isProductInStock()) {
+                if (model.isProductInStock()) {
+                    holder.productStatus.setText("In Stock");
+                    holder.productStatus.setTextColor(getColor(R.color.successColor));
                     holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
                     holder.addToCartBtn.setEnabled(true);
-                    holder.addToCartBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                    holder.addToCartBtn.setOnClickListener(v -> {
+                        if (!isConnectedToInternet(SearchProductActivity.this)) {
+                            showConnectToInternetDialog();
+                            return;
+                        } else {
+                            progressDialog.show();
 
+                            String[] split = model.getProductID().split("-", 2);
+                            String cart_id = "ITEM-" + split[1];
+
+                            HashMap<String, Object> newCartItem = new HashMap<>();
+                            newCartItem.put(Constants.KEY_CART_ITEM_ID, cart_id);
+                            newCartItem.put(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp());
+                            newCartItem.put(Constants.KEY_CART_ITEM_LOCATION, cart_location);
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_ID, model.getProductID());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_STORE_ID, model.getProductStoreID());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_STORE_NAME, model.getProductStoreName());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_CATEGORY, model.getProductCategory());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_IMAGE, model.getProductImage());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_NAME, model.getProductName());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_UNIT, model.getProductUnit());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_MRP, model.getProductMRP());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_RETAIL_PRICE, model.getProductRetailPrice());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, 1);
+
+                            cartRef.get().addOnSuccessListener(queryDocumentSnapshots1 -> {
+                                if (queryDocumentSnapshots1.getDocuments().size() == 0) {
+                                    cartRef.document(cart_id).set(newCartItem)
+                                            .addOnSuccessListener(aVoid -> {
+                                                progressDialog.dismiss();
+                                                Alerter.create(SearchProductActivity.this)
+                                                        .setText("Success! Your cart just got updated.")
+                                                        .setTextAppearance(R.style.AlertText)
+                                                        .setBackgroundColorRes(R.color.successColor)
+                                                        .setIcon(R.drawable.ic_dialog_okay)
+                                                        .setDuration(3000)
+                                                        .enableIconPulse(true)
+                                                        .enableVibration(true)
+                                                        .disableOutsideTouch()
+                                                        .enableProgress(true)
+                                                        .setProgressColorInt(getColor(android.R.color.white))
+                                                        .show();
+                                                return;
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                progressDialog.dismiss();
+                                                Alerter.create(SearchProductActivity.this)
+                                                        .setText("Whoa! Something Broke. Try again!")
+                                                        .setTextAppearance(R.style.AlertText)
+                                                        .setBackgroundColorRes(R.color.errorColor)
+                                                        .setIcon(R.drawable.ic_error)
+                                                        .setDuration(3000)
+                                                        .enableIconPulse(true)
+                                                        .enableVibration(true)
+                                                        .disableOutsideTouch()
+                                                        .enableProgress(true)
+                                                        .setProgressColorInt(getColor(android.R.color.white))
+                                                        .show();
+                                                return;
+                                            });
+                                } else {
+                                    cartRef.whereEqualTo(Constants.KEY_CART_ITEM_PRODUCT_STORE_ID, model.getProductStoreID())
+                                            .get().addOnSuccessListener(queryDocumentSnapshots2 -> {
+                                        if (queryDocumentSnapshots2.getDocuments().size() == 0) {
+                                            progressDialog.dismiss();
+                                            MaterialDialog materialDialog = new MaterialDialog.Builder(SearchProductActivity.this)
+                                                    .setTitle("Item cannot be added to your cart!")
+                                                    .setMessage("Your cart has already been setup for a store and this item does not belong to that store. You must clear your cart by placing the order or removing all the items before proceeding with this item.")
+                                                    .setCancelable(false)
+                                                    .setPositiveButton("Go to Cart", R.drawable.ic_dialog_cart, (dialogInterface, which) -> {
+                                                        dialogInterface.dismiss();
+                                                        startActivity(new Intent(getApplicationContext(), CartActivity.class));
+                                                        CustomIntent.customType(SearchProductActivity.this, "bottom-to-up");
+                                                    })
+                                                    .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                                            materialDialog.show();
+                                        } else {
+                                            cartRef.document(cart_id).get()
+                                                    .addOnCompleteListener(task -> {
+                                                        if (task.isSuccessful()) {
+                                                            if (task.getResult().exists()) {
+                                                                cartRef.document(cart_id)
+                                                                        .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
+                                                                                Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
+                                                                        .addOnSuccessListener(aVoid -> {
+                                                                            progressDialog.dismiss();
+                                                                            Alerter.create(SearchProductActivity.this)
+                                                                                    .setText("Success! Your cart just got updated.")
+                                                                                    .setTextAppearance(R.style.AlertText)
+                                                                                    .setBackgroundColorRes(R.color.successColor)
+                                                                                    .setIcon(R.drawable.ic_dialog_okay)
+                                                                                    .setDuration(3000)
+                                                                                    .enableIconPulse(true)
+                                                                                    .enableVibration(true)
+                                                                                    .disableOutsideTouch()
+                                                                                    .enableProgress(true)
+                                                                                    .setProgressColorInt(getColor(android.R.color.white))
+                                                                                    .show();
+                                                                            return;
+                                                                        }).addOnFailureListener(e -> {
+                                                                    progressDialog.dismiss();
+                                                                    Alerter.create(SearchProductActivity.this)
+                                                                            .setText("Whoa! Something Broke. Try again!")
+                                                                            .setTextAppearance(R.style.AlertText)
+                                                                            .setBackgroundColorRes(R.color.errorColor)
+                                                                            .setIcon(R.drawable.ic_error)
+                                                                            .setDuration(3000)
+                                                                            .enableIconPulse(true)
+                                                                            .enableVibration(true)
+                                                                            .disableOutsideTouch()
+                                                                            .enableProgress(true)
+                                                                            .setProgressColorInt(getColor(android.R.color.white))
+                                                                            .show();
+                                                                    return;
+                                                                });
+                                                            } else {
+                                                                cartRef.document(cart_id).set(newCartItem)
+                                                                        .addOnSuccessListener(aVoid -> {
+                                                                            progressDialog.dismiss();
+                                                                            Alerter.create(SearchProductActivity.this)
+                                                                                    .setText("Success! Your cart just got updated.")
+                                                                                    .setTextAppearance(R.style.AlertText)
+                                                                                    .setBackgroundColorRes(R.color.successColor)
+                                                                                    .setIcon(R.drawable.ic_dialog_okay)
+                                                                                    .setDuration(3000)
+                                                                                    .enableIconPulse(true)
+                                                                                    .enableVibration(true)
+                                                                                    .disableOutsideTouch()
+                                                                                    .enableProgress(true)
+                                                                                    .setProgressColorInt(getColor(android.R.color.white))
+                                                                                    .show();
+                                                                            return;
+                                                                        })
+                                                                        .addOnFailureListener(e -> {
+                                                                            progressDialog.dismiss();
+                                                                            Alerter.create(SearchProductActivity.this)
+                                                                                    .setText("Whoa! Something Broke. Try again!")
+                                                                                    .setTextAppearance(R.style.AlertText)
+                                                                                    .setBackgroundColorRes(R.color.errorColor)
+                                                                                    .setIcon(R.drawable.ic_error)
+                                                                                    .setDuration(3000)
+                                                                                    .enableIconPulse(true)
+                                                                                    .enableVibration(true)
+                                                                                    .disableOutsideTouch()
+                                                                                    .enableProgress(true)
+                                                                                    .setProgressColorInt(getColor(android.R.color.white))
+                                                                                    .show();
+                                                                            return;
+                                                                        });
+                                                            }
+                                                        } else {
+                                                            progressDialog.dismiss();
+                                                            Alerter.create(SearchProductActivity.this)
+                                                                    .setText("Whoa! Something Broke. Try again!")
+                                                                    .setTextAppearance(R.style.AlertText)
+                                                                    .setBackgroundColorRes(R.color.errorColor)
+                                                                    .setIcon(R.drawable.ic_error)
+                                                                    .setDuration(3000)
+                                                                    .enableIconPulse(true)
+                                                                    .enableVibration(true)
+                                                                    .disableOutsideTouch()
+                                                                    .enableProgress(true)
+                                                                    .setProgressColorInt(getColor(android.R.color.white))
+                                                                    .show();
+                                                            return;
+                                                        }
+                                                    }).addOnFailureListener(e -> {
+                                                progressDialog.dismiss();
+                                                Alerter.create(SearchProductActivity.this)
+                                                        .setText("Whoa! Something Broke. Try again!")
+                                                        .setTextAppearance(R.style.AlertText)
+                                                        .setBackgroundColorRes(R.color.errorColor)
+                                                        .setIcon(R.drawable.ic_error)
+                                                        .setDuration(3000)
+                                                        .enableIconPulse(true)
+                                                        .enableVibration(true)
+                                                        .disableOutsideTouch()
+                                                        .enableProgress(true)
+                                                        .setProgressColorInt(getColor(android.R.color.white))
+                                                        .show();
+                                                return;
+                                            });
+                                        }
+                                    }).addOnFailureListener(e -> {
+                                        progressDialog.dismiss();
+                                        Alerter.create(SearchProductActivity.this)
+                                                .setText("Whoa! Something Broke. Try again!")
+                                                .setTextAppearance(R.style.AlertText)
+                                                .setBackgroundColorRes(R.color.errorColor)
+                                                .setIcon(R.drawable.ic_error)
+                                                .setDuration(3000)
+                                                .enableIconPulse(true)
+                                                .enableVibration(true)
+                                                .disableOutsideTouch()
+                                                .enableProgress(true)
+                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                .show();
+                                        return;
+                                    });
+                                }
+                            }).addOnFailureListener(e -> {
+                                progressDialog.dismiss();
+                                Alerter.create(SearchProductActivity.this)
+                                        .setText("Whoa! Something Broke. Try again!")
+                                        .setTextAppearance(R.style.AlertText)
+                                        .setBackgroundColorRes(R.color.errorColor)
+                                        .setIcon(R.drawable.ic_error)
+                                        .setDuration(3000)
+                                        .enableIconPulse(true)
+                                        .enableVibration(true)
+                                        .disableOutsideTouch()
+                                        .enableProgress(true)
+                                        .setProgressColorInt(getColor(android.R.color.white))
+                                        .show();
+                                return;
+                            });
                         }
                     });
                 } else {
+                    holder.productStatus.setText("Out of Stock");
+                    holder.productStatus.setTextColor(getColor(R.color.errorColor));
                     holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
                     holder.addToCartBtn.setEnabled(false);
                 }
@@ -301,13 +572,13 @@ public class SearchProductActivity extends AppCompatActivity {
                 switch (state) {
                     case LOADING_INITIAL:
                     case LOADING_MORE:
-                        productsProgressBar.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.VISIBLE);
                         illustrationSearch.setVisibility(View.GONE);
                         textSearch.setVisibility(View.GONE);
                         break;
                     case LOADED:
                     case FINISHED:
-                        productsProgressBar.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.GONE);
 
                         if (getItemCount() == 0) {
                             illustrationSearch.setVisibility(View.VISIBLE);
@@ -340,7 +611,7 @@ public class SearchProductActivity extends AppCompatActivity {
         productAdapter.notifyDataSetChanged();
 
         recyclerProducts.setHasFixedSize(true);
-        recyclerProducts.setLayoutManager(new GridLayoutManager(SearchProductActivity.this, 2));
+        recyclerProducts.setLayoutManager(new LinearLayoutManager(SearchProductActivity.this));
         recyclerProducts.setAdapter(productAdapter);
     }
 
@@ -349,21 +620,24 @@ public class SearchProductActivity extends AppCompatActivity {
         CardView addToCartBtnContainer;
         ConstraintLayout clickListener, addToCartBtn;
         ImageView productImage, productTypeImage;
-        TextView productName, productPrice, productMRP, productOffer, productUnit;
+        TextView productName, productUnit, productCategory, productStatus, productPrice, productMRP;
+        ShimmerTextView productOffer;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
 
             clickListener = itemView.findViewById(R.id.click_listener);
             productImage = itemView.findViewById(R.id.product_image);
-            productTypeImage = itemView.findViewById(R.id.product_type_image);
-            productName = itemView.findViewById(R.id.product_name);
             addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
             addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
+            productTypeImage = itemView.findViewById(R.id.product_type_image);
+            productOffer = itemView.findViewById(R.id.product_offer);
+            productName = itemView.findViewById(R.id.product_name);
+            productUnit = itemView.findViewById(R.id.product_unit);
+            productCategory = itemView.findViewById(R.id.product_category);
+            productStatus = itemView.findViewById(R.id.product_in_stock);
             productPrice = itemView.findViewById(R.id.product_price);
             productMRP = itemView.findViewById(R.id.product_mrp);
-            productOffer = itemView.findViewById(R.id.product_offer);
-            productUnit = itemView.findViewById(R.id.product_unit);
         }
     }
 
@@ -387,7 +661,7 @@ public class SearchProductActivity extends AppCompatActivity {
 
                         illustrationSearch.setVisibility(View.VISIBLE);
                         textSearch.setVisibility(View.VISIBLE);
-                        productsProgressBar.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.GONE);
                         Alerter.create(SearchProductActivity.this)
                                 .setText("Type something in the search bar")
                                 .setTextAppearance(R.style.AlertText)
@@ -404,7 +678,7 @@ public class SearchProductActivity extends AppCompatActivity {
                         UIUtil.hideKeyboard(SearchProductActivity.this);
                         illustrationSearch.setVisibility(View.GONE);
                         textSearch.setVisibility(View.GONE);
-                        productsProgressBar.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.VISIBLE);
 
                         Query query = productsRef.orderBy(Constants.KEY_PRODUCT_SEARCH_KEYWORD, Query.Direction.ASCENDING)
                                 .startAt(inputProductSearch.getText().toString().toLowerCase().trim())
@@ -425,6 +699,33 @@ public class SearchProductActivity extends AppCompatActivity {
                 }
                 break;
         }
+    }
+
+    private boolean isConnectedToInternet(SearchProductActivity searchProductActivity) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) searchProductActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+        if ((wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void showConnectToInternetDialog() {
+        MaterialDialog materialDialog = new MaterialDialog.Builder(SearchProductActivity.this)
+                .setTitle("No Internet Connection!")
+                .setMessage("Please connect to a network first to proceed from here!")
+                .setCancelable(false)
+                .setAnimation(R.raw.no_internet_connection)
+                .setPositiveButton("Connect", R.drawable.ic_dialog_connect, (dialogInterface, which) -> {
+                    dialogInterface.dismiss();
+                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                })
+                .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+        materialDialog.show();
     }
 
     @Override

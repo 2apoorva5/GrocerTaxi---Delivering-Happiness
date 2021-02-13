@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.application.grocertaxi.Utilities.Constants;
@@ -45,16 +46,18 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView backBtn, menuHome, menuCategory, menuStore, menuProfile;
     private CircleImageView userProfilePic, choosePhoto;
     private TextView userName, userID, userEmail, userMobile, deliveryAddress;
-    private ConstraintLayout address, logout;
+    private ConstraintLayout cart, address, logout;
     private FloatingActionButton cartBtn;
+    private CardView cartIndicator, cartIndicator2;
 
     private PreferenceManager preferenceManager;
     private Uri profilePicUri = null;
 
     private FirebaseAuth firebaseAuth;
-    private CollectionReference userRef;
+    private CollectionReference userRef, cartRef;
     private StorageReference storageReference;
 
+    private String cart_location;
     private AlertDialog progressDialog;
 
     @Override
@@ -70,14 +73,14 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
             CustomIntent.customType(ProfileActivity.this, "fadein-to-fadeout");
             finish();
-        } else if(preferenceManager.getString(Constants.KEY_CITY).equals("") ||
-                preferenceManager.getString(Constants.KEY_CITY) == null ||
-                preferenceManager.getString(Constants.KEY_CITY).length() == 0 ||
-                preferenceManager.getString(Constants.KEY_CITY).isEmpty() ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).equals("") ||
-                preferenceManager.getString(Constants.KEY_LOCALITY) == null ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).length() == 0 ||
-                preferenceManager.getString(Constants.KEY_LOCALITY).isEmpty()) {
+        } else if(preferenceManager.getString(Constants.KEY_USER_CITY).equals("") ||
+                preferenceManager.getString(Constants.KEY_USER_CITY) == null ||
+                preferenceManager.getString(Constants.KEY_USER_CITY).length() == 0 ||
+                preferenceManager.getString(Constants.KEY_USER_CITY).isEmpty() ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).equals("") ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY) == null ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).length() == 0 ||
+                preferenceManager.getString(Constants.KEY_USER_LOCALITY).isEmpty()) {
             Intent intent = new Intent(ProfileActivity.this, ChooseCityActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -88,6 +91,8 @@ public class ProfileActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
+        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
 
         progressDialog = new SpotsDialog.Builder().setContext(ProfileActivity.this)
                 .setMessage("Logging you out...")
@@ -111,6 +116,30 @@ public class ProfileActivity extends AppCompatActivity {
         } else {
             deliveryAddress.setText(preferenceManager.getString(Constants.KEY_USER_ADDRESS));
         }
+
+        cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (queryDocumentSnapshots.size() == 0) {
+                cartIndicator.setVisibility(View.GONE);
+                cartIndicator2.setVisibility(View.GONE);
+            } else {
+                cartIndicator.setVisibility(View.VISIBLE);
+                cartIndicator2.setVisibility(View.VISIBLE);
+            }
+        }).addOnFailureListener(e -> {
+            Alerter.create(ProfileActivity.this)
+                    .setText("Whoa! Something Broke. Try again!")
+                    .setTextAppearance(R.style.AlertText)
+                    .setBackgroundColorRes(R.color.errorColor)
+                    .setIcon(R.drawable.ic_error)
+                    .setDuration(3000)
+                    .enableIconPulse(true)
+                    .enableVibration(true)
+                    .disableOutsideTouch()
+                    .enableProgress(true)
+                    .setProgressColorInt(getColor(android.R.color.white))
+                    .show();
+            return;
+        });
     }
 
     private void initViews() {
@@ -121,6 +150,7 @@ public class ProfileActivity extends AppCompatActivity {
         userID = findViewById(R.id.user_id);
         userEmail = findViewById(R.id.user_email);
         userMobile = findViewById(R.id.user_mobile);
+        cart = findViewById(R.id.cart);
         address = findViewById(R.id.address);
         deliveryAddress = findViewById(R.id.delivery_address);
         logout = findViewById(R.id.log_out);
@@ -129,12 +159,17 @@ public class ProfileActivity extends AppCompatActivity {
         menuStore = findViewById(R.id.menu_store);
         menuProfile = findViewById(R.id.menu_profile);
         cartBtn = findViewById(R.id.cart_btn);
+        cartIndicator = findViewById(R.id.cart_indicator);
+        cartIndicator2 = findViewById(R.id.cart_indicator2);
     }
 
     private void initFirebase() {
         firebaseAuth = FirebaseAuth.getInstance();
         userRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS);
         storageReference = FirebaseStorage.getInstance().getReference("UserProfilePics/");
+        cartRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS)
+                .document(preferenceManager.getString(Constants.KEY_USER_ID))
+                .collection(Constants.KEY_COLLECTION_CART);
     }
 
     private void setActionOnViews() {
@@ -207,8 +242,13 @@ public class ProfileActivity extends AppCompatActivity {
         userEmail.setText(preferenceManager.getString(Constants.KEY_USER_EMAIL));
         userMobile.setText(preferenceManager.getString(Constants.KEY_USER_MOBILE));
 
+        cart.setOnClickListener(v -> {
+            startActivity(new Intent(getApplicationContext(), CartActivity.class));
+            CustomIntent.customType(ProfileActivity.this, "bottom-to-up");
+        });
+
         address.setOnClickListener(view -> {
-            startActivity(new Intent(ProfileActivity.this, UpdateAddressActivity.class));
+            startActivity(new Intent(ProfileActivity.this, DeliveryAddressActivity.class));
             CustomIntent.customType(ProfileActivity.this, "bottom-to-up");
         });
 
@@ -242,7 +282,8 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         cartBtn.setOnClickListener(v -> {
-
+            startActivity(new Intent(getApplicationContext(), CartActivity.class));
+            CustomIntent.customType(ProfileActivity.this, "bottom-to-up");
         });
     }
 
@@ -365,7 +406,6 @@ public class ProfileActivity extends AppCompatActivity {
 
                     HashMap<String, Object> updates = new HashMap<>();
                     updates.put(Constants.KEY_FCM_TOKEN, FieldValue.delete());
-                    updates.put(Constants.KEY_USER_ADDRESS, "");
                     documentReference.update(updates)
                             .addOnSuccessListener(aVoid -> {
                                 progressDialog.dismiss();

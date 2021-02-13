@@ -166,14 +166,6 @@ public class VerifyOTPActivity extends AppCompatActivity {
             }
         }, 0, 1000);
 
-        otpPinView.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                verifyBtn.performClick();
-                return true;
-            }
-            return false;
-        });
-
         verifyBtn.setOnClickListener(view -> {
             if(!isConnectedToInternet(VerifyOTPActivity.this)) {
                 showConnectToInternetDialog();
@@ -324,6 +316,8 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                         newUser.put(Constants.KEY_USER_MOBILE, mobile);
                                                         newUser.put(Constants.KEY_USER_IMAGE, imageValue);
                                                         newUser.put(Constants.KEY_USER_ADDRESS, "");
+                                                        newUser.put(Constants.KEY_USER_CITY, "Dhanbad");
+                                                        newUser.put(Constants.KEY_USER_LOCALITY, "Bekarbandh - LC Road");
                                                         newUser.put(Constants.KEY_USER_SEARCH_KEYWORD, name.toLowerCase());
                                                         newUser.put(Constants.KEY_USER_TIMESTAMP, FieldValue.serverTimestamp());
                                                         newUser.put(Constants.KEY_USER_FIRST_ORDER, true);
@@ -344,14 +338,8 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                                     preferenceManager.putString(Constants.KEY_USER_MOBILE, mobile);
                                                                     preferenceManager.putString(Constants.KEY_USER_IMAGE, imageValue);
                                                                     preferenceManager.putString(Constants.KEY_USER_ADDRESS, "");
-                                                                    preferenceManager.putString(Constants.KEY_CITY, "");
-                                                                    preferenceManager.putString(Constants.KEY_LOCALITY, "");
-                                                                    preferenceManager.putString(Constants.KEY_ADDRESS_LINE1, "");
-                                                                    preferenceManager.putString(Constants.KEY_ADDRESS_LINE2, "");
-                                                                    preferenceManager.putString(Constants.KEY_LANDMARK, "");
-                                                                    preferenceManager.putString(Constants.KEY_PINCODE, "");
-                                                                    preferenceManager.putString(Constants.KEY_CITY_NAME, "");
-                                                                    preferenceManager.putString(Constants.KEY_STATE_NAME, "");
+                                                                    preferenceManager.putString(Constants.KEY_USER_CITY, "Dhanbad");
+                                                                    preferenceManager.putString(Constants.KEY_USER_LOCALITY, "Bekarbandh - LC Road");
 
                                                                     Intent intent = new Intent(getApplicationContext(), ChooseCityActivity.class);
                                                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -423,6 +411,8 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                     newUser.put(Constants.KEY_USER_MOBILE, mobile);
                                     newUser.put(Constants.KEY_USER_IMAGE, "");
                                     newUser.put(Constants.KEY_USER_ADDRESS, "");
+                                    newUser.put(Constants.KEY_USER_CITY, "Dhanbad");
+                                    newUser.put(Constants.KEY_USER_LOCALITY, "Bekarbandh - LC Road");
                                     newUser.put(Constants.KEY_USER_SEARCH_KEYWORD, name.toLowerCase());
                                     newUser.put(Constants.KEY_USER_TIMESTAMP, FieldValue.serverTimestamp());
                                     newUser.put(Constants.KEY_USER_FIRST_ORDER, true);
@@ -443,14 +433,8 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                 preferenceManager.putString(Constants.KEY_USER_MOBILE, mobile);
                                                 preferenceManager.putString(Constants.KEY_USER_IMAGE, "");
                                                 preferenceManager.putString(Constants.KEY_USER_ADDRESS, "");
-                                                preferenceManager.putString(Constants.KEY_CITY, "");
-                                                preferenceManager.putString(Constants.KEY_LOCALITY, "");
-                                                preferenceManager.putString(Constants.KEY_ADDRESS_LINE1, "");
-                                                preferenceManager.putString(Constants.KEY_ADDRESS_LINE2, "");
-                                                preferenceManager.putString(Constants.KEY_LANDMARK, "");
-                                                preferenceManager.putString(Constants.KEY_PINCODE, "");
-                                                preferenceManager.putString(Constants.KEY_CITY_NAME, "");
-                                                preferenceManager.putString(Constants.KEY_STATE_NAME, "");
+                                                preferenceManager.putString(Constants.KEY_USER_CITY, "Dhanbad");
+                                                preferenceManager.putString(Constants.KEY_USER_LOCALITY, "Bekarbandh - LC Road");
 
                                                 Intent intent = new Intent(getApplicationContext(), ChooseCityActivity.class);
                                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

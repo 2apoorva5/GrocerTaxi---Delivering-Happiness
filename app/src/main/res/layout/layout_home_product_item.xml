@@ -30,7 +30,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
-        <TextView
+        <com.romainpiel.shimmer.ShimmerTextView
             android:id="@+id/product_offer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -38,13 +38,14 @@
             android:textColor="@color/colorIconLight"
             android:textAllCaps="false"
             android:textStyle="normal"
-            android:textAlignment="textStart"
+            android:textAlignment="center"
             android:textSize="12sp"
             android:fontFamily="@font/montserrat"
             android:includeFontPadding="false"
             android:background="@color/successColor"
             android:paddingVertical="4dp"
             android:paddingHorizontal="12dp"
+            app:reflectionColor="@color/colorAccent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/product_image"/>
 
@@ -110,7 +111,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginStart="8dp"
             android:text="₹ 240"
-            android:textColor="@color/colorTextDark"
+            android:textColor="@color/errorColor"
             android:textAllCaps="false"
             android:textStyle="normal"
             android:textAlignment="textStart"

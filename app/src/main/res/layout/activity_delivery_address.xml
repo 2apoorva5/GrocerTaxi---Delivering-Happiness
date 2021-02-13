@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
-    tools:context=".UpdateAddressActivity">
+    tools:context=".DeliveryAddressActivity">
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -38,14 +38,14 @@
                 app:tint="@color/colorIconDark" />
 
             <TextView
-                android:id="@+id/update_address_title"
+                android:id="@+id/title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="24dp"
                 android:fontFamily="@font/montserrat_bold"
                 android:includeFontPadding="false"
-                android:text="Update Address"
+                android:text="Delivery Address"
                 android:textAlignment="textStart"
                 android:textAllCaps="false"
                 android:textColor="@color/colorTextDark"
@@ -56,7 +56,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/close_btn" />
 
             <TextView
-                android:id="@+id/update_address_subtitle"
+                android:id="@+id/subtitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
@@ -72,7 +72,7 @@
                 android:textStyle="normal"
                 app:layout_constraintEnd_toStartOf="@+id/illustration_update_address"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/update_address_title" />
+                app:layout_constraintTop_toBottomOf="@+id/title" />
 
             <ImageView
                 android:id="@+id/illustration_update_address"
@@ -80,11 +80,11 @@
                 android:layout_height="100dp"
                 android:layout_marginEnd="16dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/illustration_update_address"
+                android:src="@drawable/illustration_delivery_address"
                 android:contentDescription="@string/app_name"
-                app:layout_constraintBottom_toBottomOf="@+id/update_address_subtitle"
+                app:layout_constraintBottom_toBottomOf="@+id/subtitle"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/update_address_title" />
+                app:layout_constraintTop_toTopOf="@+id/title" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/address_line1"
@@ -399,7 +399,7 @@
             </androidx.cardview.widget.CardView>
 
             <ProgressBar
-                android:id="@+id/update_address_progress_bar"
+                android:id="@+id/progress_bar"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:layout_marginTop="32dp"
