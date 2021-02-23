@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -35,6 +36,7 @@ public class DeliveryAddressActivity extends AppCompatActivity {
     private TextInputLayout addressLine1, addressLine2, landmark, pinCode, city, state;
     private CardView saveBtnContainer;
     private ConstraintLayout saveBtn;
+    private TextView pinBtn;
     private ProgressBar progressBar;
 
     private PreferenceManager preferenceManager;
@@ -54,7 +56,7 @@ public class DeliveryAddressActivity extends AppCompatActivity {
             startActivity(intent);
             CustomIntent.customType(DeliveryAddressActivity.this, "fadein-to-fadeout");
             finish();
-        } else if(preferenceManager.getString(Constants.KEY_USER_CITY).equals("") ||
+        } else if (preferenceManager.getString(Constants.KEY_USER_CITY).equals("") ||
                 preferenceManager.getString(Constants.KEY_USER_CITY) == null ||
                 preferenceManager.getString(Constants.KEY_USER_CITY).length() == 0 ||
                 preferenceManager.getString(Constants.KEY_USER_CITY).isEmpty() ||
@@ -78,7 +80,7 @@ public class DeliveryAddressActivity extends AppCompatActivity {
         setActionOnViews();
     }
 
-    private void initViews(){
+    private void initViews() {
         closeBtn = findViewById(R.id.close_btn);
         addressLine1 = findViewById(R.id.address_line1);
         addressLine2 = findViewById(R.id.address_line2);
@@ -89,13 +91,14 @@ public class DeliveryAddressActivity extends AppCompatActivity {
         saveBtnContainer = findViewById(R.id.save_btn_container);
         saveBtn = findViewById(R.id.save_btn);
         progressBar = findViewById(R.id.progress_bar);
+        pinBtn = findViewById(R.id.pin_btn);
     }
 
-    private void initFirebase(){
+    private void initFirebase() {
         userRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS);
     }
 
-    private void setActionOnViews(){
+    private void setActionOnViews() {
         closeBtn.setOnClickListener(v -> {
             onBackPressed();
             finish();
@@ -171,10 +174,15 @@ public class DeliveryAddressActivity extends AppCompatActivity {
                                         .enableProgress(true)
                                         .setProgressColorInt(getColor(android.R.color.white))
                                         .show();
-                                return;
                             });
                 }
             }
+        });
+
+        pinBtn.setOnClickListener(v -> {
+            startActivity(new Intent(DeliveryAddressActivity.this, LocationPermissionActivity.class));
+            CustomIntent.customType(DeliveryAddressActivity.this, "left-to-right");
+            finish();
         });
     }
 
@@ -199,7 +207,7 @@ public class DeliveryAddressActivity extends AppCompatActivity {
             pinCode.setError("Enter a Pin Code!");
             pinCode.requestFocus();
             return false;
-        } else if(pin_code.length() != 6) {
+        } else if (pin_code.length() != 6) {
             pinCode.setError("Invalid Pin Code!");
             pinCode.requestFocus();
             return false;
@@ -268,6 +276,11 @@ public class DeliveryAddressActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(DeliveryAddressActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(DeliveryAddressActivity.this);
+            }
+        });
         CustomIntent.customType(DeliveryAddressActivity.this, "up-to-bottom");
     }
 }

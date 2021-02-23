@@ -30,14 +30,14 @@
         android:layout_marginHorizontal="16dp"
         android:fontFamily="@font/montserrat_bold"
         android:includeFontPadding="false"
-        android:text="All stores"
+        android:text="Stores"
         android:textAlignment="textStart"
         android:textAllCaps="false"
         android:textColor="@color/colorTextDark"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:textStyle="normal"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/back_btn"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/back_btn"
         app:layout_constraintTop_toTopOf="@id/back_btn" />
 
@@ -45,11 +45,11 @@
         android:id="@+id/input_store_search"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         app:cardBackgroundColor="@color/colorSearch"
-        app:cardCornerRadius="24dp"
+        app:cardCornerRadius="16dp"
         app:cardPreventCornerOverlap="true"
         app:layout_constraintEnd_toStartOf="@id/sort_btn_container"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,20 +66,20 @@
                 android:layout_marginHorizontal="8dp"
                 android:background="@android:color/transparent"
                 android:fontFamily="@font/montserrat"
-                android:includeFontPadding="false"
                 android:hint="Search store"
                 android:imeOptions="actionSearch"
+                android:importantForAutofill="no"
+                android:includeFontPadding="false"
                 android:inputType="text"
+                android:maxLines="1"
                 android:paddingHorizontal="16dp"
+                android:singleLine="true"
                 android:textAlignment="textStart"
                 android:textAllCaps="false"
                 android:textColor="@color/colorTextDark"
                 android:textColorHint="@color/colorInactive"
                 android:textSize="14sp"
                 android:textStyle="normal"
-                android:importantForAutofill="no"
-                android:maxLines="1"
-                android:singleLine="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/speech_to_text"
                 app:layout_constraintStart_toStartOf="parent"
@@ -90,17 +90,17 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="16dp"
-                android:scaleType="centerCrop"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
-                android:focusable="true"
-                android:src="@drawable/ic_mic"
-                android:padding="6dp"
-                app:tint="@color/colorIconDark"
                 android:contentDescription="@string/app_name"
+                android:focusable="true"
+                android:padding="6dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_mic"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/colorIconDark" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -112,32 +112,31 @@
         android:layout_height="48dp"
         android:layout_marginEnd="16dp"
         app:cardBackgroundColor="@color/colorPrimary"
-        app:cardCornerRadius="24dp"
+        app:cardCornerRadius="16dp"
         app:cardPreventCornerOverlap="true"
+        app:layout_constraintBottom_toBottomOf="@id/input_store_search"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/input_store_search"
-        app:layout_constraintBottom_toBottomOf="@id/input_store_search">
+        app:layout_constraintTop_toTopOf="@id/input_store_search">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/sort_btn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="?attr/selectableItemBackground"
-            android:focusable="true"
-            android:clickable="true">
+            android:clickable="true"
+            android:focusable="true">
 
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_sort"
-                android:scaleType="centerCrop"
                 android:contentDescription="@string/app_name"
-                app:tint="@color/colorIconDark"
-                android:rotation="90"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_sort"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/colorIconDark" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -148,19 +147,19 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        app:refreshType="smartisan"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_store_search">
+        app:layout_constraintTop_toBottomOf="@+id/input_store_search"
+        app:refreshType="smartisan">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_stores"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingBottom="144dp"
-            android:clipToPadding="false"
             android:scrollbars="none" />
 
     </com.baoyz.widget.PullRefreshLayout>
@@ -168,10 +167,10 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="@id/pull_refresh_layout"
-        app:layout_constraintStart_toStartOf="@id/pull_refresh_layout"
+        app:layout_constraintBottom_toBottomOf="@id/pull_refresh_layout"
         app:layout_constraintEnd_toEndOf="@id/pull_refresh_layout"
-        app:layout_constraintBottom_toBottomOf="@id/pull_refresh_layout">
+        app:layout_constraintStart_toStartOf="@id/pull_refresh_layout"
+        app:layout_constraintTop_toTopOf="@id/pull_refresh_layout">
 
         <ImageView
             android:id="@+id/illustration_empty"
@@ -180,8 +179,8 @@
             android:layout_marginBottom="64dp"
             android:contentDescription="@string/app_name"
             android:scaleType="centerInside"
-            android:visibility="gone"
             android:src="@drawable/illustration_empty1"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -191,8 +190,8 @@
             android:id="@+id/text_empty"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
             android:alpha="0.5"
             android:fontFamily="@font/montserrat"
             android:includeFontPadding="false"
@@ -203,20 +202,20 @@
             android:textSize="14sp"
             android:textStyle="normal"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@+id/illustration_empty"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/illustration_empty" />
 
         <ProgressBar
             android:id="@+id/progress_bar"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:visibility="gone"
             android:progressTint="@color/colorAccent"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -225,63 +224,63 @@
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_marginBottom="48dp"
+        android:contentDescription="@string/app_name"
+        android:elevation="16dp"
         android:src="@drawable/ic_cart"
         app:backgroundTint="@color/colorIconDark"
-        app:tint="@color/colorIconLight"
-        app:maxImageSize="24dp"
-        android:elevation="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/bottom_bar_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/bottom_bar_container"
-        app:layout_constraintBottom_toBottomOf="@+id/bottom_bar_container"
-        android:contentDescription="@string/app_name" />
+        app:maxImageSize="24dp"
+        app:tint="@color/colorIconLight" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cart_indicator"
         android:layout_width="12dp"
         android:layout_height="12dp"
+        android:visibility="gone"
         app:cardBackgroundColor="@color/colorIconLight"
         app:cardCornerRadius="6dp"
         app:cardElevation="8dp"
-        android:visibility="gone"
         app:cardPreventCornerOverlap="true"
-        app:layout_constraintTop_toBottomOf="@id/cart_btn"
+        app:layout_constraintBottom_toBottomOf="@id/cart_btn"
         app:layout_constraintEnd_toEndOf="@id/cart_btn"
         app:layout_constraintStart_toStartOf="@id/cart_btn"
-        app:layout_constraintBottom_toBottomOf="@id/cart_btn"/>
+        app:layout_constraintTop_toBottomOf="@id/cart_btn" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_bar_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
             android:id="@+id/bottom_bar"
             android:layout_width="0dp"
             android:layout_height="64dp"
-            android:src="@drawable/pattern3"
-            android:scaleType="fitXY"
             android:contentDescription="@string/app_name"
             android:rotation="180"
+            android:scaleType="fitXY"
+            android:src="@drawable/pattern3"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
             android:id="@+id/bottom_bar_secondary"
             android:layout_width="0dp"
             android:layout_height="72dp"
-            android:src="@drawable/pattern3"
-            android:scaleType="fitXY"
             android:alpha="0.5"
             android:contentDescription="@string/app_name"
             android:rotation="180"
+            android:scaleType="fitXY"
+            android:src="@drawable/pattern3"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
             android:id="@+id/menu_home"
@@ -291,15 +290,15 @@
             android:alpha="0.5"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
+            android:contentDescription="@string/app_name"
             android:focusable="true"
+            android:padding="8dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_menu_home"
-            android:contentDescription="@string/app_name"
-            app:tint="@color/colorIconDark"
-            android:padding="8dp"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
+            app:tint="@color/colorIconDark" />
 
         <ImageView
             android:id="@+id/menu_category"
@@ -343,18 +342,18 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="24dp"
+            android:alpha="0.5"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
+            android:contentDescription="@string/app_name"
             android:focusable="true"
+            android:padding="8dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_menu_profile"
-            android:contentDescription="@string/app_name"
-            app:tint="@color/colorIconDark"
-            android:padding="8dp"
-            android:alpha="0.5"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
+            app:tint="@color/colorIconDark" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

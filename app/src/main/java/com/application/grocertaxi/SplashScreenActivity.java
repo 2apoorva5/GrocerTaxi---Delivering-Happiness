@@ -10,6 +10,9 @@ import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
 import maes.tech.intentanim.CustomIntent;
 
 public class SplashScreenActivity extends AppCompatActivity {
@@ -52,6 +55,11 @@ public class SplashScreenActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(SplashScreenActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(SplashScreenActivity.this);
+            }
+        });
         finishAffinity();
     }
 }

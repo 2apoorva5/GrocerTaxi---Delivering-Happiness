@@ -1,19 +1,9 @@
 package com.application.grocertaxi;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.paging.PagedList;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
@@ -26,40 +16,32 @@ import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.application.grocertaxi.Interfaces.ICityLoadListener;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.application.grocertaxi.Model.City;
-import com.application.grocertaxi.Model.Product;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
-import com.firebase.ui.firestore.paging.FirestorePagingOptions;
-import com.firebase.ui.firestore.paging.LoadingState;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.tapadoo.alerter.Alerter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import de.mateware.snacky.Snacky;
@@ -161,7 +143,6 @@ public class ChooseCityActivity extends AppCompatActivity {
                         .enableProgress(true)
                         .setProgressColorInt(getColor(android.R.color.white))
                         .show();
-                return;
             }
         });
 
@@ -275,21 +256,20 @@ public class ChooseCityActivity extends AppCompatActivity {
                                 startActivity(new Intent(ChooseCityActivity.this, ChooseLocalityActivity.class));
                                 CustomIntent.customType(ChooseCityActivity.this, "left-to-right");
                             }).addOnFailureListener(e -> {
-                                progressBar.setVisibility(View.GONE);
-                                Alerter.create(ChooseCityActivity.this)
-                                        .setText("Whoa! Something broke. Try again!")
-                                        .setTextAppearance(R.style.AlertText)
-                                        .setBackgroundColorRes(R.color.errorColor)
-                                        .setIcon(R.drawable.ic_error)
-                                        .setDuration(3000)
-                                        .enableIconPulse(true)
-                                        .enableVibration(true)
-                                        .disableOutsideTouch()
-                                        .enableProgress(true)
-                                        .setProgressColorInt(getColor(android.R.color.white))
-                                        .show();
-                                return;
-                            });
+                        progressBar.setVisibility(View.GONE);
+                        Alerter.create(ChooseCityActivity.this)
+                                .setText("Whoa! Something broke. Try again!")
+                                .setTextAppearance(R.style.AlertText)
+                                .setBackgroundColorRes(R.color.errorColor)
+                                .setIcon(R.drawable.ic_error)
+                                .setDuration(3000)
+                                .enableIconPulse(true)
+                                .enableVibration(true)
+                                .disableOutsideTouch()
+                                .enableProgress(true)
+                                .setProgressColorInt(getColor(android.R.color.white))
+                                .show();
+                    });
                 });
 
                 setAnimation(holder.itemView, position);
@@ -312,12 +292,21 @@ public class ChooseCityActivity extends AppCompatActivity {
                 super.onDataChanged();
 
                 progressBar.setVisibility(View.GONE);
-                Snacky.builder()
-                        .setActivity(ChooseCityActivity.this)
-                        .setText(String.format("We're currently servicing in %d cities.", getItemCount()))
-                        .setDuration(Snacky.LENGTH_INDEFINITE)
-                        .info()
-                        .show();
+                if (getItemCount() == 1) {
+                    Snacky.builder()
+                            .setActivity(ChooseCityActivity.this)
+                            .setText("We're currently servicing in 1 city.")
+                            .setDuration(Snacky.LENGTH_INDEFINITE)
+                            .info()
+                            .show();
+                } else {
+                    Snacky.builder()
+                            .setActivity(ChooseCityActivity.this)
+                            .setText(String.format("We're currently servicing in %d cities.", getItemCount()))
+                            .setDuration(Snacky.LENGTH_INDEFINITE)
+                            .info()
+                            .show();
+                }
             }
 
             @Override
@@ -368,6 +357,11 @@ public class ChooseCityActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(ChooseCityActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(ChooseCityActivity.this);
+            }
+        });
         CustomIntent.customType(ChooseCityActivity.this, "fadein-to-fadeout");
     }
 }

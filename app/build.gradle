@@ -20,6 +20,16 @@ android {
         resConfig "en"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        Properties properties = new Properties()
+        if (rootProject.file("local.properties").exists()) {
+            properties.load(rootProject.file("local.properties").newDataInputStream())
+        }
+
+        manifestPlaceholders = [ mapsApiKey : properties.getProperty("MAPS_API_KEY", "") ]
+
+        resValue "string", "google_maps_key",
+                (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
     }
 
     buildTypes {
@@ -61,7 +71,7 @@ dependencies {
     implementation 'com.shreyaspatil:MaterialDialog:2.1'
 
     //LottieAnimations Library
-    implementation 'com.airbnb.android:lottie:3.6.0'
+    implementation 'com.airbnb.android:lottie:3.6.1'
 
     //Alerter Library
     implementation 'com.tapadoo.android:alerter:2.0.4'
@@ -112,6 +122,12 @@ dependencies {
     //Snacky Library
     implementation 'com.github.matecode:Snacky:1.1.5'
 
+    //Dexter Permissions Library
+    implementation 'com.karumi:dexter:6.2.2'
+
+    //Tooltip Library
+    implementation 'com.tomergoldst.android:tooltips:1.1.0'
+
     //Firebase Analytics
     implementation 'com.google.firebase:firebase-analytics:18.0.2'
 
@@ -129,4 +145,14 @@ dependencies {
 
     //Firebase Storage
     implementation 'com.google.firebase:firebase-storage:19.2.1'
+
+    //Google Maps
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+
+    //Google Location
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
+
+    //Google Places
+    implementation 'com.google.android.libraries.places:places:2.4.0'
+    implementation 'com.google.android.gms:play-services-places:17.0.0'
 }

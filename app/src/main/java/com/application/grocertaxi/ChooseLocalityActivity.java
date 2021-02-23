@@ -1,19 +1,9 @@
 package com.application.grocertaxi;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.paging.PagedList;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
@@ -26,15 +16,18 @@ import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.application.grocertaxi.Interfaces.ICityLoadListener;
-import com.application.grocertaxi.Interfaces.ILocalityLoadListener;
-import com.application.grocertaxi.Model.City;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.paging.PagedList;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.application.grocertaxi.Model.Locality;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
@@ -44,14 +37,12 @@ import com.firebase.ui.firestore.paging.LoadingState;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.tapadoo.alerter.Alerter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import maes.tech.intentanim.CustomIntent;
@@ -153,7 +144,6 @@ public class ChooseLocalityActivity extends AppCompatActivity {
                         .enableProgress(true)
                         .setProgressColorInt(getColor(android.R.color.white))
                         .show();
-                return;
             }
         });
 
@@ -295,7 +285,6 @@ public class ChooseLocalityActivity extends AppCompatActivity {
                                 .enableProgress(true)
                                 .setProgressColorInt(getColor(android.R.color.white))
                                 .show();
-                        return;
                     });
                 });
 
@@ -367,6 +356,11 @@ public class ChooseLocalityActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(ChooseLocalityActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(ChooseLocalityActivity.this);
+            }
+        });
         CustomIntent.customType(ChooseLocalityActivity.this, "right-to-left");
     }
 

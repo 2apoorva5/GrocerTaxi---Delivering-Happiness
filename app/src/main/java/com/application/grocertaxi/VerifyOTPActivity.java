@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,7 +23,6 @@ import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.chaos.view.PinView;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.google.android.gms.tasks.TaskExecutors;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthCredential;
@@ -47,7 +45,6 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +58,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
     private PinView otpPinView;
     private ConstraintLayout verifyBtn;
     private CardView verifyBtnContainer;
-    private ProgressBar verifyOtpProgressBar;
+    private ProgressBar progressBar;
 
     private FirebaseAuth firebaseAuth;
     private CollectionReference userRef;
@@ -122,7 +119,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
         otpPinView = findViewById(R.id.verify_otp_pinview);
         verifyBtn = findViewById(R.id.verify_btn);
         verifyBtnContainer = findViewById(R.id.verify_btn_container);
-        verifyOtpProgressBar = findViewById(R.id.verify_otp_progress_bar);
+        progressBar = findViewById(R.id.progress_bar);
     }
 
     private void initFirebase() {
@@ -134,7 +131,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
     private void setActionOnViews() {
         closeBtn.setOnClickListener(v -> onBackPressed());
 
-        verifyOtpSubtitle.setText(String.format("Enter below the verification code (OTP) sent to %s.", mobile));
+        verifyOtpSubtitle.setText(String.format("Enter below the One Time Password\nsent to %s.", mobile));
 
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -143,7 +140,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
                 VerifyOTPActivity.this.runOnUiThread(() -> {
                     if (count == 0) {
                         resendOtpBtn.setText("Resend OTP");
-                        resendOtpBtn.setAlpha(1.0f);
+                        resendOtpBtn.setTextColor(getColor(R.color.colorAccent));
                         resendOtpBtn.setEnabled(true);
                         resendOtpBtn.setOnClickListener(v -> {
                             if (!isConnectedToInternet(VerifyOTPActivity.this)) {
@@ -152,12 +149,12 @@ public class VerifyOTPActivity extends AppCompatActivity {
                             } else {
                                 resendOTP();
                                 resendOtpBtn.setEnabled(false);
-                                resendOtpBtn.setAlpha(0.5f);
+                                resendOtpBtn.setTextColor(getColor(R.color.errorColor));
                                 count = 60;
                             }
                         });
                     } else {
-                        resendOtpBtn.setText(String.format("Resend OTP in %d", count));
+                        resendOtpBtn.setText(String.format("%d", count));
                         resendOtpBtn.setAlpha(0.5f);
                         resendOtpBtn.setEnabled(false);
                         count--;
@@ -167,12 +164,12 @@ public class VerifyOTPActivity extends AppCompatActivity {
         }, 0, 1000);
 
         verifyBtn.setOnClickListener(view -> {
-            if(!isConnectedToInternet(VerifyOTPActivity.this)) {
+            if (!isConnectedToInternet(VerifyOTPActivity.this)) {
                 showConnectToInternetDialog();
                 return;
             } else {
-                if(String.valueOf(otpPinView.getText()).isEmpty() || String.valueOf(otpPinView.getText()).length() != 6) {
-                    verifyOtpProgressBar.setVisibility(View.INVISIBLE);
+                if (String.valueOf(otpPinView.getText()).isEmpty() || String.valueOf(otpPinView.getText()).length() != 6) {
+                    progressBar.setVisibility(View.GONE);
                     verifyBtnContainer.setVisibility(View.VISIBLE);
                     verifyBtn.setEnabled(true);
 
@@ -190,7 +187,6 @@ public class VerifyOTPActivity extends AppCompatActivity {
                             .enableProgress(true)
                             .setProgressColorInt(getColor(android.R.color.white))
                             .show();
-                    return;
                 } else {
                     verifyCode(String.valueOf(otpPinView.getText()));
                 }
@@ -219,7 +215,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
                 @Override
                 public void onVerificationFailed(@NonNull FirebaseException e) {
                     if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                        verifyOtpProgressBar.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.GONE);
                         verifyBtnContainer.setVisibility(View.VISIBLE);
                         verifyBtn.setEnabled(true);
 
@@ -235,9 +231,8 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                 .enableProgress(true)
                                 .setProgressColorInt(getColor(android.R.color.white))
                                 .show();
-                        return;
                     } else if (e instanceof FirebaseTooManyRequestsException) {
-                        verifyOtpProgressBar.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.GONE);
                         verifyBtnContainer.setVisibility(View.VISIBLE);
                         verifyBtn.setEnabled(true);
 
@@ -253,7 +248,6 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                 .enableProgress(true)
                                 .setProgressColorInt(getColor(android.R.color.white))
                                 .show();
-                        return;
                     }
                 }
             };
@@ -284,7 +278,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
     private void verifyCode(String code) {
         verifyBtnContainer.setVisibility(View.INVISIBLE);
         verifyBtn.setEnabled(false);
-        verifyOtpProgressBar.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(codeBySystem, code);
         signInUsingCredential(credential);
     }
@@ -326,7 +320,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                                 .addOnSuccessListener(aVoid -> {
                                                                     timer.cancel();
 
-                                                                    verifyOtpProgressBar.setVisibility(View.GONE);
+                                                                    progressBar.setVisibility(View.GONE);
                                                                     verifyBtnContainer.setVisibility(View.VISIBLE);
                                                                     verifyBtn.setEnabled(true);
 
@@ -340,6 +334,31 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                                     preferenceManager.putString(Constants.KEY_USER_ADDRESS, "");
                                                                     preferenceManager.putString(Constants.KEY_USER_CITY, "Dhanbad");
                                                                     preferenceManager.putString(Constants.KEY_USER_LOCALITY, "Bekarbandh - LC Road");
+                                                                    preferenceManager.putBoolean(Constants.KEY_USER_FIRST_ORDER, true);
+
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_ID, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_FROM_STOREID, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
 
                                                                     Intent intent = new Intent(getApplicationContext(), ChooseCityActivity.class);
                                                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -347,7 +366,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                                     CustomIntent.customType(VerifyOTPActivity.this, "fadein-to-fadeout");
                                                                     finish();
                                                                 }).addOnFailureListener(e -> {
-                                                            verifyOtpProgressBar.setVisibility(View.GONE);
+                                                            progressBar.setVisibility(View.GONE);
                                                             verifyBtnContainer.setVisibility(View.VISIBLE);
                                                             verifyBtn.setEnabled(true);
 
@@ -363,10 +382,9 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                                     .enableProgress(true)
                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                     .show();
-                                                            return;
                                                         });
                                                     }).addOnFailureListener(e -> {
-                                                        verifyOtpProgressBar.setVisibility(View.GONE);
+                                                        progressBar.setVisibility(View.GONE);
                                                         verifyBtnContainer.setVisibility(View.VISIBLE);
                                                         verifyBtn.setEnabled(true);
 
@@ -382,9 +400,8 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                                 .enableProgress(true)
                                                                 .setProgressColorInt(getColor(android.R.color.white))
                                                                 .show();
-                                                        return;
                                                     })).addOnFailureListener(e -> {
-                                        verifyOtpProgressBar.setVisibility(View.GONE);
+                                        progressBar.setVisibility(View.GONE);
                                         verifyBtnContainer.setVisibility(View.VISIBLE);
                                         verifyBtn.setEnabled(true);
 
@@ -400,7 +417,6 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                 .enableProgress(true)
                                                 .setProgressColorInt(getColor(android.R.color.white))
                                                 .show();
-                                        return;
                                     });
                                 } else {
                                     HashMap<String, Object> newUser = new HashMap<>();
@@ -421,7 +437,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                             .addOnSuccessListener(aVoid -> {
                                                 timer.cancel();
 
-                                                verifyOtpProgressBar.setVisibility(View.GONE);
+                                                progressBar.setVisibility(View.GONE);
                                                 verifyBtnContainer.setVisibility(View.VISIBLE);
                                                 verifyBtn.setEnabled(true);
 
@@ -435,6 +451,31 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                 preferenceManager.putString(Constants.KEY_USER_ADDRESS, "");
                                                 preferenceManager.putString(Constants.KEY_USER_CITY, "Dhanbad");
                                                 preferenceManager.putString(Constants.KEY_USER_LOCALITY, "Bekarbandh - LC Road");
+                                                preferenceManager.putBoolean(Constants.KEY_USER_FIRST_ORDER, true);
+
+                                                preferenceManager.putString(Constants.KEY_ORDER_ID, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_FROM_STOREID, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
 
                                                 Intent intent = new Intent(getApplicationContext(), ChooseCityActivity.class);
                                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -442,7 +483,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                 CustomIntent.customType(VerifyOTPActivity.this, "fadein-to-fadeout");
                                                 finish();
                                             }).addOnFailureListener(e -> {
-                                        verifyOtpProgressBar.setVisibility(View.GONE);
+                                        progressBar.setVisibility(View.GONE);
                                         verifyBtnContainer.setVisibility(View.VISIBLE);
                                         verifyBtn.setEnabled(true);
 
@@ -458,11 +499,10 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                 .enableProgress(true)
                                                 .setProgressColorInt(getColor(android.R.color.white))
                                                 .show();
-                                        return;
                                     });
                                 }
                             } else {
-                                verifyOtpProgressBar.setVisibility(View.GONE);
+                                progressBar.setVisibility(View.GONE);
                                 verifyBtnContainer.setVisibility(View.VISIBLE);
                                 verifyBtn.setEnabled(true);
 
@@ -478,10 +518,9 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                         .enableProgress(true)
                                         .setProgressColorInt(getColor(android.R.color.white))
                                         .show();
-                                return;
                             }
                         }).addOnFailureListener(e -> {
-                            verifyOtpProgressBar.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.GONE);
                             verifyBtnContainer.setVisibility(View.VISIBLE);
                             verifyBtn.setEnabled(true);
 
@@ -497,10 +536,9 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                     .enableProgress(true)
                                     .setProgressColorInt(getColor(android.R.color.white))
                                     .show();
-                            return;
                         });
                     } else {
-                        verifyOtpProgressBar.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.GONE);
                         verifyBtnContainer.setVisibility(View.VISIBLE);
                         verifyBtn.setEnabled(true);
 
@@ -516,11 +554,10 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                 .enableProgress(true)
                                 .setProgressColorInt(getColor(android.R.color.white))
                                 .show();
-                        return;
                     }
                 })
                 .addOnFailureListener(e -> {
-                    verifyOtpProgressBar.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.GONE);
                     verifyBtnContainer.setVisibility(View.VISIBLE);
                     verifyBtn.setEnabled(true);
 
@@ -536,7 +573,6 @@ public class VerifyOTPActivity extends AppCompatActivity {
                             .enableProgress(true)
                             .setProgressColorInt(getColor(android.R.color.white))
                             .show();
-                    return;
                 });
     }
 
@@ -582,6 +618,11 @@ public class VerifyOTPActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(VerifyOTPActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(VerifyOTPActivity.this);
+            }
+        });
         finishAffinity();
     }
 }

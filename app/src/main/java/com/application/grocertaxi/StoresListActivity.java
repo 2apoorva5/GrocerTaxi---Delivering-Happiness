@@ -107,8 +107,6 @@ public class StoresListActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
-
         initViews();
         initFirebase();
         setActionOnViews();
@@ -186,7 +184,6 @@ public class StoresListActivity extends AppCompatActivity {
                         .enableProgress(true)
                         .setProgressColorInt(getColor(android.R.color.white))
                         .show();
-                return;
             }
         });
 
@@ -362,6 +359,29 @@ public class StoresListActivity extends AppCompatActivity {
         });
 
         cartBtn.setOnClickListener(v -> {
+            preferenceManager.putString(Constants.KEY_ORDER_ID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STOREID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
             CustomIntent.customType(StoresListActivity.this, "bottom-to-up");
         });
@@ -551,7 +571,11 @@ public class StoresListActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
+
+
         loadStores();
+
         cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (queryDocumentSnapshots.size() == 0) {
                 cartIndicator.setVisibility(View.GONE);
@@ -571,7 +595,6 @@ public class StoresListActivity extends AppCompatActivity {
                     .enableProgress(true)
                     .setProgressColorInt(getColor(android.R.color.white))
                     .show();
-            return;
         });
 
         pullRefreshLayout.setColor(getColor(R.color.colorAccent));
@@ -584,7 +607,9 @@ public class StoresListActivity extends AppCompatActivity {
                 UIUtil.hideKeyboard(StoresListActivity.this);
                 inputStoreSearch.setText(null);
                 inputStoreSearch.clearFocus();
+
                 loadStores();
+
                 cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots.size() == 0) {
                         cartIndicator.setVisibility(View.GONE);
@@ -604,7 +629,6 @@ public class StoresListActivity extends AppCompatActivity {
                             .enableProgress(true)
                             .setProgressColorInt(getColor(android.R.color.white))
                             .show();
-                    return;
                 });
             }
         });
@@ -613,6 +637,11 @@ public class StoresListActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(StoresListActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(StoresListActivity.this);
+            }
+        });
     }
 
     @Override

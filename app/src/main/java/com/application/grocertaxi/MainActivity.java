@@ -33,9 +33,11 @@ import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -48,6 +50,9 @@ import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
 import com.smarteist.autoimageslider.SliderViewAdapter;
 import com.tapadoo.alerter.Alerter;
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import java.util.HashMap;
 
@@ -66,13 +71,13 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerStores, recyclerFruits, recyclerVegetables, recyclerFoodGrains, recyclerPCare;
     private ProgressBar storesProgressBar, fruitsProgressBar, vegProgressBar, foodGrainsProgressBar, pCareProgressBar;
     private ConstraintLayout productSearchBtn, shopByCategoryLayout, categoryFruits, categoryVegetables, categoryFoodGrains,
-            categoryDairy, categoryBakery, categoryBeverages, viewAllCategoriesBtn, layoutFirstOrderOffers,
-            layoutStores, layoutFruits, layoutVegetables, layoutFoodgrains, layoutPCare, changeLocationBtn;
+            categoryDairy, categoryBakery, categoryBeverages, viewAllCategoriesBtn, layoutFirstOrderOffers, offer1, offer2, offer3,
+            layoutStores, layoutFruits, layoutVegetables, layoutFoodGrains, layoutPCare, changeLocationBtn;
     private FloatingActionButton cartBtn;
     private CardView layoutSafeDelivery, cartIndicator, changeLocationBtnContainer;
     private PullRefreshLayout pullRefreshLayout;
 
-    private CollectionReference storesRef, fruitsRef, vegetablesRef, foodGrainsRef, pCareRef, cartRef;
+    private CollectionReference userRef, storesRef, cartRef, fruitsRef, vegetablesRef, foodGrainsRef, pCareRef;
     private FirestoreRecyclerAdapter<Store, StoreViewHolder> storeAdapter;
     private FirestoreRecyclerAdapter<Product, FruitViewHolder> fruitAdapter;
     private FirestoreRecyclerAdapter<Product, VegetableViewHolder> vegetableAdapter;
@@ -81,10 +86,10 @@ public class MainActivity extends AppCompatActivity {
 
     private String cart_location;
     private Shimmer shimmer1, shimmer2, shimmer3, shimmer4;
-    private PreferenceManager preferenceManager;
     int[] banners = {R.drawable.banner1, R.drawable.banner2, R.drawable.banner3,
             R.drawable.banner4, R.drawable.banner5, R.drawable.banner6};
     private BannerSliderAdapter bannerSliderAdapter;
+    private PreferenceManager preferenceManager;
     private AlertDialog progressDialog;
 
     @Override
@@ -119,17 +124,15 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
+        progressDialog = new SpotsDialog.Builder().setContext(MainActivity.this)
+                .setMessage("Adding item to cart..")
+                .setCancelable(false)
+                .setTheme(R.style.SpotsDialog)
+                .build();
 
         initViews();
         initFirebase();
         setActionOnViews();
-
-        progressDialog = new SpotsDialog.Builder().setContext(MainActivity.this)
-                .setMessage("Adding item to cart...")
-                .setCancelable(false)
-                .setTheme(R.style.SpotsDialog)
-                .build();
 
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
@@ -139,18 +142,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        userLocation = findViewById(R.id.user_location);
         editLocationBtn = findViewById(R.id.edit_location_btn);
+        greetings = findViewById(R.id.greetings);
+        userProfilePic = findViewById(R.id.user_profile_pic);
+        productSearchBtn = findViewById(R.id.product_search_btn);
+
+        bannerSlider = findViewById(R.id.banner_slider);
+
+        shopByCategoryLayout = findViewById(R.id.explore_by_category_layout);
         fruits = findViewById(R.id.category_fruits_img);
         vegetables = findViewById(R.id.category_vegetables_img);
         foodGrains = findViewById(R.id.category_foodgrains_img);
         dairy = findViewById(R.id.category_dairy_img);
         bakery = findViewById(R.id.category_bakery_img);
         beverages = findViewById(R.id.category_beverages_img);
-        userLocation = findViewById(R.id.user_location);
-        greetings = findViewById(R.id.greetings);
-        userProfilePic = findViewById(R.id.user_profile_pic);
-        bannerSlider = findViewById(R.id.banner_slider);
-        productSearchBtn = findViewById(R.id.product_search_btn);
         categoryFruits = findViewById(R.id.category_fruits);
         categoryVegetables = findViewById(R.id.category_vegetables);
         categoryFoodGrains = findViewById(R.id.category_foodgrains);
@@ -158,13 +164,11 @@ public class MainActivity extends AppCompatActivity {
         categoryBakery = findViewById(R.id.category_bakery);
         categoryBeverages = findViewById(R.id.category_beverages);
         viewAllCategoriesBtn = findViewById(R.id.view_all_categories_btn);
-        illustrationEmpty = findViewById(R.id.illustration_empty);
-        textEmpty = findViewById(R.id.text_empty);
-        changeLocationBtnContainer = findViewById(R.id.change_location_btn_container);
-        changeLocationBtn = findViewById(R.id.change_location_btn);
 
-        shopByCategoryLayout = findViewById(R.id.explore_by_category_layout);
         layoutFirstOrderOffers = findViewById(R.id.layout_first_order_offers);
+        offer1 = findViewById(R.id.offer1);
+        offer2 = findViewById(R.id.offer2);
+        offer3 = findViewById(R.id.offer3);
         layoutSafeDelivery = findViewById(R.id.layout_safe_delivery);
 
         //Store
@@ -183,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerVegetables = findViewById(R.id.recycler_vegetables);
         vegProgressBar = findViewById(R.id.veg_progress_bar);
         //Food Grains
-        layoutFoodgrains = findViewById(R.id.layout_foodgrains);
+        layoutFoodGrains = findViewById(R.id.layout_foodgrains);
         viewAllFoodGrainsBtn = findViewById(R.id.view_all_foodgrains_btn);
         recyclerFoodGrains = findViewById(R.id.recycler_foodgrains);
         foodGrainsProgressBar = findViewById(R.id.foodgrains_progress_bar);
@@ -205,9 +209,16 @@ public class MainActivity extends AppCompatActivity {
         menuProfile = findViewById(R.id.menu_profile);
         cartBtn = findViewById(R.id.cart_btn);
         cartIndicator = findViewById(R.id.cart_indicator);
+
+        illustrationEmpty = findViewById(R.id.illustration_empty);
+        textEmpty = findViewById(R.id.text_empty);
+        changeLocationBtnContainer = findViewById(R.id.change_location_btn_container);
+        changeLocationBtn = findViewById(R.id.change_location_btn);
     }
 
     private void initFirebase() {
+        userRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS);
+
         storesRef = FirebaseFirestore.getInstance()
                 .collection(Constants.KEY_COLLECTION_CITIES)
                 .document(preferenceManager.getString(Constants.KEY_USER_CITY))
@@ -366,12 +377,6 @@ public class MainActivity extends AppCompatActivity {
             CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
         });
 
-        if(preferenceManager.getBoolean(Constants.KEY_USER_FIRST_ORDER)) {
-            layoutFirstOrderOffers.setVisibility(View.VISIBLE);
-        } else {
-            layoutFirstOrderOffers.setVisibility(View.GONE);
-        }
-
         viewAllStoresBtn.setOnClickListener(view -> {
             startActivity(new Intent(MainActivity.this, StoresListActivity.class));
             CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
@@ -379,6 +384,12 @@ public class MainActivity extends AppCompatActivity {
 
         viewAllFruitsBtn.setOnClickListener(view -> {
             preferenceManager.putString(Constants.KEY_CATEGORY, "Fruits");
+            startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
+            CustomIntent.customType(MainActivity.this, "left-to-right");
+        });
+
+        exploreAllProductsBtn.setOnClickListener(v -> {
+            preferenceManager.putString(Constants.KEY_CATEGORY, "");
             startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
             CustomIntent.customType(MainActivity.this, "left-to-right");
         });
@@ -397,12 +408,6 @@ public class MainActivity extends AppCompatActivity {
 
         viewAllPCareBtn.setOnClickListener(view -> {
             preferenceManager.putString(Constants.KEY_CATEGORY, "Personal Care");
-            startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
-            CustomIntent.customType(MainActivity.this, "left-to-right");
-        });
-
-        exploreAllProductsBtn.setOnClickListener(v -> {
-            preferenceManager.putString(Constants.KEY_CATEGORY, "");
             startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
             CustomIntent.customType(MainActivity.this, "left-to-right");
         });
@@ -427,13 +432,36 @@ public class MainActivity extends AppCompatActivity {
         });
 
         cartBtn.setOnClickListener(v -> {
+            preferenceManager.putString(Constants.KEY_ORDER_ID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STOREID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
             CustomIntent.customType(MainActivity.this, "bottom-to-up");
         });
     }
 
 
-    //Load Banners Adapter
+    /////////////////////////////////// Load Banners Adapter ///////////////////////////////////////
 
     public class BannerSliderAdapter extends SliderViewAdapter<BannerSliderAdapter.Holder> {
 
@@ -492,7 +520,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //Load Stores Adapter
+    ///////////////////////////////////// Load Stores Adapter //////////////////////////////////////
 
     private void loadStores() {
         Query query = storesRef.orderBy(Constants.KEY_STORE_AVERAGE_RATING, Query.Direction.DESCENDING).limit(5);
@@ -526,7 +554,6 @@ public class MainActivity extends AppCompatActivity {
                     holder.storeStatusContainer.setCardBackgroundColor(getColor(R.color.errorColor));
                 }
 
-
                 holder.storeRating.setVisibility(View.VISIBLE);
                 holder.storeRating.setText(String.valueOf(model.getStoreAverageRating()));
                 holder.storeRatingBar.setVisibility(View.VISIBLE);
@@ -551,19 +578,18 @@ public class MainActivity extends AppCompatActivity {
                     bannerSlider.setVisibility(View.GONE);
                     shopByCategoryLayout.setVisibility(View.GONE);
                     layoutFirstOrderOffers.setVisibility(View.GONE);
-                    layoutStores.setVisibility(View.GONE);
-                    exploreAllProductsBtn.setVisibility(View.GONE);
-                    layoutFruits.setVisibility(View.GONE);
                     layoutSafeDelivery.setVisibility(View.GONE);
+                    layoutStores.setVisibility(View.GONE);
+                    layoutFruits.setVisibility(View.GONE);
+                    exploreAllProductsBtn.setVisibility(View.GONE);
                     layoutVegetables.setVisibility(View.GONE);
                     banner1.setVisibility(View.GONE);
-                    layoutFoodgrains.setVisibility(View.GONE);
-                    banner2.setVisibility(View.GONE);
+                    layoutFoodGrains.setVisibility(View.GONE);
                     layoutPCare.setVisibility(View.GONE);
+                    banner2.setVisibility(View.GONE);
                     illustrationEmpty.setVisibility(View.VISIBLE);
                     textEmpty.setVisibility(View.VISIBLE);
                     changeLocationBtnContainer.setVisibility(View.VISIBLE);
-                    changeLocationBtn.setEnabled(true);
                     changeLocationBtn.setOnClickListener(v -> {
                         if (!isConnectedToInternet(MainActivity.this)) {
                             showConnectToInternetDialog();
@@ -586,20 +612,92 @@ public class MainActivity extends AppCompatActivity {
                     productSearchBtn.setEnabled(true);
                     bannerSlider.setVisibility(View.VISIBLE);
                     shopByCategoryLayout.setVisibility(View.VISIBLE);
-                    layoutFirstOrderOffers.setVisibility(View.VISIBLE);
-                    layoutStores.setVisibility(View.VISIBLE);
-                    exploreAllProductsBtn.setVisibility(View.VISIBLE);
-                    layoutFruits.setVisibility(View.VISIBLE);
+                    userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
+                            .get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            if (documentSnapshot.exists()) {
+                                boolean first_order = documentSnapshot.getBoolean(Constants.KEY_USER_FIRST_ORDER);
+
+                                if (first_order) {
+                                    layoutFirstOrderOffers.setVisibility(View.VISIBLE);
+
+                                    offer1.setOnClickListener(v -> {
+                                        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
+                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_delivery_charges);
+                                        bottomSheetDialog.setCanceledOnTouchOutside(false);
+
+                                        ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
+                                        closeSheetBtn.setOnClickListener(v12 -> bottomSheetDialog.dismiss());
+
+                                        bottomSheetDialog.show();
+                                    });
+
+                                    offer2.setOnClickListener(v -> {
+                                        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
+                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_convenience_fee);
+                                        bottomSheetDialog.setCanceledOnTouchOutside(false);
+
+                                        ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
+                                        closeSheetBtn.setOnClickListener(v12 -> bottomSheetDialog.dismiss());
+
+                                        bottomSheetDialog.show();
+                                    });
+
+                                    offer3.setOnClickListener(v -> {
+                                        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
+                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_first_order_offer);
+                                        bottomSheetDialog.setCanceledOnTouchOutside(false);
+
+                                        ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
+                                        closeSheetBtn.setOnClickListener(v12 -> bottomSheetDialog.dismiss());
+
+                                        bottomSheetDialog.show();
+                                    });
+                                } else {
+                                    layoutFirstOrderOffers.setVisibility(View.GONE);
+                                }
+                            } else {
+                                Alerter.create(MainActivity.this)
+                                        .setText("Whoa! Something Broke. Try again!")
+                                        .setTextAppearance(R.style.AlertText)
+                                        .setBackgroundColorRes(R.color.errorColor)
+                                        .setIcon(R.drawable.ic_error)
+                                        .setDuration(3000)
+                                        .enableIconPulse(true)
+                                        .enableVibration(true)
+                                        .disableOutsideTouch()
+                                        .enableProgress(true)
+                                        .setProgressColorInt(getColor(android.R.color.white))
+                                        .show();
+                            }
+                        } else {
+                            Alerter.create(MainActivity.this)
+                                    .setText("Whoa! Something Broke. Try again!")
+                                    .setTextAppearance(R.style.AlertText)
+                                    .setBackgroundColorRes(R.color.errorColor)
+                                    .setIcon(R.drawable.ic_error)
+                                    .setDuration(3000)
+                                    .enableIconPulse(true)
+                                    .enableVibration(true)
+                                    .disableOutsideTouch()
+                                    .enableProgress(true)
+                                    .setProgressColorInt(getColor(android.R.color.white))
+                                    .show();
+                        }
+                    });
                     layoutSafeDelivery.setVisibility(View.VISIBLE);
+                    layoutStores.setVisibility(View.VISIBLE);
+                    layoutFruits.setVisibility(View.VISIBLE);
+                    exploreAllProductsBtn.setVisibility(View.VISIBLE);
                     layoutVegetables.setVisibility(View.VISIBLE);
                     banner1.setVisibility(View.VISIBLE);
-                    layoutFoodgrains.setVisibility(View.VISIBLE);
-                    banner2.setVisibility(View.VISIBLE);
+                    layoutFoodGrains.setVisibility(View.VISIBLE);
                     layoutPCare.setVisibility(View.VISIBLE);
+                    banner2.setVisibility(View.VISIBLE);
                     illustrationEmpty.setVisibility(View.GONE);
                     textEmpty.setVisibility(View.GONE);
                     changeLocationBtnContainer.setVisibility(View.GONE);
-                    changeLocationBtn.setEnabled(false);
                 }
             }
 
@@ -631,7 +729,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //Load Fruits Adapter
+    ////////////////////////////////// Load Fruits Adapter /////////////////////////////////////////
 
     private void loadFruits() {
         Query query = fruitsRef.orderBy(Constants.KEY_PRODUCT_NAME, Query.Direction.ASCENDING).limit(8);
@@ -646,7 +744,7 @@ public class MainActivity extends AppCompatActivity {
             @NonNull
             @Override
             public FruitViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_home_product_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_horizontal_product_item, parent, false);
                 return new FruitViewHolder(view);
             }
 
@@ -729,7 +827,6 @@ public class MainActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             })
                                             .addOnFailureListener(e -> {
                                                 progressDialog.dismiss();
@@ -745,7 +842,6 @@ public class MainActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             });
                                 } else {
                                     cartRef.whereEqualTo(Constants.KEY_CART_ITEM_PRODUCT_STORE_ID, model.getProductStoreID())
@@ -754,7 +850,7 @@ public class MainActivity extends AppCompatActivity {
                                             progressDialog.dismiss();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
-                                                    .setMessage("Your cart has already been setup for a store and this item does not belong to that store. You must clear your cart by placing the order or removing all the items before proceeding with this item.")
+                                                    .setMessage("Your cart has already been setup for a store this item does not belong to. You must clear your cart first before proceeding with this item.")
                                                     .setCancelable(false)
                                                     .setPositiveButton("Go to Cart", R.drawable.ic_dialog_cart, (dialogInterface, which) -> {
                                                         dialogInterface.dismiss();
@@ -786,7 +882,6 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         }).addOnFailureListener(e -> {
                                                                     progressDialog.dismiss();
                                                                     Alerter.create(MainActivity.this)
@@ -801,7 +896,6 @@ public class MainActivity extends AppCompatActivity {
                                                                             .enableProgress(true)
                                                                             .setProgressColorInt(getColor(android.R.color.white))
                                                                             .show();
-                                                                    return;
                                                                 });
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
@@ -820,7 +914,6 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         })
                                                                         .addOnFailureListener(e -> {
                                                                             progressDialog.dismiss();
@@ -836,7 +929,6 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         });
                                                             }
                                                         } else {
@@ -853,7 +945,6 @@ public class MainActivity extends AppCompatActivity {
                                                                     .enableProgress(true)
                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                     .show();
-                                                            return;
                                                         }
                                                     }).addOnFailureListener(e -> {
                                                 progressDialog.dismiss();
@@ -869,7 +960,6 @@ public class MainActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             });
                                         }
                                     }).addOnFailureListener(e -> {
@@ -886,7 +976,6 @@ public class MainActivity extends AppCompatActivity {
                                                 .enableProgress(true)
                                                 .setProgressColorInt(getColor(android.R.color.white))
                                                 .show();
-                                        return;
                                     });
                                 }
                             }).addOnFailureListener(e -> {
@@ -903,7 +992,6 @@ public class MainActivity extends AppCompatActivity {
                                         .enableProgress(true)
                                         .setProgressColorInt(getColor(android.R.color.white))
                                         .show();
-                                return;
                             });
                         }
                     });
@@ -955,7 +1043,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //Load Vegetables Adapter
+    /////////////////////////////////// Load Vegetables Adapter ////////////////////////////////////
 
     private void loadVegetables() {
         Query query = vegetablesRef.orderBy(Constants.KEY_PRODUCT_NAME, Query.Direction.ASCENDING).limit(8);
@@ -970,7 +1058,7 @@ public class MainActivity extends AppCompatActivity {
             @NonNull
             @Override
             public VegetableViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_home_product_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_horizontal_product_item, parent, false);
                 return new VegetableViewHolder(view);
             }
 
@@ -1053,7 +1141,6 @@ public class MainActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             })
                                             .addOnFailureListener(e -> {
                                                 progressDialog.dismiss();
@@ -1069,7 +1156,6 @@ public class MainActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             });
                                 } else {
                                     cartRef.whereEqualTo(Constants.KEY_CART_ITEM_PRODUCT_STORE_ID, model.getProductStoreID())
@@ -1078,7 +1164,7 @@ public class MainActivity extends AppCompatActivity {
                                             progressDialog.dismiss();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
-                                                    .setMessage("Your cart has already been setup for a store and this item does not belong to that store. You must clear your cart by placing the order or removing all the items before proceeding with this item.")
+                                                    .setMessage("Your cart has already been setup for a store this item does not belong to. You must clear your cart first before proceeding with this item.")
                                                     .setCancelable(false)
                                                     .setPositiveButton("Go to Cart", R.drawable.ic_dialog_cart, (dialogInterface, which) -> {
                                                         dialogInterface.dismiss();
@@ -1110,7 +1196,6 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         }).addOnFailureListener(e -> {
                                                                     progressDialog.dismiss();
                                                                     Alerter.create(MainActivity.this)
@@ -1125,7 +1210,6 @@ public class MainActivity extends AppCompatActivity {
                                                                             .enableProgress(true)
                                                                             .setProgressColorInt(getColor(android.R.color.white))
                                                                             .show();
-                                                                    return;
                                                                 });
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
@@ -1144,7 +1228,6 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         })
                                                                         .addOnFailureListener(e -> {
                                                                             progressDialog.dismiss();
@@ -1160,7 +1243,6 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         });
                                                             }
                                                         } else {
@@ -1177,7 +1259,6 @@ public class MainActivity extends AppCompatActivity {
                                                                     .enableProgress(true)
                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                     .show();
-                                                            return;
                                                         }
                                                     }).addOnFailureListener(e -> {
                                                 progressDialog.dismiss();
@@ -1193,7 +1274,6 @@ public class MainActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             });
                                         }
                                     }).addOnFailureListener(e -> {
@@ -1210,7 +1290,6 @@ public class MainActivity extends AppCompatActivity {
                                                 .enableProgress(true)
                                                 .setProgressColorInt(getColor(android.R.color.white))
                                                 .show();
-                                        return;
                                     });
                                 }
                             }).addOnFailureListener(e -> {
@@ -1227,7 +1306,6 @@ public class MainActivity extends AppCompatActivity {
                                         .enableProgress(true)
                                         .setProgressColorInt(getColor(android.R.color.white))
                                         .show();
-                                return;
                             });
                         }
                     });
@@ -1279,7 +1357,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //Load FoodGrains Adapter
+    ////////////////////////////////// Load FoodGrains Adapter /////////////////////////////////////
 
     private void loadFoodGrains() {
         Query query = foodGrainsRef.orderBy(Constants.KEY_PRODUCT_NAME, Query.Direction.ASCENDING).limit(8);
@@ -1294,7 +1372,7 @@ public class MainActivity extends AppCompatActivity {
             @NonNull
             @Override
             public FoodGrainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_home_product_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_horizontal_product_item, parent, false);
                 return new FoodGrainViewHolder(view);
             }
 
@@ -1377,7 +1455,6 @@ public class MainActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             })
                                             .addOnFailureListener(e -> {
                                                 progressDialog.dismiss();
@@ -1393,7 +1470,6 @@ public class MainActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             });
                                 } else {
                                     cartRef.whereEqualTo(Constants.KEY_CART_ITEM_PRODUCT_STORE_ID, model.getProductStoreID())
@@ -1402,7 +1478,7 @@ public class MainActivity extends AppCompatActivity {
                                             progressDialog.dismiss();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
-                                                    .setMessage("Your cart has already been setup for a store and this item does not belong to that store. You must clear your cart by placing the order or removing all the items before proceeding with this item.")
+                                                    .setMessage("Your cart has already been setup for a store this item does not belong to. You must clear your cart first before proceeding with this item.")
                                                     .setCancelable(false)
                                                     .setPositiveButton("Go to Cart", R.drawable.ic_dialog_cart, (dialogInterface, which) -> {
                                                         dialogInterface.dismiss();
@@ -1434,7 +1510,6 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         }).addOnFailureListener(e -> {
                                                                     progressDialog.dismiss();
                                                                     Alerter.create(MainActivity.this)
@@ -1449,7 +1524,6 @@ public class MainActivity extends AppCompatActivity {
                                                                             .enableProgress(true)
                                                                             .setProgressColorInt(getColor(android.R.color.white))
                                                                             .show();
-                                                                    return;
                                                                 });
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
@@ -1468,7 +1542,6 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         })
                                                                         .addOnFailureListener(e -> {
                                                                             progressDialog.dismiss();
@@ -1484,7 +1557,6 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         });
                                                             }
                                                         } else {
@@ -1501,7 +1573,6 @@ public class MainActivity extends AppCompatActivity {
                                                                     .enableProgress(true)
                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                     .show();
-                                                            return;
                                                         }
                                                     }).addOnFailureListener(e -> {
                                                 progressDialog.dismiss();
@@ -1517,7 +1588,6 @@ public class MainActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             });
                                         }
                                     }).addOnFailureListener(e -> {
@@ -1534,7 +1604,6 @@ public class MainActivity extends AppCompatActivity {
                                                 .enableProgress(true)
                                                 .setProgressColorInt(getColor(android.R.color.white))
                                                 .show();
-                                        return;
                                     });
                                 }
                             }).addOnFailureListener(e -> {
@@ -1551,7 +1620,6 @@ public class MainActivity extends AppCompatActivity {
                                         .enableProgress(true)
                                         .setProgressColorInt(getColor(android.R.color.white))
                                         .show();
-                                return;
                             });
                         }
                     });
@@ -1569,9 +1637,9 @@ public class MainActivity extends AppCompatActivity {
                 foodGrainsProgressBar.setVisibility(View.GONE);
 
                 if (getItemCount() == 0) {
-                    layoutFoodgrains.setVisibility(View.GONE);
+                    layoutFoodGrains.setVisibility(View.GONE);
                 } else {
-                    layoutFoodgrains.setVisibility(View.VISIBLE);
+                    layoutFoodGrains.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -1603,7 +1671,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //Load PersonalCare Adapter
+    ///////////////////////////////// Load PersonalCare Adapter ////////////////////////////////////
 
     private void loadPersonalCareProducts() {
         Query query = pCareRef.orderBy(Constants.KEY_PRODUCT_NAME, Query.Direction.ASCENDING).limit(8);
@@ -1618,7 +1686,7 @@ public class MainActivity extends AppCompatActivity {
             @NonNull
             @Override
             public PersonalCareViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_home_product_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_horizontal_product_item, parent, false);
                 return new PersonalCareViewHolder(view);
             }
 
@@ -1701,7 +1769,6 @@ public class MainActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             })
                                             .addOnFailureListener(e -> {
                                                 progressDialog.dismiss();
@@ -1717,7 +1784,6 @@ public class MainActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             });
                                 } else {
                                     cartRef.whereEqualTo(Constants.KEY_CART_ITEM_PRODUCT_STORE_ID, model.getProductStoreID())
@@ -1726,7 +1792,7 @@ public class MainActivity extends AppCompatActivity {
                                             progressDialog.dismiss();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
-                                                    .setMessage("Your cart has already been setup for a store and this item does not belong to that store. You must clear your cart by placing the order or removing all the items before proceeding with this item.")
+                                                    .setMessage("Your cart has already been setup for a store this item does not belong to. You must clear your cart first before proceeding with this item.")
                                                     .setCancelable(false)
                                                     .setPositiveButton("Go to Cart", R.drawable.ic_dialog_cart, (dialogInterface, which) -> {
                                                         dialogInterface.dismiss();
@@ -1758,7 +1824,6 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         }).addOnFailureListener(e -> {
                                                                     progressDialog.dismiss();
                                                                     Alerter.create(MainActivity.this)
@@ -1773,7 +1838,6 @@ public class MainActivity extends AppCompatActivity {
                                                                             .enableProgress(true)
                                                                             .setProgressColorInt(getColor(android.R.color.white))
                                                                             .show();
-                                                                    return;
                                                                 });
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
@@ -1792,7 +1856,6 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         })
                                                                         .addOnFailureListener(e -> {
                                                                             progressDialog.dismiss();
@@ -1808,7 +1871,6 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         });
                                                             }
                                                         } else {
@@ -1825,7 +1887,6 @@ public class MainActivity extends AppCompatActivity {
                                                                     .enableProgress(true)
                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                     .show();
-                                                            return;
                                                         }
                                                     }).addOnFailureListener(e -> {
                                                 progressDialog.dismiss();
@@ -1841,7 +1902,6 @@ public class MainActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             });
                                         }
                                     }).addOnFailureListener(e -> {
@@ -1858,7 +1918,6 @@ public class MainActivity extends AppCompatActivity {
                                                 .enableProgress(true)
                                                 .setProgressColorInt(getColor(android.R.color.white))
                                                 .show();
-                                        return;
                                     });
                                 }
                             }).addOnFailureListener(e -> {
@@ -1875,7 +1934,6 @@ public class MainActivity extends AppCompatActivity {
                                         .enableProgress(true)
                                         .setProgressColorInt(getColor(android.R.color.white))
                                         .show();
-                                return;
                             });
                         }
                     });
@@ -1927,7 +1985,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //StoreViewHolder
+    /////////////////////////////////////// StoreViewHolder ////////////////////////////////////////
 
     public static class StoreViewHolder extends RecyclerView.ViewHolder {
 
@@ -1951,7 +2009,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //FruitViewHolder
+    ////////////////////////////////////// FruitViewHolder /////////////////////////////////////////
 
     public static class FruitViewHolder extends RecyclerView.ViewHolder {
 
@@ -1979,7 +2037,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //VegetableViewHolder
+    /////////////////////////////////// VegetableViewHolder ////////////////////////////////////////
 
     public static class VegetableViewHolder extends RecyclerView.ViewHolder {
 
@@ -2007,7 +2065,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //FoodGrainViewHolder
+    ///////////////////////////////////// FoodGrainViewHolder //////////////////////////////////////
 
     public static class FoodGrainViewHolder extends RecyclerView.ViewHolder {
 
@@ -2035,7 +2093,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //PersonalCareViewHolder
+    //////////////////////////////////// PersonalCareViewHolder ////////////////////////////////////
 
     public static class PersonalCareViewHolder extends RecyclerView.ViewHolder {
 
@@ -2073,6 +2131,77 @@ public class MainActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(MainActivity.this, "Some ERROR occurred!", Toast.LENGTH_SHORT).show());
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
+
+        loadStores();
+        loadFruits();
+        loadVegetables();
+        loadFoodGrains();
+        loadPersonalCareProducts();
+
+        cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (queryDocumentSnapshots.size() == 0) {
+                cartIndicator.setVisibility(View.GONE);
+            } else {
+                cartIndicator.setVisibility(View.VISIBLE);
+            }
+        }).addOnFailureListener(e -> {
+            Alerter.create(MainActivity.this)
+                    .setText("Whoa! Something Broke. Try again!")
+                    .setTextAppearance(R.style.AlertText)
+                    .setBackgroundColorRes(R.color.errorColor)
+                    .setIcon(R.drawable.ic_error)
+                    .setDuration(3000)
+                    .enableIconPulse(true)
+                    .enableVibration(true)
+                    .disableOutsideTouch()
+                    .enableProgress(true)
+                    .setProgressColorInt(getColor(android.R.color.white))
+                    .show();
+        });
+
+        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
+        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorBackground));
+        pullRefreshLayout.setOnRefreshListener(() -> {
+            if (!isConnectedToInternet(MainActivity.this)) {
+                pullRefreshLayout.setRefreshing(false);
+                showConnectToInternetDialog();
+                return;
+            } else {
+                loadStores();
+                loadFruits();
+                loadVegetables();
+                loadFoodGrains();
+                loadPersonalCareProducts();
+
+                cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.size() == 0) {
+                        cartIndicator.setVisibility(View.GONE);
+                    } else {
+                        cartIndicator.setVisibility(View.VISIBLE);
+                    }
+                }).addOnFailureListener(e -> {
+                    Alerter.create(MainActivity.this)
+                            .setText("Whoa! Something Broke. Try again!")
+                            .setTextAppearance(R.style.AlertText)
+                            .setBackgroundColorRes(R.color.errorColor)
+                            .setIcon(R.drawable.ic_error)
+                            .setDuration(3000)
+                            .enableIconPulse(true)
+                            .enableVibration(true)
+                            .disableOutsideTouch()
+                            .enableProgress(true)
+                            .setProgressColorInt(getColor(android.R.color.white))
+                            .show();
+                });
+            }
+        });
+    }
+
     private boolean isConnectedToInternet(MainActivity mainActivity) {
         ConnectivityManager connectivityManager = (ConnectivityManager) mainActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -2101,77 +2230,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        loadStores();
-        loadFruits();
-        loadVegetables();
-        loadFoodGrains();
-        loadPersonalCareProducts();
-        cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (queryDocumentSnapshots.size() == 0) {
-                cartIndicator.setVisibility(View.GONE);
-            } else {
-                cartIndicator.setVisibility(View.VISIBLE);
-            }
-        }).addOnFailureListener(e -> {
-            Alerter.create(MainActivity.this)
-                    .setText("Whoa! Something Broke. Try again!")
-                    .setTextAppearance(R.style.AlertText)
-                    .setBackgroundColorRes(R.color.errorColor)
-                    .setIcon(R.drawable.ic_error)
-                    .setDuration(3000)
-                    .enableIconPulse(true)
-                    .enableVibration(true)
-                    .disableOutsideTouch()
-                    .enableProgress(true)
-                    .setProgressColorInt(getColor(android.R.color.white))
-                    .show();
-            return;
-        });
-
-        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
-        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorBackground));
-        pullRefreshLayout.setOnRefreshListener(() -> {
-            if (!isConnectedToInternet(MainActivity.this)) {
-                pullRefreshLayout.setRefreshing(false);
-                showConnectToInternetDialog();
-                return;
-            } else {
-                loadStores();
-                loadFruits();
-                loadVegetables();
-                loadFoodGrains();
-                loadPersonalCareProducts();
-                cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots.size() == 0) {
-                        cartIndicator.setVisibility(View.GONE);
-                    } else {
-                        cartIndicator.setVisibility(View.VISIBLE);
-                    }
-                }).addOnFailureListener(e -> {
-                    Alerter.create(MainActivity.this)
-                            .setText("Whoa! Something Broke. Try again!")
-                            .setTextAppearance(R.style.AlertText)
-                            .setBackgroundColorRes(R.color.errorColor)
-                            .setIcon(R.drawable.ic_error)
-                            .setDuration(3000)
-                            .enableIconPulse(true)
-                            .enableVibration(true)
-                            .disableOutsideTouch()
-                            .enableProgress(true)
-                            .setProgressColorInt(getColor(android.R.color.white))
-                            .show();
-                    return;
-                });
-            }
-        });
-    }
-
-    @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(MainActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(MainActivity.this);
+            }
+        });
         finishAffinity();
     }
 }

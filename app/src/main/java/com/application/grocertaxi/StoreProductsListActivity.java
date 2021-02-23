@@ -113,10 +113,8 @@ public class StoreProductsListActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
-
         progressDialog = new SpotsDialog.Builder().setContext(StoreProductsListActivity.this)
-                .setMessage("Adding item to cart...")
+                .setMessage("Adding item to cart..")
                 .setCancelable(false)
                 .setTheme(R.style.SpotsDialog)
                 .build();
@@ -182,13 +180,36 @@ public class StoreProductsListActivity extends AppCompatActivity {
         });
 
         cartBtn.setOnClickListener(v -> {
+            preferenceManager.putString(Constants.KEY_ORDER_ID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STOREID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
             CustomIntent.customType(StoreProductsListActivity.this, "bottom-to-up");
         });
 
         if (preferenceManager.getString(Constants.KEY_STORE_CATEGORY).isEmpty() || preferenceManager.getString(Constants.KEY_STORE_CATEGORY).equals("")) {
             title.setText("All products");
-            inputProductSearch.setHint("Search product");
+            inputProductSearch.setHint("Search products");
         } else {
             title.setText(preferenceManager.getString(Constants.KEY_STORE_CATEGORY));
             inputProductSearch.setHint(String.format("Search in %s", preferenceManager.getString(Constants.KEY_STORE_CATEGORY)));
@@ -218,7 +239,6 @@ public class StoreProductsListActivity extends AppCompatActivity {
                         .enableProgress(true)
                         .setProgressColorInt(getColor(android.R.color.white))
                         .show();
-                return;
             }
         });
 
@@ -519,7 +539,6 @@ public class StoreProductsListActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             })
                                             .addOnFailureListener(e -> {
                                                 progressDialog.dismiss();
@@ -535,7 +554,6 @@ public class StoreProductsListActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             });
                                 } else {
                                     cartRef.whereEqualTo(Constants.KEY_CART_ITEM_PRODUCT_STORE_ID, model.getProductStoreID())
@@ -544,7 +562,7 @@ public class StoreProductsListActivity extends AppCompatActivity {
                                             progressDialog.dismiss();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(StoreProductsListActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
-                                                    .setMessage("Your cart has already been setup for a store and this item does not belong to that store. You must clear your cart by placing the order or removing all the items before proceeding with this item.")
+                                                    .setMessage("Your cart has already been setup for a store this item does not belong to. You must clear your cart first before proceeding with this item.")
                                                     .setCancelable(false)
                                                     .setPositiveButton("Go to Cart", R.drawable.ic_dialog_cart, (dialogInterface, which) -> {
                                                         dialogInterface.dismiss();
@@ -576,7 +594,6 @@ public class StoreProductsListActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         }).addOnFailureListener(e -> {
                                                                     progressDialog.dismiss();
                                                                     Alerter.create(StoreProductsListActivity.this)
@@ -591,7 +608,6 @@ public class StoreProductsListActivity extends AppCompatActivity {
                                                                             .enableProgress(true)
                                                                             .setProgressColorInt(getColor(android.R.color.white))
                                                                             .show();
-                                                                    return;
                                                                 });
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
@@ -610,7 +626,6 @@ public class StoreProductsListActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         })
                                                                         .addOnFailureListener(e -> {
                                                                             progressDialog.dismiss();
@@ -626,7 +641,6 @@ public class StoreProductsListActivity extends AppCompatActivity {
                                                                                     .enableProgress(true)
                                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                                     .show();
-                                                                            return;
                                                                         });
                                                             }
                                                         } else {
@@ -643,7 +657,6 @@ public class StoreProductsListActivity extends AppCompatActivity {
                                                                     .enableProgress(true)
                                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                                     .show();
-                                                            return;
                                                         }
                                                     }).addOnFailureListener(e -> {
                                                 progressDialog.dismiss();
@@ -659,7 +672,6 @@ public class StoreProductsListActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             });
                                         }
                                     }).addOnFailureListener(e -> {
@@ -676,7 +688,6 @@ public class StoreProductsListActivity extends AppCompatActivity {
                                                 .enableProgress(true)
                                                 .setProgressColorInt(getColor(android.R.color.white))
                                                 .show();
-                                        return;
                                     });
                                 }
                             }).addOnFailureListener(e -> {
@@ -693,7 +704,6 @@ public class StoreProductsListActivity extends AppCompatActivity {
                                         .enableProgress(true)
                                         .setProgressColorInt(getColor(android.R.color.white))
                                         .show();
-                                return;
                             });
                         }
                     });
@@ -825,7 +835,10 @@ public class StoreProductsListActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
+
         loadProducts();
+
         cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (queryDocumentSnapshots.size() == 0) {
                 cartIndicator.setVisibility(View.GONE);
@@ -845,7 +858,6 @@ public class StoreProductsListActivity extends AppCompatActivity {
                     .enableProgress(true)
                     .setProgressColorInt(getColor(android.R.color.white))
                     .show();
-            return;
         });
 
         pullRefreshLayout.setColor(getColor(R.color.colorAccent));
@@ -858,7 +870,9 @@ public class StoreProductsListActivity extends AppCompatActivity {
                 UIUtil.hideKeyboard(StoreProductsListActivity.this);
                 inputProductSearch.setText(null);
                 inputProductSearch.clearFocus();
+
                 loadProducts();
+
                 cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots.size() == 0) {
                         cartIndicator.setVisibility(View.GONE);
@@ -878,7 +892,6 @@ public class StoreProductsListActivity extends AppCompatActivity {
                             .enableProgress(true)
                             .setProgressColorInt(getColor(android.R.color.white))
                             .show();
-                    return;
                 });
             }
         });
@@ -887,6 +900,11 @@ public class StoreProductsListActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(StoreProductsListActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(StoreProductsListActivity.this);
+            }
+        });
         CustomIntent.customType(StoreProductsListActivity.this, "right-to-left");
     }
 }

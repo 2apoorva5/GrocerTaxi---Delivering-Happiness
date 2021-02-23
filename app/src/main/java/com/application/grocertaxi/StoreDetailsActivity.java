@@ -1,6 +1,5 @@
 package com.application.grocertaxi;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -42,7 +41,9 @@ import com.google.firebase.firestore.Query;
 import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
-import dmax.dialog.SpotsDialog;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
 import maes.tech.intentanim.CustomIntent;
 
 public class StoreDetailsActivity extends AppCompatActivity {
@@ -50,11 +51,11 @@ public class StoreDetailsActivity extends AppCompatActivity {
     private ImageView closeBtn, cartBtn, storeImage;
     private FloatingActionButton emailBtn, callBtn;
     private TextView storeStatus1, storeName, storeID, storeRating, storeOwner, storeAddress,
-            storeEmail, storeMobile, text, storeTiming, storeDeliveryCharges, storeStatus2;
+            storeEmail, storeMobile, text, storeTiming, storeStatus2, storeMinimumOrderAmount;
     private RatingBar storeRatingBar;
     private RecyclerView recyclerCategories;
     private CardView storeStatusContainer, cartIndicator;
-    private ProgressBar progressBar;
+    private ProgressBar progressBar1, progressBar2;
     private PullRefreshLayout pullRefreshLayout;
 
     private CollectionReference storeRef, categoriesRef, cartRef;
@@ -62,7 +63,6 @@ public class StoreDetailsActivity extends AppCompatActivity {
 
     private String cart_location;
     private PreferenceManager preferenceManager;
-    private AlertDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,14 +96,6 @@ public class StoreDetailsActivity extends AppCompatActivity {
         setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
 
-        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
-
-        progressDialog = new SpotsDialog.Builder().setContext(StoreDetailsActivity.this)
-                .setMessage("Hold on...")
-                .setCancelable(false)
-                .setTheme(R.style.SpotsDialog)
-                .build();
-
         initViews();
         initFirebase();
         setActionOnViews();
@@ -128,10 +120,11 @@ public class StoreDetailsActivity extends AppCompatActivity {
         storeMobile = findViewById(R.id.store_mobile);
         text = findViewById(R.id.text);
         recyclerCategories = findViewById(R.id.recycler_categories);
-        progressBar = findViewById(R.id.progress_bar);
+        progressBar1 = findViewById(R.id.progress_bar1);
+        progressBar2 = findViewById(R.id.progress_bar2);
         storeTiming = findViewById(R.id.store_timing);
         storeStatus2 = findViewById(R.id.store_status2);
-        storeDeliveryCharges = findViewById(R.id.store_delivery_charges);
+        storeMinimumOrderAmount = findViewById(R.id.minimum_order_amount);
         pullRefreshLayout = findViewById(R.id.pull_refresh_layout);
     }
 
@@ -164,17 +157,39 @@ public class StoreDetailsActivity extends AppCompatActivity {
         });
 
         cartBtn.setOnClickListener(v -> {
+            preferenceManager.putString(Constants.KEY_ORDER_ID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STOREID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
             CustomIntent.customType(StoreDetailsActivity.this, "bottom-to-up");
         });
-
-        progressBar.setVisibility(View.VISIBLE);
     }
 
     private void loadStoreDetails() {
         final DocumentReference productDocumentRef = storeRef.document(preferenceManager.getString(Constants.KEY_STORE));
         productDocumentRef.addSnapshotListener((documentSnapshot, error) -> {
             if (error != null) {
+                progressBar2.setVisibility(View.GONE);
                 pullRefreshLayout.setRefreshing(false);
                 Alerter.create(StoreDetailsActivity.this)
                         .setText("Whoa! Something broke. Try again!")
@@ -188,8 +203,8 @@ public class StoreDetailsActivity extends AppCompatActivity {
                         .enableProgress(true)
                         .setProgressColorInt(getColor(android.R.color.white))
                         .show();
-                return;
             } else {
+                progressBar2.setVisibility(View.GONE);
                 pullRefreshLayout.setRefreshing(false);
                 if (documentSnapshot != null && documentSnapshot.exists()) {
                     Uri store_img = Uri.parse(documentSnapshot.getString(Constants.KEY_STORE_IMAGE));
@@ -203,13 +218,12 @@ public class StoreDetailsActivity extends AppCompatActivity {
                     String store_email = documentSnapshot.getString(Constants.KEY_STORE_EMAIL);
                     String store_mobile = documentSnapshot.getString(Constants.KEY_STORE_MOBILE);
                     String store_timing = documentSnapshot.getString(Constants.KEY_STORE_TIMING);
-                    double delivery_charges = documentSnapshot.getDouble(Constants.KEY_STORE_DELIVERY_CHARGES);
+                    double min_order_amount = documentSnapshot.getDouble(Constants.KEY_STORE_MINIMUM_ORDER_VALUE);
 
-                    //StoreImage
                     Glide.with(storeImage.getContext()).load(store_img)
                             .placeholder(R.drawable.thumbnail).centerCrop().into(storeImage);
 
-                    if(store_status) {
+                    if (store_status) {
                         storeStatus1.setText("Open");
                         storeStatus2.setText("Store's Open");
                         storeStatus2.setTextColor(getColor(R.color.successColor));
@@ -221,9 +235,7 @@ public class StoreDetailsActivity extends AppCompatActivity {
                         storeStatusContainer.setCardBackgroundColor(getColor(R.color.errorColor));
                     }
 
-                    //StoreName
                     storeName.setText(store_name);
-                    //StoreID
                     storeID.setText(store_id);
 
                     if (rating == 0) {
@@ -236,19 +248,26 @@ public class StoreDetailsActivity extends AppCompatActivity {
                         storeRatingBar.setRating((float) rating);
                     }
 
-                    //StoreOwner
                     storeOwner.setText(store_owner);
-                    //StoreAddress
                     storeAddress.setText(store_address);
-                    //StoreEmail
                     storeEmail.setText(store_email);
-                    //StoreMobile
                     storeMobile.setText(store_mobile);
-                    //StoreTiming
                     storeTiming.setText(store_timing);
-                    //StoreDeliveryCharges
-                    storeTiming.setText(String.format("₹ %s", delivery_charges));
+                    storeMinimumOrderAmount.setText(String.format("₹ %s", min_order_amount));
                 } else {
+                    Alerter.create(StoreDetailsActivity.this)
+                            .setText("Whoa! Something broke. Try again!")
+                            .setTextAppearance(R.style.AlertText)
+                            .setBackgroundColorRes(R.color.errorColor)
+                            .setIcon(R.drawable.ic_error)
+                            .setDuration(3000)
+                            .enableIconPulse(true)
+                            .enableVibration(true)
+                            .disableOutsideTouch()
+                            .enableProgress(true)
+                            .setProgressColorInt(getColor(android.R.color.white))
+                            .show();
+
                     storeImage.setImageResource(R.drawable.thumbnail);
                     storeStatusContainer.setVisibility(View.GONE);
                     storeStatus2.setVisibility(View.GONE);
@@ -261,7 +280,6 @@ public class StoreDetailsActivity extends AppCompatActivity {
                     storeEmail.setText("");
                     storeMobile.setText("");
                     storeTiming.setText("");
-                    storeDeliveryCharges.setText("");
 
                     emailBtn.setEnabled(false);
                     callBtn.setEnabled(false);
@@ -313,67 +331,67 @@ public class StoreDetailsActivity extends AppCompatActivity {
                 String cat_medical = "https://firebasestorage.googleapis.com/v0/b/grocer-taxi.appspot.com/o/Categories%2Fmedical.png?alt=media&token=83120872-249b-459a-ae93-8d29dad6bb98";
                 String cat_sports = "https://firebasestorage.googleapis.com/v0/b/grocer-taxi.appspot.com/o/Categories%2Fsports.png?alt=media&token=cd124d9c-2421-4e93-8e6a-d6e13b4933de";
 
-                if(model.getCategoryName().equals("Fruits")) {
+                if (model.getCategoryName().equals("Fruits")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_fruits)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Vegetables")) {
+                } else if (model.getCategoryName().equals("Vegetables")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_vegetables)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Food Grains")) {
+                } else if (model.getCategoryName().equals("Food Grains")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_foodgrains)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Dairy Items")) {
+                } else if (model.getCategoryName().equals("Dairy Items")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_dairy)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Bakery Items")) {
+                } else if (model.getCategoryName().equals("Bakery Items")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_bakery)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Beverages")) {
+                } else if (model.getCategoryName().equals("Beverages")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_beverages)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Dry Fruits")) {
+                } else if (model.getCategoryName().equals("Dry Fruits")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_dryfruits)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Meat & Bacon")) {
+                } else if (model.getCategoryName().equals("Meat & Bacon")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_meat)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Noodles & Pasta")) {
+                } else if (model.getCategoryName().equals("Noodles & Pasta")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_noodles)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Snacks")) {
+                } else if (model.getCategoryName().equals("Snacks")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_snacks)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Kitchen Oil")) {
+                } else if (model.getCategoryName().equals("Kitchen Oil")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_oil)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Spices")) {
+                } else if (model.getCategoryName().equals("Spices")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_spices)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Sweets")) {
+                } else if (model.getCategoryName().equals("Sweets")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_sweets)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Baby Care")) {
+                } else if (model.getCategoryName().equals("Baby Care")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_babycare)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Household")) {
+                } else if (model.getCategoryName().equals("Household")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_household)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Personal Care")) {
+                } else if (model.getCategoryName().equals("Personal Care")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_personalcare)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Pet Care")) {
+                } else if (model.getCategoryName().equals("Pet Care")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_petcare)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Stationary")) {
+                } else if (model.getCategoryName().equals("Stationary")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_stationary)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Hardware")) {
+                } else if (model.getCategoryName().equals("Hardware")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_hardware)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Medical")) {
+                } else if (model.getCategoryName().equals("Medical")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_medical)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
-                } else if(model.getCategoryName().equals("Sports")) {
+                } else if (model.getCategoryName().equals("Sports")) {
                     Glide.with(holder.categoryImage).load(Uri.parse(cat_sports)).placeholder(R.drawable.thumbnail)
                             .centerCrop().into(holder.categoryImage);
                 }
@@ -390,17 +408,17 @@ public class StoreDetailsActivity extends AppCompatActivity {
                 super.onDataChanged();
 
                 pullRefreshLayout.setRefreshing(false);
-                progressBar.setVisibility(View.GONE);
+                progressBar1.setVisibility(View.GONE);
 
                 if (getItemCount() == 0) {
                     recyclerCategories.setAdapter(null);
                     categoryAdapter.notifyDataSetChanged();
-                    text.setText("Not selling any product yet");
+                    text.setText("Snap! Not selling any product yet");
                 } else {
                     categoryAdapter.notifyDataSetChanged();
                     recyclerCategories.setAdapter(categoryAdapter);
                     recyclerCategories.getAdapter().notifyDataSetChanged();
-                    text.setText("Explore by Category");
+                    text.setText("Shop by Category");
                 }
             }
 
@@ -476,8 +494,13 @@ public class StoreDetailsActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
+
+        progressBar2.setVisibility(View.VISIBLE);
         loadStoreDetails();
+        progressBar1.setVisibility(View.VISIBLE);
         loadCategories();
+
         cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (queryDocumentSnapshots.size() == 0) {
                 cartIndicator.setVisibility(View.GONE);
@@ -497,7 +520,6 @@ public class StoreDetailsActivity extends AppCompatActivity {
                     .enableProgress(true)
                     .setProgressColorInt(getColor(android.R.color.white))
                     .show();
-            return;
         });
 
         pullRefreshLayout.setColor(getColor(R.color.colorBackground));
@@ -508,8 +530,11 @@ public class StoreDetailsActivity extends AppCompatActivity {
                 showConnectToInternetDialog();
                 return;
             } else {
+                progressBar2.setVisibility(View.VISIBLE);
                 loadStoreDetails();
+                progressBar1.setVisibility(View.VISIBLE);
                 loadCategories();
+
                 cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots.size() == 0) {
                         cartIndicator.setVisibility(View.GONE);
@@ -529,7 +554,6 @@ public class StoreDetailsActivity extends AppCompatActivity {
                             .enableProgress(true)
                             .setProgressColorInt(getColor(android.R.color.white))
                             .show();
-                    return;
                 });
             }
         });
@@ -550,6 +574,11 @@ public class StoreDetailsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(StoreDetailsActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(StoreDetailsActivity.this);
+            }
+        });
         CustomIntent.customType(StoreDetailsActivity.this, "up-to-bottom");
     }
 }

@@ -48,7 +48,7 @@ public class Constants {
     public static final String KEY_STORE_MOBILE = "storeMobile";
     public static final String KEY_STORE_ADDRESS = "storeAddress";
     public static final String KEY_STORE_TIMING = "storeTiming";
-    public static final String KEY_STORE_DELIVERY_CHARGES = "storeDeliveryCharges";
+    public static final String KEY_STORE_MINIMUM_ORDER_VALUE = "storeMinimumOrderValue";
     public static final String KEY_STORE_IMAGE = "storeImage";
     public static final String KEY_STORE_STATUS = "storeStatus";
     public static final String KEY_STORE_AVERAGE_RATING = "storeAverageRating";
@@ -78,6 +78,7 @@ public class Constants {
     public static final String KEY_PRODUCT_SEARCH_KEYWORD = "productSearchKeyword";
 
     //Cart Constants
+
     public static final String KEY_CART_ITEM_ID = "cartItemID";
     public static final String KEY_CART_ITEM_TIMESTAMP = "cartItemTimestamp";
     public static final String KEY_CART_ITEM_LOCATION = "cartItemLocation";
@@ -96,20 +97,25 @@ public class Constants {
     public static final String KEY_ORDER_ID = "orderID";
     public static final String KEY_ORDER_BY_USERID = "orderByUserID";
     public static final String KEY_ORDER_BY_USERNAME = "orderByUserName";
+    public static final String KEY_ORDER_FROM_STOREID = "orderFromStoreID";
+    public static final String KEY_ORDER_FROM_STORENAME = "orderFromStoreName";
     public static final String KEY_ORDER_CUSTOMER_NAME = "orderCustomerName";
-    public static final String KEY_ORDER_CUSTOMER_ADDRESS = "orderCustomerAddress";
     public static final String KEY_ORDER_CUSTOMER_MOBILE = "orderCustomerMobile";
-    public static final String KEY_ORDER_NUMBER_OF_ITEMS = "orderNumberOfItems";
+    public static final String KEY_ORDER_DELIVERY_ADDRESS = "orderDeliveryAddress";
+    public static final String KEY_ORDER_NO_OF_ITEMS = "orderNoOfItems";
     public static final String KEY_ORDER_TOTAL_MRP = "orderTotalMRP";
+    public static final String KEY_ORDER_TOTAL_RETAIL_PRICE = "orderTotalRetailPrice";
     public static final String KEY_ORDER_TOTAL_DISCOUNT = "orderTotalDiscount";
-    public static final String KEY_ORDER_TOTAL_AMOUNT = "orderTotalAmount";
-    public static final String KEY_ORDER_CONVENIENCE_FEE = "orderConvenienceFee";
     public static final String KEY_ORDER_DELIVERY_CHARGES = "orderDeliveryCharges";
-    public static final String KEY_ORDER_TOTAL_PAYABLE = "orderTotalPayable";
+    public static final String KEY_ORDER_TIP_AMOUNT = "orderTipAmount";
+    public static final String KEY_ORDER_SUB_TOTAL = "orderSubTotal";
     public static final String KEY_ORDER_PAYMENT_MODE = "orderPaymentMode";
+    public static final String KEY_ORDER_CONVENIENCE_FEE = "orderConvenienceFee";
+    public static final String KEY_ORDER_TOTAL_PAYABLE = "orderTotalPayable";
     public static final String KEY_ORDER_STATUS = "orderStatus";
-    public static final String KEY_ORDER_PLACED_DATE = "orderPlacedDate";
-    public static final String KEY_ORDER_COMPLETION_DATE = "orderCompletionDate";
+    public static final String KEY_ORDER_PLACED_TIME = "orderPlacedTime";
+    public static final String KEY_ORDER_COMPLETION_TIME = "orderCompletionTime";
+    public static final String KEY_ORDER_CANCELLATION_TIME = "orderCancellationTime";
     public static final String KEY_ORDER_TIMESTAMP = "orderTimestamp";
 
     //OrderItems Constants

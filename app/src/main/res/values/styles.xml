@@ -61,4 +61,18 @@
         <item name="android:background">@android:color/white</item>
     </style>
 
+    <style name="ChipText" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    
+    <style name="TooltipTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">10sp</item>
+        <item name="fontFamily">@font/montserrat</item>
+    </style>
+
 </resources>

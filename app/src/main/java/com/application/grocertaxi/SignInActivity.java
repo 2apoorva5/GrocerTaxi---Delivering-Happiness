@@ -7,15 +7,12 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Patterns;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -24,17 +21,12 @@ import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
@@ -53,7 +45,7 @@ public class SignInActivity extends AppCompatActivity {
     private MaterialCheckBox privacyPolicyCheckBox;
     private ConstraintLayout signInBtn;
     private CardView signInBtnContainer;
-    private ProgressBar signInProgressBar;
+    private ProgressBar progressBar;
 
     private FirebaseAuth firebaseAuth;
     private CollectionReference userRef;
@@ -93,7 +85,7 @@ public class SignInActivity extends AppCompatActivity {
         privacyPolicy = findViewById(R.id.privacy_policy);
         signInBtnContainer = findViewById(R.id.sign_in_btn_container);
         signInBtn = findViewById(R.id.sign_in_btn);
-        signInProgressBar = findViewById(R.id.sign_in_progress_bar);
+        progressBar = findViewById(R.id.progress_bar);
         signUpBtn = findViewById(R.id.sign_up_btn);
     }
 
@@ -113,7 +105,13 @@ public class SignInActivity extends AppCompatActivity {
         });
 
         forgotPassword.setOnClickListener(view -> {
-            signInProgressBar.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+            signInBtnContainer.setVisibility(View.VISIBLE);
+            signInBtn.setEnabled(true);
+        });
+
+        privacyPolicy.setOnClickListener(view -> {
+            progressBar.setVisibility(View.GONE);
             signInBtnContainer.setVisibility(View.VISIBLE);
             signInBtn.setEnabled(true);
         });
@@ -123,7 +121,7 @@ public class SignInActivity extends AppCompatActivity {
 
             final String emailOrMobile = emailOrMobileField.getEditText().getText().toString().toLowerCase().trim();
 
-            if(!validateEmailOrMobile() | !validatePassword()) {
+            if (!validateEmailOrMobile() | !validatePassword()) {
                 return;
             } else {
                 if (!privacyPolicyCheckBox.isChecked()) {
@@ -141,7 +139,6 @@ public class SignInActivity extends AppCompatActivity {
                             .enableProgress(true)
                             .setProgressColorInt(getColor(android.R.color.white))
                             .show();
-                    return;
                 } else {
                     if (Patterns.EMAIL_ADDRESS.matcher(emailOrMobile).matches()) {
                         emailOrMobileField.setError(null);
@@ -153,7 +150,7 @@ public class SignInActivity extends AppCompatActivity {
                         } else {
                             login(emailOrMobile);
                         }
-                    } else if(emailOrMobile.matches("\\d{10}")) {
+                    } else if (emailOrMobile.matches("\\d{10}")) {
                         emailOrMobileField.setError(null);
                         emailOrMobileField.setErrorEnabled(false);
 
@@ -163,14 +160,14 @@ public class SignInActivity extends AppCompatActivity {
                         } else {
                             signInBtnContainer.setVisibility(View.INVISIBLE);
                             signInBtn.setEnabled(false);
-                            signInProgressBar.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.VISIBLE);
 
                             userRef.whereEqualTo(Constants.KEY_USER_MOBILE, "+91" + emailOrMobile)
                                     .get().addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
                                     List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
                                     if (documentSnapshots.isEmpty()) {
-                                        signInProgressBar.setVisibility(View.GONE);
+                                        progressBar.setVisibility(View.GONE);
                                         signInBtnContainer.setVisibility(View.VISIBLE);
                                         signInBtn.setEnabled(true);
 
@@ -187,13 +184,12 @@ public class SignInActivity extends AppCompatActivity {
                                                 .enableProgress(true)
                                                 .setProgressColorInt(getColor(android.R.color.white))
                                                 .show();
-                                        return;
                                     } else {
                                         String email = documentSnapshots.get(0).getString(Constants.KEY_USER_EMAIL).trim();
                                         login(email);
                                     }
                                 } else {
-                                    signInProgressBar.setVisibility(View.GONE);
+                                    progressBar.setVisibility(View.GONE);
                                     signInBtnContainer.setVisibility(View.VISIBLE);
                                     signInBtn.setEnabled(true);
 
@@ -209,10 +205,9 @@ public class SignInActivity extends AppCompatActivity {
                                             .enableProgress(true)
                                             .setProgressColorInt(getColor(android.R.color.white))
                                             .show();
-                                    return;
                                 }
                             }).addOnFailureListener(e -> {
-                                signInProgressBar.setVisibility(View.GONE);
+                                progressBar.setVisibility(View.GONE);
                                 signInBtnContainer.setVisibility(View.VISIBLE);
                                 signInBtn.setEnabled(true);
 
@@ -228,7 +223,6 @@ public class SignInActivity extends AppCompatActivity {
                                         .enableProgress(true)
                                         .setProgressColorInt(getColor(android.R.color.white))
                                         .show();
-                                return;
                             });
                         }
                     } else {
@@ -241,7 +235,7 @@ public class SignInActivity extends AppCompatActivity {
         });
 
         signUpBtn.setOnClickListener(view -> {
-            signInProgressBar.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
             signInBtnContainer.setVisibility(View.VISIBLE);
             signInBtn.setEnabled(true);
 
@@ -282,7 +276,7 @@ public class SignInActivity extends AppCompatActivity {
     private void login(final String email) {
         signInBtnContainer.setVisibility(View.INVISIBLE);
         signInBtn.setEnabled(false);
-        signInProgressBar.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
 
         firebaseAuth.signInWithEmailAndPassword(email, passwordField.getEditText().getText().toString().trim())
                 .addOnCompleteListener(task -> {
@@ -290,8 +284,8 @@ public class SignInActivity extends AppCompatActivity {
                         userRef.whereEqualTo(Constants.KEY_USER_EMAIL, email)
                                 .get()
                                 .addOnCompleteListener(task1 -> {
-                                    if(task1.isSuccessful()) {
-                                        signInProgressBar.setVisibility(View.GONE);
+                                    if (task1.isSuccessful()) {
+                                        progressBar.setVisibility(View.GONE);
                                         signInBtnContainer.setVisibility(View.VISIBLE);
                                         signInBtn.setEnabled(true);
 
@@ -305,6 +299,31 @@ public class SignInActivity extends AppCompatActivity {
                                         preferenceManager.putString(Constants.KEY_USER_ADDRESS, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_ADDRESS));
                                         preferenceManager.putString(Constants.KEY_USER_CITY, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_CITY));
                                         preferenceManager.putString(Constants.KEY_USER_LOCALITY, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_LOCALITY));
+                                        preferenceManager.putBoolean(Constants.KEY_USER_FIRST_ORDER, task1.getResult().getDocuments().get(0).getBoolean(Constants.KEY_USER_FIRST_ORDER));
+
+                                        preferenceManager.putString(Constants.KEY_ORDER_ID, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_FROM_STOREID, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
+                                        preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
+                                        preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+                                        preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
+                                        preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
+                                        preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
+                                        preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(0));
+                                        preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
+                                        preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+                                        preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
 
                                         Intent intent = new Intent(getApplicationContext(), ChooseCityActivity.class);
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -312,7 +331,7 @@ public class SignInActivity extends AppCompatActivity {
                                         CustomIntent.customType(SignInActivity.this, "fadein-to-fadeout");
                                         finish();
                                     } else {
-                                        signInProgressBar.setVisibility(View.GONE);
+                                        progressBar.setVisibility(View.GONE);
                                         signInBtnContainer.setVisibility(View.VISIBLE);
                                         signInBtn.setEnabled(true);
 
@@ -328,29 +347,27 @@ public class SignInActivity extends AppCompatActivity {
                                                 .enableProgress(true)
                                                 .setProgressColorInt(getColor(android.R.color.white))
                                                 .show();
-                                        return;
                                     }
                                 }).addOnFailureListener(e -> {
-                                    signInProgressBar.setVisibility(View.GONE);
-                                    signInBtnContainer.setVisibility(View.VISIBLE);
-                                    signInBtn.setEnabled(true);
+                            progressBar.setVisibility(View.GONE);
+                            signInBtnContainer.setVisibility(View.VISIBLE);
+                            signInBtn.setEnabled(true);
 
-                                    Alerter.create(SignInActivity.this)
-                                            .setText("Whoa! Something broke. Try again!")
-                                            .setTextAppearance(R.style.AlertText)
-                                            .setBackgroundColorRes(R.color.errorColor)
-                                            .setIcon(R.drawable.ic_error)
-                                            .setDuration(3000)
-                                            .enableIconPulse(true)
-                                            .enableVibration(true)
-                                            .disableOutsideTouch()
-                                            .enableProgress(true)
-                                            .setProgressColorInt(getColor(android.R.color.white))
-                                            .show();
-                                    return;
-                                });
+                            Alerter.create(SignInActivity.this)
+                                    .setText("Whoa! Something broke. Try again!")
+                                    .setTextAppearance(R.style.AlertText)
+                                    .setBackgroundColorRes(R.color.errorColor)
+                                    .setIcon(R.drawable.ic_error)
+                                    .setDuration(3000)
+                                    .enableIconPulse(true)
+                                    .enableVibration(true)
+                                    .disableOutsideTouch()
+                                    .enableProgress(true)
+                                    .setProgressColorInt(getColor(android.R.color.white))
+                                    .show();
+                        });
                     } else {
-                        signInProgressBar.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.GONE);
                         signInBtnContainer.setVisibility(View.VISIBLE);
                         signInBtn.setEnabled(true);
 
@@ -366,10 +383,9 @@ public class SignInActivity extends AppCompatActivity {
                                 .enableProgress(true)
                                 .setProgressColorInt(getColor(android.R.color.white))
                                 .show();
-                        return;
                     }
                 }).addOnFailureListener(e -> {
-            signInProgressBar.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
             signInBtnContainer.setVisibility(View.VISIBLE);
             signInBtn.setEnabled(true);
 
@@ -385,7 +401,6 @@ public class SignInActivity extends AppCompatActivity {
                     .enableProgress(true)
                     .setProgressColorInt(getColor(android.R.color.white))
                     .show();
-            return;
         });
     }
 
@@ -419,6 +434,11 @@ public class SignInActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(SignInActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(SignInActivity.this);
+            }
+        });
         finishAffinity();
     }
 }

@@ -1,14 +1,14 @@
 package com.application.grocertaxi;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
@@ -17,6 +17,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tapadoo.alerter.Alerter;
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import maes.tech.intentanim.CustomIntent;
 
@@ -69,8 +72,6 @@ public class CategoriesActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-
-        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
 
         initViews();
         initFirebase();
@@ -352,6 +353,29 @@ public class CategoriesActivity extends AppCompatActivity {
         });
 
         cartBtn.setOnClickListener(v -> {
+            preferenceManager.putString(Constants.KEY_ORDER_ID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STOREID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
             CustomIntent.customType(CategoriesActivity.this, "bottom-to-up");
         });
@@ -360,6 +384,8 @@ public class CategoriesActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
 
         cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (queryDocumentSnapshots.size() == 0) {
@@ -380,13 +406,17 @@ public class CategoriesActivity extends AppCompatActivity {
                     .enableProgress(true)
                     .setProgressColorInt(getColor(android.R.color.white))
                     .show();
-            return;
         });
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(CategoriesActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(CategoriesActivity.this);
+            }
+        });
     }
 
     @Override

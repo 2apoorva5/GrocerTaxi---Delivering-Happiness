@@ -13,6 +13,7 @@
         android:layout_height="0dp"
         android:background="@color/colorBackground"
         android:fillViewport="true"
+        android:scrollbars="none"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -22,8 +23,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="144dp"
-            android:clipToPadding="false">
+            android:clipToPadding="false"
+            android:paddingBottom="144dp">
 
             <ImageView
                 android:id="@+id/back_btn"
@@ -33,10 +34,10 @@
                 android:layout_marginTop="24dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
+                android:contentDescription="@string/app_name"
                 android:focusable="true"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_back"
-                android:contentDescription="@string/app_name"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/colorIconDark" />
@@ -50,14 +51,14 @@
                 android:src="@drawable/illustration_user_avatar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/back_btn"/>
+                app:layout_constraintTop_toBottomOf="@id/back_btn" />
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/choose_photo"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_camera"
                 android:scaleType="centerCrop"
+                android:src="@drawable/ic_camera"
                 android:tint="@color/colorIconDark"
                 app:civ_circle_background_color="@color/colorIconLight"
                 app:layout_constraintBottom_toBottomOf="@+id/user_profile_pic"
@@ -77,9 +78,9 @@
                 android:textColor="@color/colorTextDark"
                 android:textSize="22sp"
                 android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@+id/user_profile_pic"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@+id/user_profile_pic" />
 
             <TextView
                 android:id="@+id/user_id"
@@ -87,6 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
+                android:alpha="0.5"
                 android:fontFamily="@font/montserrat"
                 android:includeFontPadding="false"
                 android:text="USER-00000-00000"
@@ -95,10 +97,9 @@
                 android:textColor="@color/colorTextDark"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:alpha="0.5"
-                app:layout_constraintTop_toBottomOf="@+id/user_name"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@+id/user_name" />
 
             <TextView
                 android:id="@+id/user_email"
@@ -106,6 +107,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="8dp"
+                android:alpha="0.5"
                 android:fontFamily="@font/montserrat"
                 android:includeFontPadding="false"
                 android:text="apoorvaranjan025@gmail.com"
@@ -114,10 +116,9 @@
                 android:textColor="@color/colorTextDark"
                 android:textSize="14sp"
                 android:textStyle="normal"
-                android:alpha="0.5"
-                app:layout_constraintTop_toBottomOf="@+id/user_id"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@+id/user_id" />
 
             <TextView
                 android:id="@+id/user_mobile"
@@ -125,6 +126,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="8dp"
+                android:alpha="0.5"
                 android:fontFamily="@font/montserrat"
                 android:includeFontPadding="false"
                 android:text="+919915462971"
@@ -133,10 +135,9 @@
                 android:textColor="@color/colorTextDark"
                 android:textSize="14sp"
                 android:textStyle="normal"
-                android:alpha="0.5"
-                app:layout_constraintTop_toBottomOf="@+id/user_email"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@+id/user_email" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/orders"
@@ -146,9 +147,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/user_mobile"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/user_mobile">
 
                 <TextView
                     android:id="@+id/text_orders"
@@ -163,10 +164,10 @@
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_orders"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_orders"
                     app:layout_constraintEnd_toStartOf="@+id/img_orders"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_orders" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_orders" />
 
                 <ImageView
                     android:id="@+id/img_orders"
@@ -174,14 +175,14 @@
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_orders"
-                    android:scaleType="centerCrop"
                     android:alpha="0.5"
-                    app:tint="@color/colorIconDark"
                     android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_orders"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:tint="@color/colorIconDark" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -192,9 +193,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/orders"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/orders">
 
                 <TextView
                     android:id="@+id/text_cart"
@@ -209,10 +210,10 @@
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_cart"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_cart"
                     app:layout_constraintEnd_toStartOf="@+id/img_cart"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_cart" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_cart" />
 
                 <ImageView
                     android:id="@+id/img_cart"
@@ -220,72 +221,26 @@
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_cart"
-                    android:scaleType="centerCrop"
                     android:alpha="0.5"
-                    app:tint="@color/colorIconDark"
                     android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_cart"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:tint="@color/colorIconDark" />
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cart_indicator2"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
+                    android:visibility="gone"
                     app:cardBackgroundColor="@color/colorPrimary"
                     app:cardCornerRadius="5dp"
                     app:cardElevation="8dp"
-                    android:visibility="gone"
                     app:cardPreventCornerOverlap="true"
                     app:layout_constraintStart_toStartOf="@id/img_cart"
                     app:layout_constraintTop_toTopOf="@id/img_cart" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/wishlist"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/cart"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <TextView
-                    android:id="@+id/text_wishlist"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Wishlist"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
-                    android:textStyle="normal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_wishlist"
-                    app:layout_constraintEnd_toStartOf="@+id/img_wishlist"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_wishlist" />
-
-                <ImageView
-                    android:id="@+id/img_wishlist"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginVertical="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_wishlist"
-                    android:scaleType="centerCrop"
-                    android:alpha="0.5"
-                    app:tint="@color/colorIconDark"
-                    android:contentDescription="@string/app_name"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -296,9 +251,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/wishlist"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/cart">
 
                 <TextView
                     android:id="@+id/text_address"
@@ -313,10 +268,10 @@
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_address"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_address"
                     app:layout_constraintEnd_toStartOf="@+id/img_address"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_address"/>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_address" />
 
                 <ImageView
                     android:id="@+id/img_address"
@@ -324,14 +279,14 @@
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_address"
-                    android:scaleType="centerCrop"
                     android:alpha="0.5"
-                    app:tint="@color/colorIconDark"
                     android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_address"
+                    app:layout_constraintBottom_toTopOf="@+id/delivery_address"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/delivery_address"/>
+                    app:tint="@color/colorIconDark" />
 
                 <TextView
                     android:id="@+id/delivery_address"
@@ -339,19 +294,19 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginBottom="16dp"
+                    android:alpha="0.5"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
                     android:text="Parvati Sadan, Chitrakoot Colony (Palnagar), B-Polytechnic, Dhanbad - 828130"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textStyle="normal"
-                    android:alpha="0.5"
-                    app:layout_constraintTop_toBottomOf="@+id/img_address"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/img_address"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintTop_toBottomOf="@+id/img_address" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -359,12 +314,12 @@
                 android:id="@+id/divider1"
                 android:layout_width="0dp"
                 android:layout_height="0.5dp"
-                android:layout_marginTop="24dp"
                 android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
                 android:background="@color/colorInactive"
-                app:layout_constraintTop_toBottomOf="@+id/address"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@+id/address" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/coupons"
@@ -374,9 +329,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/divider1"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/divider1">
 
                 <TextView
                     android:id="@+id/text_coupons"
@@ -391,10 +346,10 @@
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_coupons"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_coupons"
                     app:layout_constraintEnd_toStartOf="@+id/img_coupons"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_coupons" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_coupons" />
 
                 <ImageView
                     android:id="@+id/img_coupons"
@@ -402,14 +357,14 @@
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_coupons"
-                    android:scaleType="centerCrop"
                     android:alpha="0.5"
-                    app:tint="@color/colorIconDark"
                     android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_coupons"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:tint="@color/colorIconDark" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -420,9 +375,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/coupons"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/coupons">
 
                 <TextView
                     android:id="@+id/text_notifications"
@@ -437,10 +392,10 @@
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_notifications"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_notifications"
                     app:layout_constraintEnd_toStartOf="@+id/img_notifications"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_notifications" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_notifications" />
 
                 <ImageView
                     android:id="@+id/img_notifications"
@@ -448,14 +403,14 @@
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_notifications"
-                    android:scaleType="centerCrop"
                     android:alpha="0.5"
-                    app:tint="@color/colorIconDark"
                     android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_notifications"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:tint="@color/colorIconDark" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -463,12 +418,12 @@
                 android:id="@+id/divider2"
                 android:layout_width="0dp"
                 android:layout_height="0.5dp"
-                android:layout_marginTop="24dp"
                 android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
                 android:background="@color/colorInactive"
-                app:layout_constraintTop_toBottomOf="@+id/notifications"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@+id/notifications" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/chat_with_us"
@@ -478,9 +433,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/divider2"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/divider2">
 
                 <TextView
                     android:id="@+id/text_chat_with_us"
@@ -495,10 +450,10 @@
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_chat_with_us"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_chat_with_us"
                     app:layout_constraintEnd_toStartOf="@+id/img_chat_with_us"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_chat_with_us" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_chat_with_us" />
 
                 <ImageView
                     android:id="@+id/img_chat_with_us"
@@ -506,14 +461,14 @@
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_chat"
-                    android:scaleType="centerCrop"
                     android:alpha="0.5"
-                    app:tint="@color/colorIconDark"
                     android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_chat"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:tint="@color/colorIconDark" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -524,9 +479,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/chat_with_us"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/chat_with_us">
 
                 <TextView
                     android:id="@+id/text_write_us"
@@ -541,10 +496,10 @@
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_write_us"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_write_us"
                     app:layout_constraintEnd_toStartOf="@+id/img_write_us"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_write_us" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_write_us" />
 
                 <ImageView
                     android:id="@+id/img_write_us"
@@ -552,14 +507,14 @@
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_write"
-                    android:scaleType="centerCrop"
                     android:alpha="0.5"
-                    app:tint="@color/colorIconDark"
                     android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_write"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:tint="@color/colorIconDark" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -570,9 +525,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/write_us"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/write_us">
 
                 <TextView
                     android:id="@+id/text_rate_us"
@@ -587,10 +542,10 @@
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_rate_us"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_rate_us"
                     app:layout_constraintEnd_toStartOf="@+id/img_rate_us"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_rate_us" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_rate_us" />
 
                 <ImageView
                     android:id="@+id/img_rate_us"
@@ -598,14 +553,14 @@
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_rate"
-                    android:scaleType="centerCrop"
                     android:alpha="0.5"
-                    app:tint="@color/colorIconDark"
                     android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_rate"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:tint="@color/colorIconDark" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -616,9 +571,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/rate_us"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/rate_us">
 
                 <TextView
                     android:id="@+id/text_invite_friend"
@@ -633,10 +588,10 @@
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_invite_friend"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_invite_friend"
                     app:layout_constraintEnd_toStartOf="@+id/img_invite_friend"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_invite_friend" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_invite_friend" />
 
                 <ImageView
                     android:id="@+id/img_invite_friend"
@@ -644,14 +599,14 @@
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_invite"
-                    android:scaleType="centerCrop"
                     android:alpha="0.5"
-                    app:tint="@color/colorIconDark"
                     android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_invite"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:tint="@color/colorIconDark" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -659,12 +614,12 @@
                 android:id="@+id/divider3"
                 android:layout_width="0dp"
                 android:layout_height="0.5dp"
-                android:layout_marginTop="24dp"
                 android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
                 android:background="@color/colorInactive"
-                app:layout_constraintTop_toBottomOf="@+id/invite_friend"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@+id/invite_friend" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/privacy_policy"
@@ -674,9 +629,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/divider3"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/divider3">
 
                 <TextView
                     android:id="@+id/text_privacy_policy"
@@ -691,10 +646,10 @@
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_privacy_policy"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_privacy_policy"
                     app:layout_constraintEnd_toStartOf="@+id/img_privacy_policy"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_privacy_policy" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_privacy_policy" />
 
                 <ImageView
                     android:id="@+id/img_privacy_policy"
@@ -702,14 +657,14 @@
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_privacy_policy"
-                    android:scaleType="centerCrop"
                     android:alpha="0.5"
-                    app:tint="@color/colorIconDark"
                     android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_privacy_policy"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:tint="@color/colorIconDark" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -720,9 +675,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/privacy_policy"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/privacy_policy">
 
                 <TextView
                     android:id="@+id/text_terms"
@@ -737,10 +692,10 @@
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_terms"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_terms"
                     app:layout_constraintEnd_toStartOf="@+id/img_terms"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_terms" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_terms" />
 
                 <ImageView
                     android:id="@+id/img_terms"
@@ -748,14 +703,14 @@
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_terms"
-                    android:scaleType="centerCrop"
                     android:alpha="0.5"
-                    app:tint="@color/colorIconDark"
                     android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_terms"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:tint="@color/colorIconDark" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -763,12 +718,12 @@
                 android:id="@+id/divider4"
                 android:layout_width="0dp"
                 android:layout_height="0.5dp"
-                android:layout_marginTop="24dp"
                 android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
                 android:background="@color/colorInactive"
-                app:layout_constraintTop_toBottomOf="@+id/terms_of_service"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@+id/terms_of_service" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/app_settings"
@@ -778,9 +733,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/divider4"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/divider4">
 
                 <TextView
                     android:id="@+id/text_settings"
@@ -795,10 +750,10 @@
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_settings"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_settings"
                     app:layout_constraintEnd_toStartOf="@+id/img_settings"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_settings" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_settings" />
 
                 <ImageView
                     android:id="@+id/img_settings"
@@ -806,14 +761,14 @@
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_settings"
-                    android:scaleType="centerCrop"
                     android:alpha="0.5"
-                    app:tint="@color/colorIconDark"
                     android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_settings"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:tint="@color/colorIconDark" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -824,9 +779,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/app_settings"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/app_settings">
 
                 <TextView
                     android:id="@+id/text_logout"
@@ -841,10 +796,10 @@
                     android:textColor="@color/errorColor"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_logout"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_logout"
                     app:layout_constraintEnd_toStartOf="@+id/img_logout"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_logout" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_logout" />
 
                 <ImageView
                     android:id="@+id/img_logout"
@@ -852,13 +807,13 @@
                     android:layout_height="28dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_logout"
-                    android:scaleType="centerCrop"
-                    app:tint="@color/errorColor"
                     android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_logout"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:tint="@color/errorColor" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -871,81 +826,81 @@
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_marginBottom="48dp"
+        android:contentDescription="@string/app_name"
+        android:elevation="16dp"
         android:src="@drawable/ic_cart"
         app:backgroundTint="@color/colorIconDark"
-        app:tint="@color/colorIconLight"
-        app:maxImageSize="24dp"
-        android:elevation="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/bottom_bar_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/bottom_bar_container"
-        app:layout_constraintBottom_toBottomOf="@+id/bottom_bar_container"
-        android:contentDescription="@string/app_name" />
+        app:maxImageSize="24dp"
+        app:tint="@color/colorIconLight" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cart_indicator"
         android:layout_width="12dp"
         android:layout_height="12dp"
+        android:visibility="gone"
         app:cardBackgroundColor="@color/colorIconLight"
         app:cardCornerRadius="6dp"
         app:cardElevation="8dp"
-        android:visibility="gone"
         app:cardPreventCornerOverlap="true"
-        app:layout_constraintTop_toBottomOf="@id/cart_btn"
+        app:layout_constraintBottom_toBottomOf="@id/cart_btn"
         app:layout_constraintEnd_toEndOf="@id/cart_btn"
         app:layout_constraintStart_toStartOf="@id/cart_btn"
-        app:layout_constraintBottom_toBottomOf="@id/cart_btn"/>
+        app:layout_constraintTop_toBottomOf="@id/cart_btn" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_bar_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
             android:id="@+id/bottom_bar"
             android:layout_width="0dp"
             android:layout_height="64dp"
-            android:src="@drawable/pattern3"
-            android:scaleType="fitXY"
             android:contentDescription="@string/app_name"
             android:rotation="180"
+            android:scaleType="fitXY"
+            android:src="@drawable/pattern3"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
             android:id="@+id/bottom_bar_secondary"
             android:layout_width="0dp"
             android:layout_height="72dp"
-            android:src="@drawable/pattern3"
-            android:scaleType="fitXY"
             android:alpha="0.5"
             android:contentDescription="@string/app_name"
             android:rotation="180"
+            android:scaleType="fitXY"
+            android:src="@drawable/pattern3"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
             android:id="@+id/menu_home"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="24dp"
+            android:alpha="0.5"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
+            android:contentDescription="@string/app_name"
             android:focusable="true"
-            android:alpha="0.5"
+            android:padding="8dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_menu_home"
-            android:contentDescription="@string/app_name"
-            app:tint="@color/colorIconDark"
-            android:padding="8dp"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
+            app:tint="@color/colorIconDark" />
 
         <ImageView
             android:id="@+id/menu_category"
@@ -992,15 +947,15 @@
             android:layout_marginEnd="24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
+            android:contentDescription="@string/app_name"
             android:focusable="true"
+            android:padding="4dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_menu_profile"
-            android:contentDescription="@string/app_name"
-            app:tint="@color/colorIconDark"
-            android:padding="4dp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
+            app:tint="@color/colorIconDark" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

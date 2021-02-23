@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -24,6 +23,7 @@
             android:layout_height="match_parent"
             android:background="@color/colorBackground"
             android:fillViewport="true"
+            android:scrollbars="none"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -95,7 +95,7 @@
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
-                    android:textSize="22sp"
+                    android:textSize="20sp"
                     android:textStyle="normal"
                     app:layout_constraintEnd_toStartOf="@+id/user_profile_pic"
                     app:layout_constraintStart_toStartOf="parent"
@@ -228,7 +228,7 @@
                         android:layout_marginTop="16dp"
                         android:fontFamily="@font/montserrat"
                         android:includeFontPadding="false"
-                        android:text="Shop by category"
+                        android:text="Shop by Category"
                         android:textAlignment="center"
                         android:textAllCaps="false"
                         android:textColor="@color/colorTextDark"
@@ -628,8 +628,12 @@
                         app:layout_constraintTop_toBottomOf="@id/text2">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/offer1"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:background="?attr/selectableItemBackground"
+                            android:focusable="true"
+                            android:clickable="true">
 
                             <ImageView
                                 android:id="@+id/img_offer1"
@@ -638,7 +642,7 @@
                                 android:layout_marginTop="16dp"
                                 android:contentDescription="@string/app_name"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/delivery_guy"
+                                android:src="@drawable/free_delivery"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -682,8 +686,12 @@
                         app:layout_constraintTop_toBottomOf="@id/text2">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/offer2"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:background="?attr/selectableItemBackground"
+                            android:focusable="true"
+                            android:clickable="true">
 
                             <ImageView
                                 android:id="@+id/img_offer2"
@@ -737,8 +745,12 @@
                         app:layout_constraintTop_toBottomOf="@id/text2">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/offer3"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:background="?attr/selectableItemBackground"
+                            android:focusable="true"
+                            android:clickable="true">
 
                             <ImageView
                                 android:id="@+id/img_offer3"
@@ -752,7 +764,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
-                            <com.romainpiel.shimmer.ShimmerTextView
+                            <TextView
                                 android:id="@+id/text_offer3"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -761,7 +773,7 @@
                                 android:layout_marginBottom="16dp"
                                 android:fontFamily="@font/montserrat"
                                 android:includeFontPadding="false"
-                                android:text="10% Extra\nDiscount"
+                                android:text="Extra 10%\nDiscount"
                                 android:textAlignment="center"
                                 android:textAllCaps="false"
                                 android:textColor="@color/colorTextDark"
@@ -778,14 +790,109 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/layout_safe_delivery"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="32dp"
+                    app:cardBackgroundColor="@color/safeDeliveryColor"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="8dp"
+                    app:cardPreventCornerOverlap="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/layout_first_order_offers">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/img_safe_delivery"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:layout_marginEnd="16dp"
+                            android:contentDescription="@string/app_name"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/safe_delivery"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/text_safe_delivery1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="24dp"
+                            android:layout_marginEnd="24dp"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:text="Safe No-Contact Delivery"
+                            android:textAlignment="textStart"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorTextDark"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toStartOf="@id/img_safe_delivery"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/text_safe_delivery2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="24dp"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:text="Keep yourself saviour safe with our safe delivery program equiped with social distancing"
+                            android:textAlignment="textStart"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorTextDark"
+                            android:textSize="12sp"
+                            android:textStyle="normal"
+                            app:layout_constraintEnd_toStartOf="@id/img_safe_delivery"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/text_safe_delivery1" />
+
+                        <TextView
+                            android:id="@+id/learn_more_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="20dp"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:text="Learn More"
+                            android:textAlignment="textStart"
+                            android:textAllCaps="false"
+                            android:textColor="@color/errorColor"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:padding="4dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/text_safe_delivery2" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </androidx.cardview.widget.CardView>
+
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/layout_stores"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="24dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_first_order_offers">
+                    app:layout_constraintTop_toBottomOf="@id/layout_safe_delivery">
 
                     <TextView
                         android:id="@+id/text3"
@@ -854,19 +961,6 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <ImageView
-                    android:id="@+id/explore_all_products_btn"
-                    android:layout_width="0dp"
-                    android:layout_height="210dp"
-                    android:layout_marginTop="24dp"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/app_name"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/banner3"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_stores" />
-
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/layout_fruits"
                     android:layout_width="match_parent"
@@ -874,7 +968,7 @@
                     android:layout_marginTop="24dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/explore_all_products_btn">
+                    app:layout_constraintTop_toBottomOf="@id/layout_stores">
 
                     <TextView
                         android:id="@+id/text4"
@@ -944,96 +1038,18 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/layout_safe_delivery"
+                <ImageView
+                    android:id="@+id/explore_all_products_btn"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="32dp"
-                    app:cardBackgroundColor="@color/safeDeliveryColor"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="8dp"
-                    app:cardPreventCornerOverlap="true"
+                    android:layout_height="210dp"
+                    android:layout_marginTop="24dp"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/app_name"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/banner3"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_fruits">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <ImageView
-                            android:id="@+id/img_safe_delivery"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:layout_marginEnd="16dp"
-                            android:contentDescription="@string/app_name"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/safe_delivery"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/text_safe_delivery1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginTop="24dp"
-                            android:layout_marginEnd="24dp"
-                            android:fontFamily="@font/montserrat"
-                            android:includeFontPadding="false"
-                            android:text="Safe No-Contact Delivery"
-                            android:textAlignment="textStart"
-                            android:textAllCaps="false"
-                            android:textColor="@color/colorTextDark"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            app:layout_constraintEnd_toStartOf="@id/img_safe_delivery"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/text_safe_delivery2"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginEnd="24dp"
-                            android:fontFamily="@font/montserrat"
-                            android:includeFontPadding="false"
-                            android:text="Keep yourself saviour safe with our safe delivery program equiped with social distancing"
-                            android:textAlignment="textStart"
-                            android:textAllCaps="false"
-                            android:textColor="@color/colorTextDark"
-                            android:textSize="12sp"
-                            android:textStyle="normal"
-                            app:layout_constraintEnd_toStartOf="@id/img_safe_delivery"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/text_safe_delivery1" />
-
-                        <TextView
-                            android:id="@+id/learn_more_btn"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="24dp"
-                            android:fontFamily="@font/montserrat"
-                            android:includeFontPadding="false"
-                            android:text="Learn More"
-                            android:textAlignment="textStart"
-                            android:textAllCaps="false"
-                            android:textColor="@color/errorColor"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/text_safe_delivery2" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                </androidx.cardview.widget.CardView>
+                    app:layout_constraintTop_toBottomOf="@id/layout_fruits" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/layout_vegetables"
@@ -1042,7 +1058,7 @@
                     android:layout_marginTop="24dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_safe_delivery">
+                    app:layout_constraintTop_toBottomOf="@id/explore_all_products_btn">
 
                     <TextView
                         android:id="@+id/text5"
@@ -1218,7 +1234,7 @@
                         android:layout_marginHorizontal="16dp"
                         android:fontFamily="@font/montserrat"
                         android:includeFontPadding="false"
-                        android:text="Personal Care Products"
+                        android:text="Personal Care"
                         android:textAlignment="textStart"
                         android:textAllCaps="false"
                         android:textColor="@color/colorTextDark"
@@ -1406,15 +1422,15 @@
         android:id="@+id/cart_indicator"
         android:layout_width="12dp"
         android:layout_height="12dp"
+        android:visibility="gone"
         app:cardBackgroundColor="@color/colorIconLight"
         app:cardCornerRadius="6dp"
         app:cardElevation="8dp"
-        android:visibility="gone"
         app:cardPreventCornerOverlap="true"
-        app:layout_constraintTop_toBottomOf="@id/cart_btn"
+        app:layout_constraintBottom_toBottomOf="@id/cart_btn"
         app:layout_constraintEnd_toEndOf="@id/cart_btn"
         app:layout_constraintStart_toStartOf="@id/cart_btn"
-        app:layout_constraintBottom_toBottomOf="@id/cart_btn"/>
+        app:layout_constraintTop_toBottomOf="@id/cart_btn" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_bar_container"

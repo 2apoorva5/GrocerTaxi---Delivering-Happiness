@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/click_listener"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true">
+    android:clipToPadding="false"
+    android:focusable="true"
+    android:paddingBottom="16dp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/store_image_container"
@@ -17,8 +18,8 @@
         android:layout_marginTop="16dp"
         app:cardCornerRadius="16dp"
         app:cardPreventCornerOverlap="true"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -29,14 +30,14 @@
                 android:id="@+id/store_image"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:scaleType="centerCrop"
                 android:adjustViewBounds="true"
-                android:src="@drawable/thumbnail"
                 android:contentDescription="@string/app_name"
-                app:layout_constraintStart_toStartOf="parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/thumbnail"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -46,54 +47,59 @@
         android:id="@+id/store_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginHorizontal="16dp"
-        android:text="Store Name"
-        android:textColor="@color/colorTextDark"
-        android:textAllCaps="false"
-        android:textStyle="bold"
-        android:textAlignment="textStart"
-        android:textSize="18sp"
+        android:layout_marginTop="16dp"
+        android:ellipsize="end"
         android:fontFamily="@font/montserrat"
         android:includeFontPadding="false"
-        app:layout_constraintStart_toStartOf="parent"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:text="Store Name"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/colorTextDark"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/store_image_container" />
 
     <TextView
         android:id="@+id/store_address"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_marginHorizontal="16dp"
-        android:text="Chitrakoot Colony (Palnagar), B-Polytechnic, Near Shiv Temple, Dhanbad, Jharkhand - 828130"
-        android:textColor="@color/colorTextDark"
-        android:textAllCaps="false"
-        android:textStyle="normal"
-        android:textAlignment="textStart"
-        android:textSize="12sp"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
         android:fontFamily="@font/montserrat"
         android:includeFontPadding="false"
-        app:layout_constraintStart_toStartOf="parent"
+        android:maxLines="2"
+        android:text="Chitrakoot Colony (Palnagar), B-Polytechnic, Near Shiv Temple, Dhanbad, Jharkhand - 828130"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/colorTextDark"
+        android:textSize="12sp"
+        android:textStyle="normal"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/store_name" />
 
     <TextView
         android:id="@+id/store_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginHorizontal="16dp"
-        android:text="Store's open"
-        android:textColor="@color/successColor"
-        android:textAllCaps="false"
-        android:textStyle="bold"
-        android:textAlignment="textStart"
-        android:textSize="14sp"
+        android:layout_marginTop="16dp"
         android:fontFamily="@font/montserrat"
         android:includeFontPadding="false"
+        android:text="Store's open"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/successColor"
+        android:textSize="14sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/store_address"/>
+        app:layout_constraintTop_toBottomOf="@id/store_address" />
 
     <TextView
         android:id="@+id/store_rating"
@@ -108,9 +114,9 @@
         android:textColor="@color/colorTextDark"
         android:textSize="14sp"
         android:textStyle="normal"
+        app:layout_constraintBottom_toBottomOf="@id/store_rating_bar"
         app:layout_constraintEnd_toStartOf="@+id/store_rating_bar"
-        app:layout_constraintTop_toTopOf="@id/store_rating_bar"
-        app:layout_constraintBottom_toBottomOf="@id/store_rating_bar" />
+        app:layout_constraintTop_toTopOf="@id/store_rating_bar" />
 
     <RatingBar
         android:id="@+id/store_rating_bar"
@@ -126,15 +132,5 @@
         app:layout_constraintBottom_toBottomOf="@id/store_status"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/store_status" />
-
-    <View
-        android:layout_width="0dp"
-        android:layout_height="0.5dp"
-        android:layout_marginTop="16dp"
-        android:background="@color/colorInactive"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/store_status"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

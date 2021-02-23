@@ -11,7 +11,6 @@ import android.provider.Settings;
 import android.util.Patterns;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -53,7 +52,7 @@ public class SignUpActivity extends AppCompatActivity {
     private MaterialCheckBox privacyPolicyCheckBox;
     private ConstraintLayout sendOtpBtn;
     private CardView sendOtpBtnContainer;
-    private ProgressBar signUpProgressBar;
+    private ProgressBar progressBar;
 
     private FirebaseAuth firebaseAuth;
     private CollectionReference userRef;
@@ -97,7 +96,7 @@ public class SignUpActivity extends AppCompatActivity {
         privacyPolicy = findViewById(R.id.privacy_policy);
         sendOtpBtnContainer = findViewById(R.id.send_otp_btn_container);
         sendOtpBtn = findViewById(R.id.send_otp_btn);
-        signUpProgressBar = findViewById(R.id.sign_up_progress_bar);
+        progressBar = findViewById(R.id.progress_bar);
         signInBtn = findViewById(R.id.sign_in_btn);
     }
 
@@ -138,7 +137,7 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
         privacyPolicy.setOnClickListener(view -> {
-            signUpProgressBar.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
             sendOtpBtnContainer.setVisibility(View.VISIBLE);
             sendOtpBtn.setEnabled(true);
         });
@@ -167,7 +166,6 @@ public class SignUpActivity extends AppCompatActivity {
                             .enableProgress(true)
                             .setProgressColorInt(getColor(android.R.color.white))
                             .show();
-                    return;
                 } else {
                     if (!isConnectedToInternet(SignUpActivity.this)) {
                         showConnectToInternetDialog();
@@ -175,7 +173,7 @@ public class SignUpActivity extends AppCompatActivity {
                     } else {
                         sendOtpBtnContainer.setVisibility(View.INVISIBLE);
                         sendOtpBtn.setEnabled(false);
-                        signUpProgressBar.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.VISIBLE);
 
                         firebaseAuth.fetchSignInMethodsForEmail(email)
                                 .addOnCompleteListener(task -> {
@@ -189,7 +187,7 @@ public class SignUpActivity extends AppCompatActivity {
                                                             task1.getResult().getDocuments().size() == 0) {
                                                         openVerifyOTP();
                                                     } else {
-                                                        signUpProgressBar.setVisibility(View.GONE);
+                                                        progressBar.setVisibility(View.GONE);
                                                         sendOtpBtnContainer.setVisibility(View.VISIBLE);
                                                         sendOtpBtn.setEnabled(true);
 
@@ -206,10 +204,9 @@ public class SignUpActivity extends AppCompatActivity {
                                                                 .enableProgress(true)
                                                                 .setProgressColorInt(getColor(android.R.color.white))
                                                                 .show();
-                                                        return;
                                                     }
                                                 } else {
-                                                    signUpProgressBar.setVisibility(View.GONE);
+                                                    progressBar.setVisibility(View.GONE);
                                                     sendOtpBtnContainer.setVisibility(View.VISIBLE);
                                                     sendOtpBtn.setEnabled(true);
 
@@ -225,10 +222,9 @@ public class SignUpActivity extends AppCompatActivity {
                                                             .enableProgress(true)
                                                             .setProgressColorInt(getColor(android.R.color.white))
                                                             .show();
-                                                    return;
                                                 }
                                             }).addOnFailureListener(e -> {
-                                                signUpProgressBar.setVisibility(View.GONE);
+                                                progressBar.setVisibility(View.GONE);
                                                 sendOtpBtnContainer.setVisibility(View.VISIBLE);
                                                 sendOtpBtn.setEnabled(true);
 
@@ -244,10 +240,9 @@ public class SignUpActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             });
                                         } else {
-                                            signUpProgressBar.setVisibility(View.GONE);
+                                            progressBar.setVisibility(View.GONE);
                                             sendOtpBtnContainer.setVisibility(View.VISIBLE);
                                             sendOtpBtn.setEnabled(true);
 
@@ -264,10 +259,9 @@ public class SignUpActivity extends AppCompatActivity {
                                                     .enableProgress(true)
                                                     .setProgressColorInt(getColor(android.R.color.white))
                                                     .show();
-                                            return;
                                         }
                                     } else {
-                                        signUpProgressBar.setVisibility(View.GONE);
+                                        progressBar.setVisibility(View.GONE);
                                         sendOtpBtnContainer.setVisibility(View.VISIBLE);
                                         sendOtpBtn.setEnabled(true);
 
@@ -283,10 +277,9 @@ public class SignUpActivity extends AppCompatActivity {
                                                 .enableProgress(true)
                                                 .setProgressColorInt(getColor(android.R.color.white))
                                                 .show();
-                                        return;
                                     }
                                 }).addOnFailureListener(e -> {
-                            signUpProgressBar.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.GONE);
                             sendOtpBtnContainer.setVisibility(View.VISIBLE);
                             sendOtpBtn.setEnabled(true);
 
@@ -302,7 +295,6 @@ public class SignUpActivity extends AppCompatActivity {
                                     .enableProgress(true)
                                     .setProgressColorInt(getColor(android.R.color.white))
                                     .show();
-                            return;
                         });
                     }
                 }
@@ -310,7 +302,7 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
         signInBtn.setOnClickListener(view -> {
-            signUpProgressBar.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
             sendOtpBtnContainer.setVisibility(View.VISIBLE);
             sendOtpBtn.setEnabled(true);
 
@@ -396,8 +388,8 @@ public class SignUpActivity extends AppCompatActivity {
             createPasswordField.requestFocus();
             return false;
         } else if (!confirmPassword.equals(createPassword)) {
-            createPasswordField.setError("Those passwords didn't match!");
-            confirmPasswordField.setError("Those passwords didn't match!");
+            createPasswordField.setError("Ahan! Those passwords didn't match.");
+            confirmPasswordField.setError("Ahan! Those passwords didn't match.");
             confirmPasswordField.requestFocus();
             return false;
         } else {
@@ -436,7 +428,6 @@ public class SignUpActivity extends AppCompatActivity {
                     .enableProgress(true)
                     .setProgressColorInt(getColor(android.R.color.white))
                     .show();
-            return;
         } else {
             return;
         }
@@ -454,7 +445,7 @@ public class SignUpActivity extends AppCompatActivity {
         int number3 = random.nextInt(9000) + 1000;
 
         if (profilePicUri != null) {
-            signUpProgressBar.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
             sendOtpBtnContainer.setVisibility(View.VISIBLE);
             sendOtpBtn.setEnabled(true);
 
@@ -469,7 +460,7 @@ public class SignUpActivity extends AppCompatActivity {
             CustomIntent.customType(SignUpActivity.this, "left-to-right");
             finish();
         } else {
-            signUpProgressBar.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
             sendOtpBtnContainer.setVisibility(View.VISIBLE);
             sendOtpBtn.setEnabled(true);
 
@@ -516,6 +507,11 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(SignUpActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(SignUpActivity.this);
+            }
+        });
         finishAffinity();
     }
 }

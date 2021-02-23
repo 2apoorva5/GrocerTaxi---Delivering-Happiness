@@ -7,15 +7,15 @@ public class Store {
             storeTiming, storeImage, storeSearchKeyword;
     private Timestamp storeTimestamp;
     private boolean storeStatus;
-    private double storeDeliveryCharges, storeAverageRating, storeTotalRating;
+    private double storeMinimumOrderValue, storeAverageRating, storeTotalRating;
 
     public Store() {
     }
 
-    public Store(String storeID, String storeName, String storeOwner, String storeEmail, String storeMobile,
-                 String storeAddress, String storeTiming, String storeImage, String storeSearchKeyword,
-                 Timestamp storeTimestamp, boolean storeStatus, double storeDeliveryCharges,
-                 double storeAverageRating, double storeTotalRating) {
+    public Store(String storeID, String storeName, String storeOwner, String storeEmail,
+                 String storeMobile, String storeAddress, String storeTiming, String storeImage,
+                 String storeSearchKeyword, Timestamp storeTimestamp, boolean storeStatus,
+                 double storeMinimumOrderValue, double storeAverageRating, double storeTotalRating) {
         this.storeID = storeID;
         this.storeName = storeName;
         this.storeOwner = storeOwner;
@@ -27,7 +27,7 @@ public class Store {
         this.storeSearchKeyword = storeSearchKeyword;
         this.storeTimestamp = storeTimestamp;
         this.storeStatus = storeStatus;
-        this.storeDeliveryCharges = storeDeliveryCharges;
+        this.storeMinimumOrderValue = storeMinimumOrderValue;
         this.storeAverageRating = storeAverageRating;
         this.storeTotalRating = storeTotalRating;
     }
@@ -120,12 +120,12 @@ public class Store {
         this.storeStatus = storeStatus;
     }
 
-    public double getStoreDeliveryCharges() {
-        return storeDeliveryCharges;
+    public double getStoreMinimumOrderValue() {
+        return storeMinimumOrderValue;
     }
 
-    public void setStoreDeliveryCharges(double storeDeliveryCharges) {
-        this.storeDeliveryCharges = storeDeliveryCharges;
+    public void setStoreMinimumOrderValue(double storeMinimumOrderValue) {
+        this.storeMinimumOrderValue = storeMinimumOrderValue;
     }
 
     public double getStoreAverageRating() {

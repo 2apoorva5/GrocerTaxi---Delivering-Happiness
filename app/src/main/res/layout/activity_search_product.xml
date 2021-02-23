@@ -44,7 +44,7 @@
             android:background="@android:color/transparent"
             android:fontFamily="@font/montserrat"
             android:includeFontPadding="false"
-            android:hint="Search product"
+            android:hint="Start typing to search"
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:paddingHorizontal="8dp"

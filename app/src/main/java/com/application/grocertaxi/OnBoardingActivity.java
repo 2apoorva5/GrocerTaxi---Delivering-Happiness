@@ -15,6 +15,9 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.application.grocertaxi.Adapters.OnBoardingSliderAdapter;
 
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
 import maes.tech.intentanim.CustomIntent;
 
 public class OnBoardingActivity extends AppCompatActivity {
@@ -134,6 +137,11 @@ public class OnBoardingActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(OnBoardingActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(OnBoardingActivity.this);
+            }
+        });
         finishAffinity();
     }
 }

@@ -12,19 +12,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="10dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         android:fontFamily="@font/montserrat"
         android:includeFontPadding="false"
+        android:padding="6dp"
         android:text="SKIP"
         android:textAlignment="center"
         android:textAllCaps="true"
         android:textColor="@color/colorTextDark"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:padding="8dp"
-        android:background="?attr/selectableItemBackground"
-        android:focusable="true"
-        android:clickable="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -73,8 +73,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="@id/next_btn"
         app:layout_constraintBottom_toBottomOf="@id/next_btn"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/next_btn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

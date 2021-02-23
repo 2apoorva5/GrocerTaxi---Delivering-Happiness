@@ -35,6 +35,9 @@ import com.google.firebase.storage.StorageReference;
 import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -73,7 +76,7 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
             CustomIntent.customType(ProfileActivity.this, "fadein-to-fadeout");
             finish();
-        } else if(preferenceManager.getString(Constants.KEY_USER_CITY).equals("") ||
+        } else if (preferenceManager.getString(Constants.KEY_USER_CITY).equals("") ||
                 preferenceManager.getString(Constants.KEY_USER_CITY) == null ||
                 preferenceManager.getString(Constants.KEY_USER_CITY).length() == 0 ||
                 preferenceManager.getString(Constants.KEY_USER_CITY).isEmpty() ||
@@ -92,10 +95,8 @@ public class ProfileActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
-
         progressDialog = new SpotsDialog.Builder().setContext(ProfileActivity.this)
-                .setMessage("Logging you out...")
+                .setMessage("Logging you out..")
                 .setCancelable(false)
                 .setTheme(R.style.SpotsDialog)
                 .build();
@@ -108,7 +109,10 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(preferenceManager.getString(Constants.KEY_USER_ADDRESS).equals("") ||
+
+        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
+
+        if (preferenceManager.getString(Constants.KEY_USER_ADDRESS).equals("") ||
                 preferenceManager.getString(Constants.KEY_USER_ADDRESS).length() == 0 ||
                 preferenceManager.getString(Constants.KEY_USER_ADDRESS).isEmpty() ||
                 preferenceManager.getString(Constants.KEY_USER_ADDRESS) == null) {
@@ -138,7 +142,6 @@ public class ProfileActivity extends AppCompatActivity {
                     .enableProgress(true)
                     .setProgressColorInt(getColor(android.R.color.white))
                     .show();
-            return;
         });
     }
 
@@ -175,7 +178,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void setActionOnViews() {
         backBtn.setOnClickListener(view -> onBackPressed());
 
-        if(preferenceManager.getString(Constants.KEY_USER_IMAGE).equals("") ||
+        if (preferenceManager.getString(Constants.KEY_USER_IMAGE).equals("") ||
                 preferenceManager.getString(Constants.KEY_USER_IMAGE).length() == 0 ||
                 preferenceManager.getString(Constants.KEY_USER_IMAGE).isEmpty() ||
                 preferenceManager.getString(Constants.KEY_USER_IMAGE) == null) {
@@ -186,55 +189,58 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         choosePhoto.setOnClickListener(v -> {
-            MaterialDialog dialog = new MaterialDialog.Builder(ProfileActivity.this)
-                    .setTitle("Edit Profile Photo")
-                    .setMessage("Choose an action to continue!")
-                    .setCancelable(false)
-                    .setAnimation(R.raw.choose_photo)
-                    .setPositiveButton("Edit", R.drawable.ic_dialog_camera, (dialogInterface, which) -> {
-                        dialogInterface.dismiss();
-                        selectImage();
-                    })
-                    .setNegativeButton("Remove", R.drawable.ic_dialog_remove, (dialogInterface, which) -> {
-                        dialogInterface.dismiss();
-                        profilePicUri = null;
-                        userProfilePic.setImageResource(R.drawable.illustration_user_avatar);
+            if (!isConnectedToInternet(ProfileActivity.this)) {
+                showConnectToInternetDialog();
+                return;
+            } else {
+                MaterialDialog dialog = new MaterialDialog.Builder(ProfileActivity.this)
+                        .setTitle("Edit Profile Photo")
+                        .setMessage("Choose an action to continue!")
+                        .setCancelable(false)
+                        .setAnimation(R.raw.choose_photo)
+                        .setPositiveButton("Edit", R.drawable.ic_dialog_camera, (dialogInterface, which) -> {
+                            dialogInterface.dismiss();
+                            selectImage();
+                        })
+                        .setNegativeButton("Remove", R.drawable.ic_dialog_remove, (dialogInterface, which) -> {
+                            dialogInterface.dismiss();
+                            profilePicUri = null;
+                            userProfilePic.setImageResource(R.drawable.illustration_user_avatar);
 
-                        userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
-                                .update(Constants.KEY_USER_IMAGE, "")
-                                .addOnSuccessListener(aVoid -> {
-                                    preferenceManager.putString(Constants.KEY_USER_IMAGE, "");
-                                    Alerter.create(ProfileActivity.this)
-                                            .setText("Success! Your profile picture is removed.")
-                                            .setTextAppearance(R.style.AlertText)
-                                            .setBackgroundColorRes(R.color.successColor)
-                                            .setIcon(R.drawable.ic_dialog_okay)
-                                            .setDuration(3000)
-                                            .enableIconPulse(true)
-                                            .enableVibration(true)
-                                            .disableOutsideTouch()
-                                            .enableProgress(true)
-                                            .setProgressColorInt(getColor(android.R.color.white))
-                                            .show();
-                                    return;
-                                })
-                                .addOnFailureListener(e -> {
-                                    Alerter.create(ProfileActivity.this)
-                                            .setText("Whoa! Something broke. Try again!")
-                                            .setTextAppearance(R.style.AlertText)
-                                            .setBackgroundColorRes(R.color.errorColor)
-                                            .setIcon(R.drawable.ic_error)
-                                            .setDuration(3000)
-                                            .enableIconPulse(true)
-                                            .enableVibration(true)
-                                            .disableOutsideTouch()
-                                            .enableProgress(true)
-                                            .setProgressColorInt(getColor(android.R.color.white))
-                                            .show();
-                                    return;
-                                });
-                    }).build();
-            dialog.show();
+                            userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
+                                    .update(Constants.KEY_USER_IMAGE, "")
+                                    .addOnSuccessListener(aVoid -> {
+                                        preferenceManager.putString(Constants.KEY_USER_IMAGE, "");
+                                        Alerter.create(ProfileActivity.this)
+                                                .setText("Success! Your profile picture is removed.")
+                                                .setTextAppearance(R.style.AlertText)
+                                                .setBackgroundColorRes(R.color.successColor)
+                                                .setIcon(R.drawable.ic_dialog_okay)
+                                                .setDuration(3000)
+                                                .enableIconPulse(true)
+                                                .enableVibration(true)
+                                                .disableOutsideTouch()
+                                                .enableProgress(true)
+                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                .show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Alerter.create(ProfileActivity.this)
+                                                .setText("Whoa! Something broke. Try again!")
+                                                .setTextAppearance(R.style.AlertText)
+                                                .setBackgroundColorRes(R.color.errorColor)
+                                                .setIcon(R.drawable.ic_error)
+                                                .setDuration(3000)
+                                                .enableIconPulse(true)
+                                                .enableVibration(true)
+                                                .disableOutsideTouch()
+                                                .enableProgress(true)
+                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                .show();
+                                    });
+                        }).build();
+                dialog.show();
+            }
         });
 
         userName.setText(preferenceManager.getString(Constants.KEY_USER_NAME));
@@ -243,6 +249,29 @@ public class ProfileActivity extends AppCompatActivity {
         userMobile.setText(preferenceManager.getString(Constants.KEY_USER_MOBILE));
 
         cart.setOnClickListener(v -> {
+            preferenceManager.putString(Constants.KEY_ORDER_ID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STOREID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
             CustomIntent.customType(ProfileActivity.this, "bottom-to-up");
         });
@@ -282,6 +311,29 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         cartBtn.setOnClickListener(v -> {
+            preferenceManager.putString(Constants.KEY_ORDER_ID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STOREID, "");
+            preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
+            preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
             CustomIntent.customType(ProfileActivity.this, "bottom-to-up");
         });
@@ -302,7 +354,7 @@ public class ProfileActivity extends AppCompatActivity {
             profilePicUri = data.getData();
             Glide.with(ProfileActivity.this).load(profilePicUri).centerCrop().into(userProfilePic);
 
-            if (profilePicUri != null){
+            if (profilePicUri != null) {
                 final StorageReference fileRef = storageReference.child(preferenceManager.getString(Constants.KEY_USER_ID) + ".img");
 
                 fileRef.putFile(profilePicUri)
@@ -326,7 +378,6 @@ public class ProfileActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             })
                                             .addOnFailureListener(e -> {
                                                 Alerter.create(ProfileActivity.this)
@@ -341,7 +392,6 @@ public class ProfileActivity extends AppCompatActivity {
                                                         .enableProgress(true)
                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                         .show();
-                                                return;
                                             });
                                 })
                                 .addOnFailureListener(e -> {
@@ -357,7 +407,6 @@ public class ProfileActivity extends AppCompatActivity {
                                             .enableProgress(true)
                                             .setProgressColorInt(getColor(android.R.color.white))
                                             .show();
-                                    return;
                                 }))
                         .addOnFailureListener(e -> {
                             Alerter.create(ProfileActivity.this)
@@ -372,7 +421,6 @@ public class ProfileActivity extends AppCompatActivity {
                                     .enableProgress(true)
                                     .setProgressColorInt(getColor(android.R.color.white))
                                     .show();
-                            return;
                         });
             }
         } else if (resultCode == ImagePicker.RESULT_ERROR) {
@@ -388,7 +436,6 @@ public class ProfileActivity extends AppCompatActivity {
                     .enableProgress(true)
                     .setProgressColorInt(getColor(android.R.color.white))
                     .show();
-            return;
         } else {
             return;
         }
@@ -467,6 +514,11 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        KeyboardVisibilityEvent.setEventListener(ProfileActivity.this, isOpen -> {
+            if (isOpen) {
+                UIUtil.hideKeyboard(ProfileActivity.this);
+            }
+        });
     }
 
     @Override
