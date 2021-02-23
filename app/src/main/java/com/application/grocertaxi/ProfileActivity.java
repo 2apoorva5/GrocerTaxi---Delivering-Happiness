@@ -101,6 +101,8 @@ public class ProfileActivity extends AppCompatActivity {
                 .setTheme(R.style.SpotsDialog)
                 .build();
 
+        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
+
         initViews();
         initFirebase();
         setActionOnViews();
@@ -109,8 +111,6 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
 
         if (preferenceManager.getString(Constants.KEY_USER_ADDRESS).equals("") ||
                 preferenceManager.getString(Constants.KEY_USER_ADDRESS).length() == 0 ||

@@ -114,6 +114,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
                 .setTheme(R.style.SpotsDialog)
                 .build();
 
+        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
+
         initViews();
         initFirebase();
         setActionOnViews();
@@ -1180,8 +1182,6 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
         similarItemsProgressBar.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.VISIBLE);
-
-        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
 
         loadProductDetails();
 

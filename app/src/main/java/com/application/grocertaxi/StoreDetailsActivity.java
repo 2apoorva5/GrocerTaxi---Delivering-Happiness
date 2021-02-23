@@ -96,6 +96,8 @@ public class StoreDetailsActivity extends AppCompatActivity {
         setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
 
+        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
+
         initViews();
         initFirebase();
         setActionOnViews();
@@ -493,8 +495,6 @@ public class StoreDetailsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
 
         progressBar2.setVisibility(View.VISIBLE);
         loadStoreDetails();
