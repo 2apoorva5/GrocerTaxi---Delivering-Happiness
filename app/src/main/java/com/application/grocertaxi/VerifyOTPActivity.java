@@ -354,6 +354,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                                     preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
                                                                     preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
                                                                     preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, "");
                                                                     preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
                                                                     preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
                                                                     preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
@@ -471,6 +472,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                 preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
                                                 preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
                                                 preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, "");
                                                 preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
                                                 preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
                                                 preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");

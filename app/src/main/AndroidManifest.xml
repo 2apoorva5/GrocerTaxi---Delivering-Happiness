@@ -20,6 +20,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
@@ -42,7 +43,9 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:icon, android:allowBackup"
         tools:targetApi="q">
-        <activity android:name=".OrderConfirmationActivity"></activity>
+        <activity android:name=".TrackOrderActivity"></activity>
+        <activity android:name=".OrdersHistoryActivity" />
+        <activity android:name=".OrderConfirmationActivity" />
         <activity android:name=".OrderSummaryActivity" />
         <activity android:name=".OrderAddressActivity" />
         <activity android:name=".PinOnMapActivity" />
@@ -53,10 +56,6 @@
         <activity android:name=".SearchProductActivity" />
         <activity android:name=".ProductDetailsActivity" />
         <activity android:name=".ProductsListActivity" />
-        <activity
-            android:name=".DeliveryAddressActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ProfileActivity"
             android:screenOrientation="portrait"

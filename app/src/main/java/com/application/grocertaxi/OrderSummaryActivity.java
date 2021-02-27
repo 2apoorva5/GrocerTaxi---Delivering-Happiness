@@ -117,7 +117,11 @@ public class OrderSummaryActivity extends AppCompatActivity {
         double convenience_fee = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_CONVENIENCE_FEE));
         double total_payable = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_PAYABLE));
 
-        itemsCount.setText(String.format("(%d Items)", no_of_items));
+        if(no_of_items == 1) {
+            itemsCount.setText(String.format("(%d Item)", no_of_items));
+        } else {
+            itemsCount.setText(String.format("(%d Items)", no_of_items));
+        }
         totalMRP.setText(String.format("₹ %s", total_mrp));
         discountAmount.setText(String.format("₹ %s", discount_amount));
 
@@ -152,7 +156,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
 
         knowMoreBtn1.setOnClickListener(v -> {
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(OrderSummaryActivity.this);
-            bottomSheetDialog.setContentView(R.layout.bottom_sheet_delivery_address);
+            bottomSheetDialog.setContentView(R.layout.bottom_sheet_info5);
             bottomSheetDialog.setCanceledOnTouchOutside(false);
 
             ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
@@ -163,7 +167,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
 
         knowMoreBtn2.setOnClickListener(v -> {
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(OrderSummaryActivity.this);
-            bottomSheetDialog.setContentView(R.layout.bottom_sheet_delivery_charges);
+            bottomSheetDialog.setContentView(R.layout.bottom_sheet_info2);
             bottomSheetDialog.setCanceledOnTouchOutside(false);
 
             ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
@@ -185,7 +189,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
 
         knowMoreBtn4.setOnClickListener(v -> {
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(OrderSummaryActivity.this);
-            bottomSheetDialog.setContentView(R.layout.bottom_sheet_convenience_fee);
+            bottomSheetDialog.setContentView(R.layout.bottom_sheet_info3);
             bottomSheetDialog.setCanceledOnTouchOutside(false);
 
             ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);

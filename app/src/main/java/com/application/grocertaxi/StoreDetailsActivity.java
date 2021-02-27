@@ -1,7 +1,9 @@
 package com.application.grocertaxi;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -22,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,12 +41,19 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
+import de.mateware.snacky.Snacky;
 import maes.tech.intentanim.CustomIntent;
 
 public class StoreDetailsActivity extends AppCompatActivity {
@@ -177,6 +187,7 @@ public class StoreDetailsActivity extends AppCompatActivity {
             preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
             preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, "");
             preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
             preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
             preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
@@ -252,8 +263,73 @@ public class StoreDetailsActivity extends AppCompatActivity {
 
                     storeOwner.setText(store_owner);
                     storeAddress.setText(store_address);
+
                     storeEmail.setText(store_email);
+                    emailBtn.setOnClickListener(v -> {
+                        Intent email = new Intent(Intent.ACTION_SENDTO);
+                        email.setData(Uri.parse("mailto:" + store_email));
+                        startActivity(email);
+                    });
+
                     storeMobile.setText(store_mobile);
+                    callBtn.setOnClickListener(v -> {
+                        MaterialDialog materialDialog = new MaterialDialog.Builder(StoreDetailsActivity.this)
+                                .setTitle("Call " + store_name + "?")
+                                .setMessage("Are you sure of making a call to " + store_name + "?")
+                                .setCancelable(false)
+                                .setPositiveButton("Yes", R.drawable.ic_dialog_call, (dialogInterface, which) -> {
+                                    dialogInterface.dismiss();
+                                    if (ContextCompat.checkSelfPermission(StoreDetailsActivity.this,
+                                            Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                                        String dial = "tel:" + store_mobile;
+                                        startActivity(new Intent(Intent.ACTION_CALL, Uri.parse(dial)));
+                                    } else {
+                                        Dexter.withContext(StoreDetailsActivity.this)
+                                                .withPermission(Manifest.permission.CALL_PHONE)
+                                                .withListener(new PermissionListener() {
+                                                    @Override
+                                                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                                                        String dial = "tel:" + store_mobile;
+                                                        startActivity(new Intent(Intent.ACTION_CALL, Uri.parse(dial)));
+                                                    }
+
+                                                    @Override
+                                                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                                                        if (permissionDeniedResponse.isPermanentlyDenied()) {
+                                                            MaterialDialog materialDialog = new MaterialDialog.Builder(StoreDetailsActivity.this)
+                                                                    .setTitle("Permission Denied!")
+                                                                    .setMessage("Permission to access this device's phone and manage calls has been permanently denied for the app. Open the app settings to manually grant the permission.")
+                                                                    .setCancelable(false)
+                                                                    .setPositiveButton("Open", R.drawable.ic_dialog_settings, (dialogInterface, which) -> {
+                                                                        dialogInterface.dismiss();
+                                                                        Intent intent = new Intent();
+                                                                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                                                        intent.setData(Uri.fromParts("package", getPackageName(), null));
+                                                                        startActivity(intent);
+                                                                    })
+                                                                    .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                                                            materialDialog.show();
+                                                        } else {
+                                                            Snacky.builder()
+                                                                    .setActivity(StoreDetailsActivity.this)
+                                                                    .setText("Permission to call denied!")
+                                                                    .setDuration(Snacky.LENGTH_SHORT)
+                                                                    .error()
+                                                                    .show();
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+                                                        permissionToken.continuePermissionRequest();
+                                                    }
+                                                }).check();
+                                    }
+                                })
+                                .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                        materialDialog.show();
+                    });
+
                     storeTiming.setText(store_timing);
                     storeMinimumOrderAmount.setText(String.format("₹ %s", min_order_amount));
                 } else {
@@ -445,8 +521,10 @@ public class StoreDetailsActivity extends AppCompatActivity {
 
         categoryAdapter.notifyDataSetChanged();
 
-        recyclerCategories.setHasFixedSize(true);
         recyclerCategories.setLayoutManager(new GridLayoutManager(StoreDetailsActivity.this, 3));
+        recyclerCategories.getLayoutManager().setAutoMeasureEnabled(true);
+        recyclerCategories.setNestedScrollingEnabled(false);
+        recyclerCategories.setHasFixedSize(false);
         recyclerCategories.setAdapter(categoryAdapter);
     }
 

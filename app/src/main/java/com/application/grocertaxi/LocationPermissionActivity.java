@@ -77,7 +77,7 @@ public class LocationPermissionActivity extends AppCompatActivity {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             startActivity(new Intent(getApplicationContext(), PinOnMapActivity.class));
-            CustomIntent.customType(LocationPermissionActivity.this, "left-to-right");
+            CustomIntent.customType(LocationPermissionActivity.this, "bottom-to-up");
             finish();
         } else {
             return;
@@ -106,7 +106,7 @@ public class LocationPermissionActivity extends AppCompatActivity {
                             @Override
                             public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
                                 startActivity(new Intent(getApplicationContext(), PinOnMapActivity.class));
-                                CustomIntent.customType(LocationPermissionActivity.this, "left-to-right");
+                                CustomIntent.customType(LocationPermissionActivity.this, "bottom-to-up");
                                 finish();
                             }
 
@@ -180,6 +180,6 @@ public class LocationPermissionActivity extends AppCompatActivity {
                 UIUtil.hideKeyboard(LocationPermissionActivity.this);
             }
         });
-        CustomIntent.customType(LocationPermissionActivity.this, "right-to-left");
+        CustomIntent.customType(LocationPermissionActivity.this, "up-to-bottom");
     }
 }

@@ -68,10 +68,13 @@
                 android:id="@+id/user_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="32dp"
+                android:ellipsize="end"
                 android:fontFamily="@font/montserrat"
                 android:includeFontPadding="false"
+                android:maxLines="1"
+                android:singleLine="true"
                 android:text="Apoorva Ranjan"
                 android:textAlignment="center"
                 android:textAllCaps="false"
@@ -86,15 +89,17 @@
                 android:id="@+id/user_id"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="16dp"
-                android:alpha="0.5"
+                android:ellipsize="end"
                 android:fontFamily="@font/montserrat"
                 android:includeFontPadding="false"
+                android:maxLines="1"
+                android:singleLine="true"
                 android:text="USER-00000-00000"
                 android:textAlignment="center"
                 android:textAllCaps="false"
-                android:textColor="@color/colorTextDark"
+                android:textColor="@color/colorInactive"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -105,15 +110,17 @@
                 android:id="@+id/user_email"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="8dp"
-                android:alpha="0.5"
+                android:ellipsize="end"
                 android:fontFamily="@font/montserrat"
                 android:includeFontPadding="false"
+                android:maxLines="1"
+                android:singleLine="true"
                 android:text="apoorvaranjan025@gmail.com"
                 android:textAlignment="center"
                 android:textAllCaps="false"
-                android:textColor="@color/colorTextDark"
+                android:textColor="@color/colorInactive"
                 android:textSize="14sp"
                 android:textStyle="normal"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -124,15 +131,17 @@
                 android:id="@+id/user_mobile"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="8dp"
-                android:alpha="0.5"
+                android:ellipsize="end"
                 android:fontFamily="@font/montserrat"
                 android:includeFontPadding="false"
+                android:maxLines="1"
+                android:singleLine="true"
                 android:text="+919915462971"
                 android:textAlignment="center"
                 android:textAllCaps="false"
-                android:textColor="@color/colorTextDark"
+                android:textColor="@color/colorInactive"
                 android:textSize="14sp"
                 android:textStyle="normal"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -140,7 +149,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/user_email" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/orders"
+                android:id="@+id/address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="48dp"
@@ -152,25 +161,25 @@
                 app:layout_constraintTop_toBottomOf="@id/user_mobile">
 
                 <TextView
-                    android:id="@+id/text_orders"
+                    android:id="@+id/text_address"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    android:text="Orders"
+                    android:text="Delivery Address"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_orders"
-                    app:layout_constraintEnd_toStartOf="@+id/img_orders"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_address"
+                    app:layout_constraintEnd_toStartOf="@+id/img_address"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_orders" />
+                    app:layout_constraintTop_toTopOf="@+id/img_address" />
 
                 <ImageView
-                    android:id="@+id/img_orders"
+                    android:id="@+id/img_address"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
@@ -178,11 +187,32 @@
                     android:alpha="0.5"
                     android:contentDescription="@string/app_name"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/ic_orders"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:src="@drawable/ic_address"
+                    app:layout_constraintBottom_toTopOf="@+id/delivery_address"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:tint="@color/colorIconDark" />
+
+                <TextView
+                    android:id="@+id/delivery_address"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/montserrat"
+                    android:includeFontPadding="false"
+                    android:maxLines="2"
+                    android:text="Parvati Sadan, Chitrakoot Colony (Palnagar), B-Polytechnic, Dhanbad - 828130"
+                    android:textAlignment="textStart"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorInactive"
+                    android:textSize="12sp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/img_address"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/img_address" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -195,7 +225,7 @@
                 android:focusable="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/orders">
+                app:layout_constraintTop_toBottomOf="@id/address">
 
                 <TextView
                     android:id="@+id/text_cart"
@@ -245,7 +275,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/address"
+                android:id="@+id/orders"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
@@ -256,25 +286,25 @@
                 app:layout_constraintTop_toBottomOf="@id/cart">
 
                 <TextView
-                    android:id="@+id/text_address"
+                    android:id="@+id/text_orders"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    android:text="Delivery Address"
+                    android:text="Orders"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
                     android:textSize="16sp"
                     android:textStyle="normal"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_address"
-                    app:layout_constraintEnd_toStartOf="@+id/img_address"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_orders"
+                    app:layout_constraintEnd_toStartOf="@+id/img_orders"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_address" />
+                    app:layout_constraintTop_toTopOf="@+id/img_orders" />
 
                 <ImageView
-                    android:id="@+id/img_address"
+                    android:id="@+id/img_orders"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginVertical="16dp"
@@ -282,31 +312,11 @@
                     android:alpha="0.5"
                     android:contentDescription="@string/app_name"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/ic_address"
-                    app:layout_constraintBottom_toTopOf="@+id/delivery_address"
+                    android:src="@drawable/ic_orders"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:tint="@color/colorIconDark" />
-
-                <TextView
-                    android:id="@+id/delivery_address"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:alpha="0.5"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Parvati Sadan, Chitrakoot Colony (Palnagar), B-Polytechnic, Dhanbad - 828130"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="12sp"
-                    android:textStyle="normal"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/img_address"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/img_address" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -319,7 +329,7 @@
                 android:background="@color/colorInactive"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/address" />
+                app:layout_constraintTop_toBottomOf="@+id/orders" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/coupons"

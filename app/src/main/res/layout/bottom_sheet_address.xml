@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/bottom_sheet_address"
+    android:background="@color/colorBackground"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/text1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/colorTextDark"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        android:text="Enter address details"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/close_bottom_sheet_btn"
+        app:layout_constraintBottom_toBottomOf="@id/close_bottom_sheet_btn"
+        app:layout_constraintEnd_toStartOf="@id/close_bottom_sheet_btn"/>
+
+    <ImageView
+        android:id="@+id/close_bottom_sheet_btn"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_close"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/app_name"
+        app:tint="@color/colorIconDark"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:focusable="true"
+        android:clickable="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <View
+        android:id="@+id/view1"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/colorInactive"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/close_bottom_sheet_btn"/>
+
+    <TextView
+        android:id="@+id/text2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/colorInactive"
+        android:textSize="12sp"
+        android:textStyle="normal"
+        android:text="Your location"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view1"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:id="@+id/img_location"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:src="@drawable/ic_current_location"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/app_name"
+        app:tint="@color/colorPrimary"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:focusable="true"
+        android:clickable="true"
+        app:layout_constraintTop_toBottomOf="@id/text2"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:includeFontPadding="false"
+        android:text="Locating.."
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/colorTextDark"
+        android:textSize="18sp"
+        android:textStyle="normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/img_location"
+        app:layout_constraintStart_toEndOf="@id/img_location"
+        app:layout_constraintTop_toTopOf="@id/img_location" />
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/colorInactive"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/img_location"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+        android:theme="@style/TextInputLayoutAppearance"
+        android:layout_marginTop="32dp"
+        android:layout_marginHorizontal="16dp"
+        app:boxStrokeColor="@color/colorIconDark"
+        app:boxStrokeWidthFocused="1dp"
+        app:boxStrokeErrorColor="@color/errorColor"
+        app:boxBackgroundColor="@color/colorBackground"
+        app:endIconMode="clear_text"
+        app:endIconTint="@color/colorIconDark"
+        app:errorIconTint="@color/errorColor"
+        app:errorTextColor="@color/errorColor"
+        app:hintAnimationEnabled="true"
+        app:hintEnabled="true"
+        android:hint="Complete address*"
+        android:textColorHint="@color/colorTextDark"
+        app:hintTextColor="@color/colorInactive"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view2">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:cursorVisible="true"
+            android:fontFamily="@font/montserrat"
+            android:imeOptions="actionNext"
+            android:includeFontPadding="false"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/colorTextDark"
+            android:textSize="14sp"
+            android:textStyle="normal"
+            android:importantForAutofill="no"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/landmark"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+        android:theme="@style/TextInputLayoutAppearance"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp"
+        app:boxStrokeColor="@color/colorIconDark"
+        app:boxStrokeWidthFocused="1dp"
+        app:boxStrokeErrorColor="@color/errorColor"
+        app:boxBackgroundColor="@color/colorBackground"
+        app:endIconMode="clear_text"
+        app:endIconTint="@color/colorIconDark"
+        app:errorIconTint="@color/errorColor"
+        app:errorTextColor="@color/errorColor"
+        app:hintAnimationEnabled="true"
+        app:hintEnabled="true"
+        android:hint="Landmark (optional)"
+        android:textColorHint="@color/colorTextDark"
+        app:hintTextColor="@color/colorInactive"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/address">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:cursorVisible="true"
+            android:fontFamily="@font/montserrat"
+            android:imeOptions="actionDone"
+            android:includeFontPadding="false"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/colorTextDark"
+            android:textSize="14sp"
+            android:textStyle="normal"
+            android:importantForAutofill="no"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/address_type_chip_group"
+        style="@style/Widget.MaterialComponents.Chip.Choice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
+        android:nestedScrollingEnabled="true"
+        app:chipSpacingHorizontal="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/landmark"
+        app:singleLine="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/home_chip"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="Home"
+            android:textAppearance="@style/ChipText"
+            android:textColor="@color/chip_text_color"
+            app:chipBackgroundColor="@color/chip_background_color"
+            app:chipCornerRadius="8dp"
+            app:chipEndPadding="8dp"
+            app:chipMinHeight="32dp"
+            app:chipStartPadding="8dp"
+            app:chipStrokeColor="@color/chip_stroke_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@color/colorAccent" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/office_chip"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="Office"
+            android:textAppearance="@style/ChipText"
+            android:textColor="@color/chip_text_color"
+            app:chipBackgroundColor="@color/chip_background_color"
+            app:chipCornerRadius="8dp"
+            app:chipEndPadding="8dp"
+            app:chipMinHeight="32dp"
+            app:chipStartPadding="8dp"
+            app:chipStrokeColor="@color/chip_stroke_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@color/colorAccent" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/other_chip"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="Other"
+            android:textAppearance="@style/ChipText"
+            android:textColor="@color/chip_text_color"
+            app:chipBackgroundColor="@color/chip_background_color"
+            app:chipCornerRadius="8dp"
+            app:chipEndPadding="8dp"
+            app:chipMinHeight="32dp"
+            app:chipStartPadding="8dp"
+            app:chipStrokeColor="@color/chip_stroke_color"
+            app:chipStrokeWidth="1dp"
+            app:rippleColor="@color/colorAccent" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/save_btn_container"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginHorizontal="16dp"
+        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardPreventCornerOverlap="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/address_type_chip_group">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/save_btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat"
+                android:includeFontPadding="false"
+                android:text="Save"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textColor="@color/colorTextDark"
+                android:textSize="18sp"
+                android:textStyle="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"
+        android:progressTint="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/address_type_chip_group"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

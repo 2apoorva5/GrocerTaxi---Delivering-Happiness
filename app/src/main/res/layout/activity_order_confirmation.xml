@@ -279,7 +279,7 @@
             android:layout_marginBottom="72dp"
             android:fontFamily="@font/montserrat"
             android:includeFontPadding="false"
-            android:text="You can track the status of your order #00000000"
+            android:text="You can track the status of your order #000000000000"
             android:textAlignment="center"
             android:textAllCaps="false"
             android:textColor="@color/colorTextDark"

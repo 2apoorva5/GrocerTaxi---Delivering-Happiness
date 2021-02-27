@@ -61,7 +61,6 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
-        android:alpha="0.5"
         android:fontFamily="@font/montserrat"
         android:includeFontPadding="false"
         android:text="@string/app_slogan"

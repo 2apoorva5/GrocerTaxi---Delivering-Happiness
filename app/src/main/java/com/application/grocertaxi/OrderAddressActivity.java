@@ -1,5 +1,6 @@
 package com.application.grocertaxi;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -9,20 +10,15 @@ import android.provider.Settings;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputLayout;
@@ -37,22 +33,21 @@ import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import java.util.Random;
 
+import dmax.dialog.SpotsDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class OrderAddressActivity extends AppCompatActivity {
 
     private ImageView backBtn, knowMoreBtn;
-    private TextInputLayout nameInput, mobileInput;
-    private TextView deliveryAddress, changeAddressBtn;
-    private View view;
+    private TextInputLayout nameInput, mobileInput, deliveryAddress, instructions;
+    private TextView changeAddressBtn;
     private ChipGroup paymentMethodChipGroup;
     private ConstraintLayout proceedBtn;
-    private CardView proceedBtnContainer;
-    private ProgressBar progressBar;
 
     private CollectionReference userRef;
 
     private PreferenceManager preferenceManager;
+    private AlertDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +81,12 @@ public class OrderAddressActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
+        progressDialog = new SpotsDialog.Builder().setContext(OrderAddressActivity.this)
+                .setMessage("Hold on..")
+                .setCancelable(false)
+                .setTheme(R.style.SpotsDialog)
+                .build();
+
         initViews();
         initFirebase();
         setActionOnViews();
@@ -98,11 +99,15 @@ public class OrderAddressActivity extends AppCompatActivity {
                 preferenceManager.getString(Constants.KEY_USER_ADDRESS).length() == 0 ||
                 preferenceManager.getString(Constants.KEY_USER_ADDRESS).isEmpty() ||
                 preferenceManager.getString(Constants.KEY_USER_ADDRESS) == null) {
-            deliveryAddress.setText("No address added yet");
+            deliveryAddress.getEditText().setEnabled(false);
+            deliveryAddress.setEndIconActivated(false);
+            deliveryAddress.getEditText().setText("No address added yet");
             changeAddressBtn.setText("Add Address");
             preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
         } else {
-            deliveryAddress.setText(preferenceManager.getString(Constants.KEY_USER_ADDRESS));
+            deliveryAddress.getEditText().setEnabled(false);
+            deliveryAddress.setEndIconActivated(false);
+            deliveryAddress.getEditText().setText(preferenceManager.getString(Constants.KEY_USER_ADDRESS));
             changeAddressBtn.setText("Change Address");
             preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, preferenceManager.getString(Constants.KEY_USER_ADDRESS));
         }
@@ -113,13 +118,11 @@ public class OrderAddressActivity extends AppCompatActivity {
         nameInput = findViewById(R.id.name);
         mobileInput = findViewById(R.id.mobile);
         deliveryAddress = findViewById(R.id.address);
-        view = findViewById(R.id.view);
         changeAddressBtn = findViewById(R.id.change_address_btn);
         knowMoreBtn = findViewById(R.id.know_more_btn);
+        instructions = findViewById(R.id.instructions);
         paymentMethodChipGroup = findViewById(R.id.payment_method_chip_group);
         proceedBtn = findViewById(R.id.proceed_btn);
-        proceedBtnContainer = findViewById(R.id.proceed_btn_container);
-        progressBar = findViewById(R.id.progress_bar);
     }
 
     private void initFirebase() {
@@ -136,6 +139,7 @@ public class OrderAddressActivity extends AppCompatActivity {
             if (!isOpen) {
                 nameInput.clearFocus();
                 mobileInput.clearFocus();
+                instructions.clearFocus();
             }
         });
 
@@ -143,13 +147,13 @@ public class OrderAddressActivity extends AppCompatActivity {
         mobileInput.getEditText().setText(preferenceManager.getString(Constants.KEY_USER_MOBILE).substring(3, 13));
 
         changeAddressBtn.setOnClickListener(v -> {
-            startActivity(new Intent(OrderAddressActivity.this, DeliveryAddressActivity.class));
+            startActivity(new Intent(OrderAddressActivity.this, LocationPermissionActivity.class));
             CustomIntent.customType(OrderAddressActivity.this, "bottom-to-up");
         });
 
         knowMoreBtn.setOnClickListener(v -> {
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(OrderAddressActivity.this);
-            bottomSheetDialog.setContentView(R.layout.bottom_sheet_delivery_address);
+            bottomSheetDialog.setContentView(R.layout.bottom_sheet_info5);
             bottomSheetDialog.setCanceledOnTouchOutside(false);
 
             ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
@@ -163,6 +167,7 @@ public class OrderAddressActivity extends AppCompatActivity {
 
             final String name = nameInput.getEditText().getText().toString().trim();
             final String mobile = mobileInput.getPrefixText().toString().trim() + mobileInput.getEditText().getText().toString().trim();
+            final String instruction = instructions.getEditText().getText().toString().trim();
 
             if (!validateName() | !validateMobile()) {
                 return;
@@ -172,7 +177,6 @@ public class OrderAddressActivity extends AppCompatActivity {
                         preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_ADDRESS).isEmpty() ||
                         preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_ADDRESS) == null) {
                     YoYo.with(Techniques.Shake).duration(700).repeat(1).playOn(deliveryAddress);
-                    YoYo.with(Techniques.Shake).duration(700).repeat(1).playOn(view);
                     Alerter.create(OrderAddressActivity.this)
                             .setText("Add a delivery address to process the order further!")
                             .setTextAppearance(R.style.AlertText)
@@ -191,9 +195,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                             showConnectToInternetDialog();
                             return;
                         } else {
-                            proceedBtnContainer.setVisibility(View.INVISIBLE);
-                            proceedBtn.setEnabled(false);
-                            progressBar.setVisibility(View.VISIBLE);
+                            progressDialog.show();
 
                             userRef.document(preferenceManager.getString(Constants.KEY_USER_ID)).get()
                                     .addOnCompleteListener(task -> {
@@ -213,6 +215,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                     preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, preferenceManager.getString(Constants.KEY_USER_NAME));
                                                     preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, name);
                                                     preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, mobile);
+                                                    preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, instruction);
                                                     preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "Online Payment");
 
                                                     double total_payable = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
@@ -221,9 +224,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                     preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
                                                     preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
 
-                                                    progressBar.setVisibility(View.GONE);
-                                                    proceedBtnContainer.setVisibility(View.VISIBLE);
-                                                    proceedBtn.setEnabled(true);
+                                                    progressDialog.dismiss();
 
                                                     startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
                                                     CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
@@ -239,6 +240,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                     preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, preferenceManager.getString(Constants.KEY_USER_NAME));
                                                     preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, name);
                                                     preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, mobile);
+                                                    preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, instruction);
                                                     preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "Online Payment");
 
                                                     double sub_total = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
@@ -252,18 +254,14 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                     preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(convenience_fee));
                                                     preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
 
-                                                    progressBar.setVisibility(View.GONE);
-                                                    proceedBtnContainer.setVisibility(View.VISIBLE);
-                                                    proceedBtn.setEnabled(true);
+                                                    progressDialog.dismiss();
 
                                                     startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
                                                     CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
                                                     finish();
                                                 }
                                             } else {
-                                                progressBar.setVisibility(View.GONE);
-                                                proceedBtnContainer.setVisibility(View.VISIBLE);
-                                                proceedBtn.setEnabled(true);
+                                                progressDialog.dismiss();
 
                                                 Alerter.create(OrderAddressActivity.this)
                                                         .setText("Whoa! Something broke. Try again!")
@@ -279,9 +277,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                         .show();
                                             }
                                         } else {
-                                            progressBar.setVisibility(View.GONE);
-                                            proceedBtnContainer.setVisibility(View.VISIBLE);
-                                            proceedBtn.setEnabled(true);
+                                            progressDialog.dismiss();
 
                                             Alerter.create(OrderAddressActivity.this)
                                                     .setText("Whoa! Something broke. Try again!")
@@ -303,9 +299,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                             showConnectToInternetDialog();
                             return;
                         } else {
-                            proceedBtnContainer.setVisibility(View.INVISIBLE);
-                            proceedBtn.setEnabled(false);
-                            progressBar.setVisibility(View.VISIBLE);
+                            progressDialog.show();
 
                             userRef.document(preferenceManager.getString(Constants.KEY_USER_ID)).get()
                                     .addOnCompleteListener(task -> {
@@ -325,6 +319,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                     preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, preferenceManager.getString(Constants.KEY_USER_NAME));
                                                     preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, name);
                                                     preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, mobile);
+                                                    preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, instruction);
                                                     preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "Pay on Delivery");
 
                                                     double total_payable = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
@@ -333,9 +328,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                     preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
                                                     preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
 
-                                                    progressBar.setVisibility(View.GONE);
-                                                    proceedBtnContainer.setVisibility(View.VISIBLE);
-                                                    proceedBtn.setEnabled(true);
+                                                    progressDialog.dismiss();
 
                                                     startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
                                                     CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
@@ -351,6 +344,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                     preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, preferenceManager.getString(Constants.KEY_USER_NAME));
                                                     preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, name);
                                                     preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, mobile);
+                                                    preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, instruction);
                                                     preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "Pay on Delivery");
 
                                                     double total_payable = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
@@ -359,18 +353,14 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                     preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
                                                     preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
 
-                                                    progressBar.setVisibility(View.GONE);
-                                                    proceedBtnContainer.setVisibility(View.VISIBLE);
-                                                    proceedBtn.setEnabled(true);
+                                                    progressDialog.dismiss();
 
                                                     startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
                                                     CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
                                                     finish();
                                                 }
                                             } else {
-                                                progressBar.setVisibility(View.GONE);
-                                                proceedBtnContainer.setVisibility(View.VISIBLE);
-                                                proceedBtn.setEnabled(true);
+                                                progressDialog.dismiss();
 
                                                 Alerter.create(OrderAddressActivity.this)
                                                         .setText("Whoa! Something broke. Try again!")
@@ -386,9 +376,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                         .show();
                                             }
                                         } else {
-                                            progressBar.setVisibility(View.GONE);
-                                            proceedBtnContainer.setVisibility(View.VISIBLE);
-                                            proceedBtn.setEnabled(true);
+                                            progressDialog.dismiss();
 
                                             Alerter.create(OrderAddressActivity.this)
                                                     .setText("Whoa! Something broke. Try again!")

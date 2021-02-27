@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorBackground"
     tools:context=".OrderAddressActivity">
 
@@ -14,7 +14,7 @@
         android:fillViewport="true"
         android:scrollbars="none"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/proceed_btn_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -22,9 +22,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
-            android:clipToPadding="false"
-            android:paddingBottom="48dp">
+            android:animateLayoutChanges="true">
 
             <ImageView
                 android:id="@+id/back_btn"
@@ -241,28 +239,25 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/name"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                android:theme="@style/TextInputLayoutAppearance"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="40dp"
                 android:hint="Name*"
                 android:textColorHint="@color/colorTextDark"
-                android:theme="@style/TextInputLayoutAppearance"
-                app:boxCornerRadiusBottomEnd="16dp"
-                app:boxCornerRadiusBottomStart="16dp"
-                app:boxCornerRadiusTopEnd="16dp"
-                app:boxCornerRadiusTopStart="16dp"
+                app:boxBackgroundColor="@color/colorBackground"
                 app:boxStrokeColor="@color/colorIconDark"
-                app:boxStrokeErrorColor="@color/errorColor"
                 app:boxStrokeWidthFocused="1dp"
+                app:boxStrokeErrorColor="@color/errorColor"
                 app:endIconMode="clear_text"
                 app:endIconTint="@color/colorIconDark"
                 app:errorIconTint="@color/errorColor"
                 app:errorTextColor="@color/errorColor"
                 app:hintAnimationEnabled="true"
                 app:hintEnabled="true"
-                app:hintTextColor="@color/colorTextDark"
+                app:hintTextColor="@color/colorInactive"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_address">
@@ -270,6 +265,8 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
                     android:cursorVisible="true"
                     android:fontFamily="@font/montserrat"
                     android:imeOptions="actionNext"
@@ -288,21 +285,18 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/mobile"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                android:theme="@style/TextInputLayoutAppearance"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:hint="Mobile*"
                 android:textColorHint="@color/colorTextDark"
-                android:theme="@style/TextInputLayoutAppearance"
-                app:boxCornerRadiusBottomEnd="16dp"
-                app:boxCornerRadiusBottomStart="16dp"
-                app:boxCornerRadiusTopEnd="16dp"
-                app:boxCornerRadiusTopStart="16dp"
+                app:boxBackgroundColor="@color/colorBackground"
                 app:boxStrokeColor="@color/colorIconDark"
-                app:boxStrokeErrorColor="@color/errorColor"
                 app:boxStrokeWidthFocused="1dp"
+                app:boxStrokeErrorColor="@color/errorColor"
                 app:counterEnabled="true"
                 app:counterMaxLength="10"
                 app:counterOverflowTextColor="@color/errorColor"
@@ -313,7 +307,7 @@
                 app:errorTextColor="@color/errorColor"
                 app:hintAnimationEnabled="true"
                 app:hintEnabled="true"
-                app:hintTextColor="@color/colorTextDark"
+                app:hintTextColor="@color/colorInactive"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/name"
@@ -323,9 +317,11 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
                     android:cursorVisible="true"
                     android:fontFamily="@font/montserrat"
-                    android:imeOptions="actionDone"
+                    android:imeOptions="actionNext"
                     android:importantForAutofill="no"
                     android:includeFontPadding="false"
                     android:inputType="phone"
@@ -339,60 +335,57 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:id="@+id/text1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="32dp"
-                android:fontFamily="@font/montserrat"
-                android:includeFontPadding="false"
-                android:textAlignment="textStart"
-                android:textAllCaps="false"
-                android:textColor="@color/colorTextDark"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:text="Delivery address"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/mobile"/>
-
-            <TextView
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/address"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                android:theme="@style/TextInputLayoutAppearance"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp"
-                android:fontFamily="@font/montserrat"
-                android:includeFontPadding="false"
-                android:textAlignment="textStart"
-                android:textAllCaps="false"
-                android:textColor="@color/colorTextDark"
-                android:textSize="12sp"
-                android:textStyle="normal"
-                android:maxLines="2"
-                android:ellipsize="end"
-                android:text="No address added yet"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="40dp"
+                android:hint="Delivery Address*"
+                android:textColorHint="@color/colorTextDark"
+                app:boxBackgroundColor="@color/colorBackground"
+                app:boxStrokeColor="@color/colorIconDark"
+                app:boxStrokeWidthFocused="1dp"
+                app:boxStrokeErrorColor="@color/errorColor"
+                app:errorIconTint="@color/errorColor"
+                app:errorTextColor="@color/errorColor"
+                app:hintAnimationEnabled="true"
+                app:hintEnabled="true"
+                app:hintTextColor="@color/colorInactive"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text1"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mobile">
 
-            <View
-                android:id="@+id/view"
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="8dp"
-                android:background="@color/colorInactive"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/address"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
+                    android:cursorVisible="true"
+                    android:fontFamily="@font/montserrat"
+                    android:imeOptions="actionNext"
+                    android:importantForAutofill="no"
+                    android:includeFontPadding="false"
+                    android:inputType="textMultiLine"
+                    android:gravity="top|start"
+                    android:singleLine="false"
+                    android:ellipsize="end"
+                    android:textAlignment="textStart"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorTextDark"
+                    android:textSize="14sp"
+                    android:textStyle="normal" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:id="@+id/change_address_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:layout_marginEnd="12dp"
+                android:layout_marginStart="12dp"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
@@ -405,20 +398,96 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/view" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/address" />
 
             <ImageView
                 android:id="@+id/know_more_btn"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
+                android:layout_marginStart="6dp"
                 android:src="@drawable/ic_info"
                 app:tint="@color/infoColor"
                 android:contentDescription="@string/app_name"
                 android:scaleType="centerCrop"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:focusable="true"
+                android:clickable="true"
                 app:layout_constraintTop_toTopOf="@id/change_address_btn"
                 app:layout_constraintBottom_toBottomOf="@id/change_address_btn"
-                app:layout_constraintStart_toStartOf="@id/view"/>
+                app:layout_constraintStart_toEndOf="@id/change_address_btn"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_instructions"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
+                android:background="@color/bottomSheetColor"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/change_address_btn">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/instructions"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/TextInputLayoutAppearance"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginVertical="16dp"
+                    android:hint="Add instructions (optional)"
+                    android:textColorHint="@color/colorTextDark"
+                    app:boxBackgroundColor="@color/bottomSheetColor"
+                    app:boxStrokeColor="@color/colorIconDark"
+                    app:boxStrokeWidthFocused="1dp"
+                    app:endIconMode="clear_text"
+                    app:endIconTint="@color/colorIconDark"
+                    app:errorIconTint="@color/errorColor"
+                    app:errorTextColor="@color/errorColor"
+                    app:boxStrokeErrorColor="@color/errorColor"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="200"
+                    app:counterOverflowTextColor="@color/errorColor"
+                    app:counterTextColor="@color/colorTextDark"
+                    app:hintAnimationEnabled="true"
+                    app:hintEnabled="true"
+                    app:hintTextColor="@color/colorTextDark"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="0dp"
+                        android:cursorVisible="true"
+                        android:fontFamily="@font/montserrat"
+                        android:imeOptions="actionDone"
+                        android:includeFontPadding="false"
+                        android:inputType="textMultiLine"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="14sp"
+                        android:textStyle="normal"
+                        android:importantForAutofill="no"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="24dp"
+                android:src="@drawable/instructions"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/app_name"
+                app:layout_constraintTop_toTopOf="@id/layout_instructions"
+                app:layout_constraintBottom_toTopOf="@id/layout_instructions"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
                 android:id="@+id/text2"
@@ -435,7 +504,7 @@
                 android:textStyle="bold"
                 android:text="Select Payment Method"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/change_address_btn"/>
+                app:layout_constraintTop_toBottomOf="@id/layout_instructions"/>
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/payment_method_chip_group"
@@ -489,61 +558,308 @@
 
             </com.google.android.material.chip.ChipGroup>
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/proceed_btn_container"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="40dp"
-                app:cardBackgroundColor="@color/colorPrimary"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="8dp"
-                app:cardPreventCornerOverlap="true"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:background="@color/colorViews"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/payment_method_chip_group">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/payment_method_chip_group"
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/proceed_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true">
+                    android:id="@+id/layout_cancellation_policy"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/colorBackground"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/img_terms"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginStart="16dp"
+                        android:src="@drawable/policy"
+                        android:scaleType="centerCrop"
+                        android:contentDescription="@string/app_name"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/text3"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="14sp"
+                        android:textStyle="normal"
+                        android:text="Review your order and address details to avoid cancellations"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/img_terms"
+                        app:layout_constraintTop_toTopOf="@id/img_terms"/>
+
+                    <ImageView
+                        android:id="@+id/img_clock"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginTop="24dp"
+                        android:src="@drawable/ic_clock"
+                        android:scaleType="centerCrop"
+                        app:tint="@color/colorPrimary"
+                        android:contentDescription="@string/app_name"
+                        app:layout_constraintTop_toBottomOf="@id/img_terms"
+                        app:layout_constraintStart_toStartOf="@id/img_terms"
+                        app:layout_constraintEnd_toEndOf="@id/img_terms"/>
+
+                    <TextView
+                        android:id="@+id/text4"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat"
                         android:includeFontPadding="false"
-                        android:text="Proceed"
-                        android:textAlignment="center"
+                        android:textAlignment="textStart"
                         android:textAllCaps="false"
                         android:textColor="@color/colorTextDark"
-                        android:textSize="18sp"
+                        android:textSize="12sp"
                         android:textStyle="normal"
+                        android:alpha="0.75"
+                        android:text="If you choose to cancel, you can do it within 60 minutes after placing the order."
+                        app:layout_constraintEnd_toEndOf="@id/text3"
+                        app:layout_constraintStart_toStartOf="@id/text3"
+                        app:layout_constraintTop_toTopOf="@id/img_clock"/>
+
+                    <ImageView
+                        android:id="@+id/img_rupee"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginTop="16dp"
+                        android:src="@drawable/ic_rupee"
+                        android:scaleType="centerCrop"
+                        app:tint="@color/colorPrimary"
+                        android:contentDescription="@string/app_name"
+                        app:layout_constraintTop_toBottomOf="@id/img_clock"
+                        app:layout_constraintStart_toStartOf="@id/img_terms"
+                        app:layout_constraintEnd_toEndOf="@id/img_terms"/>
+
+                    <TextView
+                        android:id="@+id/text5"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="12sp"
+                        android:textStyle="normal"
+                        android:alpha="0.75"
+                        android:text="Post 60 minutes, you will be charged a 100% cancellation fee on the order."
+                        app:layout_constraintEnd_toEndOf="@id/text3"
+                        app:layout_constraintStart_toStartOf="@id/text3"
+                        app:layout_constraintTop_toTopOf="@id/img_rupee"/>
+
+                    <ImageView
+                        android:id="@+id/img_support"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginTop="16dp"
+                        android:src="@drawable/ic_support"
+                        android:scaleType="centerCrop"
+                        app:tint="@color/colorPrimary"
+                        android:contentDescription="@string/app_name"
+                        app:layout_constraintTop_toBottomOf="@id/img_rupee"
+                        app:layout_constraintStart_toStartOf="@id/img_terms"
+                        app:layout_constraintEnd_toEndOf="@id/img_terms"/>
+
+                    <TextView
+                        android:id="@+id/text6"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="12sp"
+                        android:textStyle="normal"
+                        android:alpha="0.75"
+                        android:text="This policy helps us compensate stores / delivery partners for their efforts."
+                        app:layout_constraintEnd_toEndOf="@id/text3"
+                        app:layout_constraintStart_toStartOf="@id/text3"
+                        app:layout_constraintTop_toTopOf="@id/img_support"/>
+
+                    <TextView
+                        android:id="@+id/read_policy_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="24dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/infoColor"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:text="Read Policy"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintStart_toStartOf="@id/text3"
+                        app:layout_constraintTop_toBottomOf="@id/img_support"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </androidx.cardview.widget.CardView>
+                <ImageView
+                    android:id="@+id/img_quality_products"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="32dp"
+                    android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_quality_products"
+                    app:layout_constraintEnd_toStartOf="@id/img_social_distance"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/layout_cancellation_policy" />
 
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_marginTop="40dp"
-                android:progressTint="@color/colorAccent"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/payment_method_chip_group" />
+                <TextView
+                    android:id="@+id/text_quality_products"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="32dp"
+                    android:fontFamily="@font/montserrat"
+                    android:includeFontPadding="false"
+                    android:text="Quality Products"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorTextDark"
+                    android:textSize="11sp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/img_quality_products"
+                    app:layout_constraintStart_toStartOf="@id/img_quality_products"
+                    app:layout_constraintTop_toBottomOf="@+id/img_quality_products"
+                    tools:ignore="SmallSp" />
+
+                <ImageView
+                    android:id="@+id/img_social_distance"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginHorizontal="40dp"
+                    android:layout_marginTop="32dp"
+                    android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_social_distance"
+                    app:layout_constraintEnd_toStartOf="@id/img_secure_payments"
+                    app:layout_constraintStart_toEndOf="@id/img_quality_products"
+                    app:layout_constraintTop_toBottomOf="@id/layout_cancellation_policy" />
+
+                <TextView
+                    android:id="@+id/text_social_distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="32dp"
+                    android:fontFamily="@font/montserrat"
+                    android:includeFontPadding="false"
+                    android:text="Contact-less Delivery"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorTextDark"
+                    android:textSize="11sp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/img_social_distance"
+                    app:layout_constraintStart_toStartOf="@id/img_social_distance"
+                    app:layout_constraintTop_toBottomOf="@+id/img_social_distance"
+                    tools:ignore="SmallSp" />
+
+                <ImageView
+                    android:id="@+id/img_secure_payments"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="32dp"
+                    android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_secure_payment"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/img_social_distance"
+                    app:layout_constraintTop_toBottomOf="@id/layout_cancellation_policy"/>
+
+                <TextView
+                    android:id="@+id/text_secure_payments"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="32dp"
+                    android:fontFamily="@font/montserrat"
+                    android:includeFontPadding="false"
+                    android:text="Secure Payments"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorTextDark"
+                    android:textSize="11sp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/img_secure_payments"
+                    app:layout_constraintStart_toStartOf="@id/img_secure_payments"
+                    app:layout_constraintTop_toBottomOf="@+id/img_secure_payments"
+                    tools:ignore="SmallSp" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/proceed_btn_container"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:elevation="8dp"
+        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardPreventCornerOverlap="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/proceed_btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:id="@+id/text_add_to_cart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat"
+                android:includeFontPadding="false"
+                android:text="Proceed"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textColor="@color/colorTextDark"
+                android:textSize="18sp"
+                android:textStyle="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

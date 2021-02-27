@@ -211,6 +211,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
             preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
             preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, "");
             preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
             preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
             preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
@@ -345,7 +346,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                                     textOffer3.setText("Yay! No convenience fee for you.");
                                     knowMoreBtn1.setOnClickListener(v -> {
                                         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(ProductDetailsActivity.this);
-                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_first_order_offer);
+                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_info1);
                                         bottomSheetDialog.setCanceledOnTouchOutside(false);
 
                                         ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
@@ -355,7 +356,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                                     });
                                     knowMoreBtn2.setOnClickListener(v -> {
                                         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(ProductDetailsActivity.this);
-                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_delivery_charges);
+                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_info2);
                                         bottomSheetDialog.setCanceledOnTouchOutside(false);
 
                                         ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
@@ -365,7 +366,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                                     });
                                     knowMoreBtn3.setOnClickListener(v -> {
                                         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(ProductDetailsActivity.this);
-                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_convenience_fee);
+                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_info3);
                                         bottomSheetDialog.setCanceledOnTouchOutside(false);
 
                                         ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
@@ -383,7 +384,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
                                     knowMoreBtn2.setOnClickListener(v -> {
                                         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(ProductDetailsActivity.this);
-                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_delivery_charges);
+                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_info2);
                                         bottomSheetDialog.setCanceledOnTouchOutside(false);
 
                                         ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
@@ -393,7 +394,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                                     });
                                     knowMoreBtn3.setOnClickListener(v -> {
                                         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(ProductDetailsActivity.this);
-                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_convenience_fee);
+                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_info3);
                                         bottomSheetDialog.setCanceledOnTouchOutside(false);
 
                                         ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
@@ -438,7 +439,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
                     knowMoreBtn4.setOnClickListener(v -> {
                         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(ProductDetailsActivity.this);
-                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_cod);
+                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_info4);
                         bottomSheetDialog.setCanceledOnTouchOutside(false);
 
                         ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
@@ -524,6 +525,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                                                         preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
                                                         preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
                                                         preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+                                                        preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, "");
                                                         preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
                                                         preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
                                                         preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
@@ -610,6 +612,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                                                                                     preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
                                                                                     preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
                                                                                     preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+                                                                                    preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, "");
                                                                                     preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
                                                                                     preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
                                                                                     preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
@@ -673,6 +676,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                                                                                     preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
                                                                                     preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
                                                                                     preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+                                                                                    preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, "");
                                                                                     preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
                                                                                     preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
                                                                                     preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");

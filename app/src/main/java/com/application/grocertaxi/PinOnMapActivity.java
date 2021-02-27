@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,6 +32,8 @@ import androidx.core.content.ContextCompat;
 
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -47,6 +50,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.shreyaspatil.MaterialDialog.MaterialDialog;
@@ -64,12 +70,10 @@ import maes.tech.intentanim.CustomIntent;
 
 public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
 
-    private ImageView backBtn, pin;
+    private ImageView backBtn, pin, userCurrentLocationBtn;
     private View mapView;
-    private TextView addressText, userCurrentLocationBtn;
-    private CardView saveBtnContainer;
-    private ConstraintLayout saveBtn, mapLayout;
-    private ProgressBar progressBar;
+    private TextView location;
+    private ConstraintLayout confirmBtn, mapLayout;
 
     private GoogleMap googleMap;
     private Location currentLocation;
@@ -81,6 +85,7 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
     private LocationCallback locationCallback;
     private final float DEFAULT_ZOOM = 17.5f;
 
+    private String subLocality, locality, country, pinCode;
     private PreferenceManager preferenceManager;
 
     @Override
@@ -106,7 +111,7 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         } else {
             startActivity(new Intent(getApplicationContext(), LocationPermissionActivity.class));
-            CustomIntent.customType(PinOnMapActivity.this, "right-to-left");
+            CustomIntent.customType(PinOnMapActivity.this, "up-to-bottom");
             finish();
         }
     }
@@ -224,12 +229,13 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
             List<Address> addressList = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
 
             if (addressList != null && addressList.size() > 0) {
-                String locality = addressList.get(0).getAddressLine(0);
-                String country = addressList.get(0).getCountryName();
-                String pincode = addressList.get(0).getPostalCode();
+                subLocality = addressList.get(0).getSubLocality();
+                locality = addressList.get(0).getLocality();
+                country = addressList.get(0).getCountryName();
+                pinCode = addressList.get(0).getPostalCode();
 
-                if (!locality.isEmpty() && !country.isEmpty()) {
-                    addressText.setText(String.format("%s, %s - %s", locality, country, pincode));
+                if (!subLocality.isEmpty() && !locality.isEmpty() && !country.isEmpty() && !pinCode.isEmpty()) {
+                    location.setText(String.format("%s, %s", subLocality, locality));
                 }
             }
         } catch (IOException e) {
@@ -249,13 +255,11 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     private void initViews() {
-        addressText = findViewById(R.id.address);
         backBtn = findViewById(R.id.back_btn);
         pin = findViewById(R.id.pin);
         userCurrentLocationBtn = findViewById(R.id.use_current_location_btn);
-        saveBtnContainer = findViewById(R.id.save_btn_container);
-        saveBtn = findViewById(R.id.save_btn);
-        progressBar = findViewById(R.id.progress_bar);
+        location = findViewById(R.id.location);
+        confirmBtn = findViewById(R.id.confirm_btn);
         mapLayout = findViewById(R.id.map_layout);
     }
 
@@ -271,43 +275,137 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
 
         userCurrentLocationBtn.setOnClickListener(v -> getCurrentLocation());
 
-        saveBtn.setOnClickListener(v -> {
+        confirmBtn.setOnClickListener(v -> {
             if (!isConnectedToInternet(PinOnMapActivity.this)) {
                 showConnectToInternetDialog();
                 return;
             } else {
-                saveBtnContainer.setVisibility(View.INVISIBLE);
-                saveBtn.setEnabled(false);
-                progressBar.setVisibility(View.VISIBLE);
+                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(PinOnMapActivity.this);
+                bottomSheetDialog.setContentView(R.layout.bottom_sheet_address);
+                bottomSheetDialog.setCanceledOnTouchOutside(false);
 
-                userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
-                        .update(Constants.KEY_USER_ADDRESS, addressText.getText().toString().trim())
-                        .addOnSuccessListener(aVoid -> {
-                            progressBar.setVisibility(View.GONE);
-                            saveBtnContainer.setVisibility(View.VISIBLE);
-                            saveBtn.setEnabled(true);
+                ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
+                closeSheetBtn.setOnClickListener(v12 -> bottomSheetDialog.dismiss());
 
-                            preferenceManager.putString(Constants.KEY_USER_ADDRESS, addressText.getText().toString().trim());
+                TextView location = bottomSheetDialog.findViewById(R.id.location);
+                location.setText(String.format("%s, %s", subLocality, locality));
 
-                            onBackPressed();
-                        }).addOnFailureListener(e -> {
-                    progressBar.setVisibility(View.GONE);
-                    saveBtnContainer.setVisibility(View.VISIBLE);
-                    saveBtn.setEnabled(true);
+                TextInputLayout address = bottomSheetDialog.findViewById(R.id.address);
+                TextInputLayout landmark = bottomSheetDialog.findViewById(R.id.landmark);
 
-                    Alerter.create(PinOnMapActivity.this)
-                            .setText("Whoa! Something broke. Try again!")
-                            .setTextAppearance(R.style.AlertText)
-                            .setBackgroundColorRes(R.color.errorColor)
-                            .setIcon(R.drawable.ic_error)
-                            .setDuration(3000)
-                            .enableIconPulse(true)
-                            .enableVibration(true)
-                            .disableOutsideTouch()
-                            .enableProgress(true)
-                            .setProgressColorInt(getColor(android.R.color.white))
-                            .show();
+                ChipGroup addressTypeChipGroup = bottomSheetDialog.findViewById(R.id.address_type_chip_group);
+
+                CardView saveBtnContainer = bottomSheetDialog.findViewById(R.id.save_btn_container);
+                ConstraintLayout saveBtn = bottomSheetDialog.findViewById(R.id.save_btn);
+                ProgressBar progressBar = bottomSheetDialog.findViewById(R.id.progress_bar);
+
+                KeyboardVisibilityEvent.setEventListener(PinOnMapActivity.this, isOpen -> {
+                    if (!isOpen) {
+                        address.clearFocus();
+                        landmark.clearFocus();
+                    }
                 });
+
+                saveBtn.setOnClickListener(v1 -> {
+                    UIUtil.hideKeyboard(PinOnMapActivity.this);
+
+                    final String address_value = address.getEditText().getText().toString().trim();
+                    final String landmark_value = landmark.getEditText().getText().toString().trim();
+
+                    if (address_value.isEmpty()) {
+                        YoYo.with(Techniques.Shake).duration(700).repeat(1).playOn(address);
+                    } else {
+                        if(addressTypeChipGroup.getCheckedChipId() == R.id.home_chip) {
+                            String deliveryAddress = address_value + ", " + landmark_value + ", " +
+                                    subLocality + ", " + locality + ", " + country + " - " + pinCode + " (Home)";
+
+                            if (!isConnectedToInternet(PinOnMapActivity.this)) {
+                                showConnectToInternetDialog();
+                                return;
+                            } else {
+                                saveBtnContainer.setVisibility(View.INVISIBLE);
+                                saveBtn.setEnabled(false);
+                                progressBar.setVisibility(View.VISIBLE);
+
+                                userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
+                                        .update(Constants.KEY_USER_ADDRESS, deliveryAddress)
+                                        .addOnSuccessListener(aVoid -> {
+                                            progressBar.setVisibility(View.GONE);
+                                            saveBtnContainer.setVisibility(View.VISIBLE);
+                                            saveBtn.setEnabled(true);
+
+                                            preferenceManager.putString(Constants.KEY_USER_ADDRESS, deliveryAddress);
+
+                                            bottomSheetDialog.dismiss();
+                                            onBackPressed();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(PinOnMapActivity.this, "Whoa! Something broke. Try again!", Toast.LENGTH_SHORT).show();
+                                        });
+                            }
+                        } else if(addressTypeChipGroup.getCheckedChipId() == R.id.office_chip) {
+                            String deliveryAddress = address_value + ", " + landmark_value + ", " +
+                                    subLocality + ", " + locality + ", " + country + " - " + pinCode + " (Office)";
+
+                            if (!isConnectedToInternet(PinOnMapActivity.this)) {
+                                showConnectToInternetDialog();
+                                return;
+                            } else {
+                                saveBtnContainer.setVisibility(View.INVISIBLE);
+                                saveBtn.setEnabled(false);
+                                progressBar.setVisibility(View.VISIBLE);
+
+                                userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
+                                        .update(Constants.KEY_USER_ADDRESS, deliveryAddress)
+                                        .addOnSuccessListener(aVoid -> {
+                                            progressBar.setVisibility(View.GONE);
+                                            saveBtnContainer.setVisibility(View.VISIBLE);
+                                            saveBtn.setEnabled(true);
+
+                                            preferenceManager.putString(Constants.KEY_USER_ADDRESS, deliveryAddress);
+
+                                            bottomSheetDialog.dismiss();
+                                            onBackPressed();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(PinOnMapActivity.this, "Whoa! Something broke. Try again!", Toast.LENGTH_SHORT).show();
+                                        });
+                            }
+                        } else if(addressTypeChipGroup.getCheckedChipId() == R.id.other_chip) {
+                            String deliveryAddress = address_value + ", " + landmark_value + ", " +
+                                    subLocality + ", " + locality + ", " + country + " - " + pinCode + " (Other)";
+
+                            if (!isConnectedToInternet(PinOnMapActivity.this)) {
+                                showConnectToInternetDialog();
+                                return;
+                            } else {
+                                saveBtnContainer.setVisibility(View.INVISIBLE);
+                                saveBtn.setEnabled(false);
+                                progressBar.setVisibility(View.VISIBLE);
+
+                                userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
+                                        .update(Constants.KEY_USER_ADDRESS, deliveryAddress)
+                                        .addOnSuccessListener(aVoid -> {
+                                            progressBar.setVisibility(View.GONE);
+                                            saveBtnContainer.setVisibility(View.VISIBLE);
+                                            saveBtn.setEnabled(true);
+
+                                            preferenceManager.putString(Constants.KEY_USER_ADDRESS, deliveryAddress);
+
+                                            bottomSheetDialog.dismiss();
+                                            onBackPressed();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(PinOnMapActivity.this, "Whoa! Something broke. Try again!", Toast.LENGTH_SHORT).show();
+                                        });
+                            }
+                        } else if(!addressTypeChipGroup.isSelected()) {
+                            YoYo.with(Techniques.Shake).duration(700).repeat(1).playOn(addressTypeChipGroup);
+                        }
+                    }
+                });
+
+                bottomSheetDialog.show();
             }
         });
     }
@@ -372,6 +470,6 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
                 UIUtil.hideKeyboard(PinOnMapActivity.this);
             }
         });
-        CustomIntent.customType(PinOnMapActivity.this, "right-to-left");
+        CustomIntent.customType(PinOnMapActivity.this, "up-to-bottom");
     }
 }

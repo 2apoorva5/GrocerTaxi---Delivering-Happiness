@@ -49,7 +49,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView backBtn, menuHome, menuCategory, menuStore, menuProfile;
     private CircleImageView userProfilePic, choosePhoto;
     private TextView userName, userID, userEmail, userMobile, deliveryAddress;
-    private ConstraintLayout cart, address, logout;
+    private ConstraintLayout address, cart, orders, writeToUs, logout;
     private FloatingActionButton cartBtn;
     private CardView cartIndicator, cartIndicator2;
 
@@ -153,9 +153,11 @@ public class ProfileActivity extends AppCompatActivity {
         userID = findViewById(R.id.user_id);
         userEmail = findViewById(R.id.user_email);
         userMobile = findViewById(R.id.user_mobile);
-        cart = findViewById(R.id.cart);
         address = findViewById(R.id.address);
         deliveryAddress = findViewById(R.id.delivery_address);
+        cart = findViewById(R.id.cart);
+        orders = findViewById(R.id.orders);
+        writeToUs = findViewById(R.id.write_us);
         logout = findViewById(R.id.log_out);
         menuHome = findViewById(R.id.menu_home);
         menuCategory = findViewById(R.id.menu_category);
@@ -248,6 +250,11 @@ public class ProfileActivity extends AppCompatActivity {
         userEmail.setText(preferenceManager.getString(Constants.KEY_USER_EMAIL));
         userMobile.setText(preferenceManager.getString(Constants.KEY_USER_MOBILE));
 
+        address.setOnClickListener(view -> {
+            startActivity(new Intent(ProfileActivity.this, LocationPermissionActivity.class));
+            CustomIntent.customType(ProfileActivity.this, "bottom-to-up");
+        });
+
         cart.setOnClickListener(v -> {
             preferenceManager.putString(Constants.KEY_ORDER_ID, "");
             preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
@@ -267,6 +274,7 @@ public class ProfileActivity extends AppCompatActivity {
             preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
             preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, "");
             preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
             preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
             preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
@@ -276,9 +284,15 @@ public class ProfileActivity extends AppCompatActivity {
             CustomIntent.customType(ProfileActivity.this, "bottom-to-up");
         });
 
-        address.setOnClickListener(view -> {
-            startActivity(new Intent(ProfileActivity.this, DeliveryAddressActivity.class));
-            CustomIntent.customType(ProfileActivity.this, "bottom-to-up");
+        orders.setOnClickListener(view -> {
+            startActivity(new Intent(ProfileActivity.this, OrdersHistoryActivity.class));
+            CustomIntent.customType(ProfileActivity.this, "left-to-right");
+        });
+
+        writeToUs.setOnClickListener(v -> {
+            Intent email = new Intent(Intent.ACTION_SENDTO);
+            email.setData(Uri.parse("mailto:grocer.taxi@gmail.com"));
+            startActivity(email);
         });
 
         logout.setOnClickListener(view -> {
@@ -329,6 +343,7 @@ public class ProfileActivity extends AppCompatActivity {
             preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
             preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, "");
             preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
             preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
             preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");

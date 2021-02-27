@@ -7,7 +7,9 @@
     <color name="errorColor">#B71C1C</color>
     <color name="infoColor">#0F4C81</color>
     <color name="successColor">#4CAF50</color>
+    <color name="processingColor">#F9AF00</color>
 
+    <color name="colorOtpView">#E4A100</color>
     <color name="colorSwitchThumbOpened">#4CAF50</color>
     <color name="colorSwitchTrackOpened">#98EC9B</color>
     <color name="colorSwitchThumbClosed">#EE4E4E</color>
@@ -19,17 +21,14 @@
     <color name="colorTextLight">@android:color/white</color>
 
     <color name="colorBackground">@android:color/white</color>
-    <color name="colorInactive">#808080</color>
-    <color name="colorOtpView">#E4A100</color>
-    <color name="colorEditText">#E9E9F3</color>
+    <color name="colorInactive">#9A9A9A</color>
     <color name="colorViews">#E9E9F3</color>
     <color name="colorSearch">#E9E9F3</color>
     <color name="offer1Color">#60EDAC</color>
     <color name="offer2Color">#F88989</color>
     <color name="offer3Color">#6CDAE6</color>
-    <color name="safeDeliveryColor">#F1E473</color>
-    <color name="bottomSheetColor1">#FBE2E2</color>
-    <color name="bottomSheetColor2">#FBEDC9</color>
+    <color name="safeDeliveryColor">#FDF5A8</color>
+    <color name="bottomSheetColor">#FBEDC9</color>
 
     <!-- Categories Colors -->
     <color name="category1">#FFE400</color>

@@ -75,4 +75,10 @@
         <item name="fontFamily">@font/montserrat</item>
     </style>
 
+    <style name="TabTitleText" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
 </resources>

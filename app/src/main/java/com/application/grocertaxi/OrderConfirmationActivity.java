@@ -156,6 +156,7 @@ public class OrderConfirmationActivity extends AppCompatActivity {
             newOrder.put(Constants.KEY_ORDER_PAYMENT_MODE, preferenceManager.getString(Constants.KEY_ORDER_PAYMENT_MODE));
             newOrder.put(Constants.KEY_ORDER_CONVENIENCE_FEE, Double.valueOf(preferenceManager.getString(Constants.KEY_ORDER_CONVENIENCE_FEE)));
             newOrder.put(Constants.KEY_ORDER_TOTAL_PAYABLE, Double.valueOf(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_PAYABLE)));
+            newOrder.put(Constants.KEY_ORDER_INSTRUCTIONS, preferenceManager.getString(Constants.KEY_ORDER_INSTRUCTIONS));
             newOrder.put(Constants.KEY_ORDER_STATUS, "Placed");
             newOrder.put(Constants.KEY_ORDER_PLACED_TIME, currentTime);
             newOrder.put(Constants.KEY_ORDER_COMPLETION_TIME, "");
@@ -230,7 +231,11 @@ public class OrderConfirmationActivity extends AppCompatActivity {
                                                                                                             });
 
                                                                                                             trackBtn.setOnClickListener(v -> {
-
+                                                                                                                preferenceManager.putString(Constants.KEY_ORDER, preferenceManager.getString(Constants.KEY_ORDER_ID));
+                                                                                                                preferenceManager.putString(Constants.KEY_ORDER_TYPE, "Pending");
+                                                                                                                startActivity(new Intent(OrderConfirmationActivity.this, TrackOrderActivity.class));
+                                                                                                                CustomIntent.customType(OrderConfirmationActivity.this, "bottom-to-up");
+                                                                                                                finish();
                                                                                                             });
                                                                                                         }).addOnFailureListener(e -> {
                                                                                                     view3.setCardBackgroundColor(getColor(R.color.errorColor));
@@ -456,6 +461,7 @@ public class OrderConfirmationActivity extends AppCompatActivity {
         preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
         preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
         preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+        preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, "");
         preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
         preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
         preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");

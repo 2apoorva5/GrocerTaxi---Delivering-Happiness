@@ -185,8 +185,10 @@ public class CartActivity extends AppCompatActivity {
         cartAdapter = new CartAdapter(options);
         cartAdapter.notifyDataSetChanged();
 
-        recyclerCart.setHasFixedSize(true);
         recyclerCart.setLayoutManager(new LinearLayoutManager(CartActivity.this));
+        recyclerCart.getLayoutManager().setAutoMeasureEnabled(true);
+        recyclerCart.setNestedScrollingEnabled(false);
+        recyclerCart.setHasFixedSize(false);
         recyclerCart.setAdapter(cartAdapter);
 
         recyclerCart.getAdapter().notifyDataSetChanged();
@@ -241,7 +243,8 @@ public class CartActivity extends AppCompatActivity {
 
         @Override
         protected void onBindViewHolder(@NonNull CartViewHolder holder, int position, @NonNull CartItem model) {
-            Glide.with(holder.cartProductImage.getContext()).load(model.getCartItemProductImage()).centerCrop().into(holder.cartProductImage);
+            Glide.with(holder.cartProductImage.getContext()).load(model.getCartItemProductImage())
+                    .placeholder(R.drawable.thumbnail).centerCrop().into(holder.cartProductImage);
             holder.cartItemID.setText(model.getCartItemID());
             holder.cartProductName.setText(model.getCartItemProductName());
             holder.cartProductUnit.setText(model.getCartItemProductUnit());
@@ -411,6 +414,7 @@ public class CartActivity extends AppCompatActivity {
                 preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "");
                 preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
                 preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(0));
+                preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, "");
                 preferenceManager.putString(Constants.KEY_ORDER_STATUS, "");
                 preferenceManager.putString(Constants.KEY_ORDER_PLACED_TIME, "");
                 preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
@@ -418,8 +422,13 @@ public class CartActivity extends AppCompatActivity {
                 preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
             } else {
                 noOfItems.setVisibility(View.VISIBLE);
-                noOfItems.setText(String.format("%d Items", getItemCount()));
-                itemsCount.setText(String.format("(%d Items)", getItemCount()));
+                if(getItemCount() == 1) {
+                    noOfItems.setText(String.format("%d Item", getItemCount()));
+                    itemsCount.setText(String.format("(%d Item)", getItemCount()));
+                } else {
+                    noOfItems.setText(String.format("%d Items", getItemCount()));
+                    itemsCount.setText(String.format("(%d Items)", getItemCount()));
+                }
                 illustrationEmpty.setVisibility(View.GONE);
                 textEmpty.setVisibility(View.GONE);
                 shopBtnContainer.setVisibility(View.GONE);
@@ -499,7 +508,7 @@ public class CartActivity extends AppCompatActivity {
 
                                 knowMoreBtn1.setOnClickListener(v -> {
                                     BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(CartActivity.this);
-                                    bottomSheetDialog.setContentView(R.layout.bottom_sheet_convenience_fee);
+                                    bottomSheetDialog.setContentView(R.layout.bottom_sheet_info3);
                                     bottomSheetDialog.setCanceledOnTouchOutside(false);
 
                                     ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
@@ -614,7 +623,7 @@ public class CartActivity extends AppCompatActivity {
 
                 knowMoreBtn2.setOnClickListener(v -> {
                     BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(CartActivity.this);
-                    bottomSheetDialog.setContentView(R.layout.bottom_sheet_delivery_charges);
+                    bottomSheetDialog.setContentView(R.layout.bottom_sheet_info2);
                     bottomSheetDialog.setCanceledOnTouchOutside(false);
 
                     ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);

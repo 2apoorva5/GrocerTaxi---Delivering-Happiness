@@ -22,6 +22,8 @@ public class Constants {
     public static final String KEY_PRODUCT = "Product";
     public static final String KEY_STORE = "Store";
     public static final String KEY_STORE_CATEGORY = "StoreCategory";
+    public static final String KEY_ORDER = "Order";
+    public static final String KEY_ORDER_TYPE = "OrderType";
 
     public static final String KEY_UID = "UID";
     public static final String KEY_FCM_TOKEN = "FCMToken";
@@ -112,6 +114,7 @@ public class Constants {
     public static final String KEY_ORDER_PAYMENT_MODE = "orderPaymentMode";
     public static final String KEY_ORDER_CONVENIENCE_FEE = "orderConvenienceFee";
     public static final String KEY_ORDER_TOTAL_PAYABLE = "orderTotalPayable";
+    public static final String KEY_ORDER_INSTRUCTIONS = "orderInstructions";
     public static final String KEY_ORDER_STATUS = "orderStatus";
     public static final String KEY_ORDER_PLACED_TIME = "orderPlacedTime";
     public static final String KEY_ORDER_COMPLETION_TIME = "orderCompletionTime";
