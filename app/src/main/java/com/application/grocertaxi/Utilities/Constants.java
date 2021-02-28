@@ -41,6 +41,11 @@ public class Constants {
     public static final String KEY_USER_SEARCH_KEYWORD = "userSearchKeyword";
     public static final String KEY_USER_FIRST_ORDER = "userFirstOrder";
 
+    public static final String KEY_SUBLOCALITY = "subLocality";
+    public static final String KEY_LOCALITY = "locality";
+    public static final String KEY_COUNTRY = "country";
+    public static final String KEY_PINCODE = "pinCode";
+
     //Store Constants
     public static final String KEY_STORE_ID = "storeID";
     public static final String KEY_STORE_TIMESTAMP = "storeTimestamp";

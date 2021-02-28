@@ -251,6 +251,10 @@ public class ProfileActivity extends AppCompatActivity {
         userMobile.setText(preferenceManager.getString(Constants.KEY_USER_MOBILE));
 
         address.setOnClickListener(view -> {
+            preferenceManager.putString(Constants.KEY_SUBLOCALITY, "");
+            preferenceManager.putString(Constants.KEY_LOCALITY, "");
+            preferenceManager.putString(Constants.KEY_COUNTRY, "");
+            preferenceManager.putString(Constants.KEY_PINCODE, "");
             startActivity(new Intent(ProfileActivity.this, LocationPermissionActivity.class));
             CustomIntent.customType(ProfileActivity.this, "bottom-to-up");
         });

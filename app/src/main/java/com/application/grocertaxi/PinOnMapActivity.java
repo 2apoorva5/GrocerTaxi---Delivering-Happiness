@@ -85,7 +85,6 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
     private LocationCallback locationCallback;
     private final float DEFAULT_ZOOM = 17.5f;
 
-    private String subLocality, locality, country, pinCode;
     private PreferenceManager preferenceManager;
 
     @Override
@@ -229,14 +228,12 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
             List<Address> addressList = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
 
             if (addressList != null && addressList.size() > 0) {
-                subLocality = addressList.get(0).getSubLocality();
-                locality = addressList.get(0).getLocality();
-                country = addressList.get(0).getCountryName();
-                pinCode = addressList.get(0).getPostalCode();
+                preferenceManager.putString(Constants.KEY_SUBLOCALITY, addressList.get(0).getSubLocality());
+                preferenceManager.putString(Constants.KEY_LOCALITY, addressList.get(0).getLocality());
+                preferenceManager.putString(Constants.KEY_COUNTRY, addressList.get(0).getCountryName());
+                preferenceManager.putString(Constants.KEY_PINCODE, addressList.get(0).getPostalCode());
 
-                if (!subLocality.isEmpty() && !locality.isEmpty() && !country.isEmpty() && !pinCode.isEmpty()) {
-                    location.setText(String.format("%s, %s", subLocality, locality));
-                }
+                location.setText(String.format("%s, %s", preferenceManager.getString(Constants.KEY_SUBLOCALITY), preferenceManager.getString(Constants.KEY_LOCALITY)));
             }
         } catch (IOException e) {
             Alerter.create(PinOnMapActivity.this)
@@ -288,7 +285,7 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
                 closeSheetBtn.setOnClickListener(v12 -> bottomSheetDialog.dismiss());
 
                 TextView location = bottomSheetDialog.findViewById(R.id.location);
-                location.setText(String.format("%s, %s", subLocality, locality));
+                location.setText(String.format("%s, %s", preferenceManager.getString(Constants.KEY_SUBLOCALITY), preferenceManager.getString(Constants.KEY_LOCALITY)));
 
                 TextInputLayout address = bottomSheetDialog.findViewById(R.id.address);
                 TextInputLayout landmark = bottomSheetDialog.findViewById(R.id.landmark);
@@ -317,7 +314,10 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
                     } else {
                         if(addressTypeChipGroup.getCheckedChipId() == R.id.home_chip) {
                             String deliveryAddress = address_value + ", " + landmark_value + ", " +
-                                    subLocality + ", " + locality + ", " + country + " - " + pinCode + " (Home)";
+                                    preferenceManager.getString(Constants.KEY_SUBLOCALITY) + ", " +
+                                    preferenceManager.getString(Constants.KEY_LOCALITY) + ", " +
+                                    preferenceManager.getString(Constants.KEY_COUNTRY) + " - " +
+                                    preferenceManager.getString(Constants.KEY_PINCODE) + " (Home)";
 
                             if (!isConnectedToInternet(PinOnMapActivity.this)) {
                                 showConnectToInternetDialog();
@@ -337,6 +337,12 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
                                             preferenceManager.putString(Constants.KEY_USER_ADDRESS, deliveryAddress);
 
                                             bottomSheetDialog.dismiss();
+
+                                            preferenceManager.putString(Constants.KEY_SUBLOCALITY, "");
+                                            preferenceManager.putString(Constants.KEY_LOCALITY, "");
+                                            preferenceManager.putString(Constants.KEY_COUNTRY, "");
+                                            preferenceManager.putString(Constants.KEY_PINCODE, "");
+
                                             onBackPressed();
                                         })
                                         .addOnFailureListener(e -> {
@@ -345,7 +351,10 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
                             }
                         } else if(addressTypeChipGroup.getCheckedChipId() == R.id.office_chip) {
                             String deliveryAddress = address_value + ", " + landmark_value + ", " +
-                                    subLocality + ", " + locality + ", " + country + " - " + pinCode + " (Office)";
+                                    preferenceManager.getString(Constants.KEY_SUBLOCALITY) + ", " +
+                                    preferenceManager.getString(Constants.KEY_LOCALITY) + ", " +
+                                    preferenceManager.getString(Constants.KEY_COUNTRY) + " - " +
+                                    preferenceManager.getString(Constants.KEY_PINCODE) + " (Office)";
 
                             if (!isConnectedToInternet(PinOnMapActivity.this)) {
                                 showConnectToInternetDialog();
@@ -365,6 +374,12 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
                                             preferenceManager.putString(Constants.KEY_USER_ADDRESS, deliveryAddress);
 
                                             bottomSheetDialog.dismiss();
+
+                                            preferenceManager.putString(Constants.KEY_SUBLOCALITY, "");
+                                            preferenceManager.putString(Constants.KEY_LOCALITY, "");
+                                            preferenceManager.putString(Constants.KEY_COUNTRY, "");
+                                            preferenceManager.putString(Constants.KEY_PINCODE, "");
+
                                             onBackPressed();
                                         })
                                         .addOnFailureListener(e -> {
@@ -373,7 +388,10 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
                             }
                         } else if(addressTypeChipGroup.getCheckedChipId() == R.id.other_chip) {
                             String deliveryAddress = address_value + ", " + landmark_value + ", " +
-                                    subLocality + ", " + locality + ", " + country + " - " + pinCode + " (Other)";
+                                    preferenceManager.getString(Constants.KEY_SUBLOCALITY) + ", " +
+                                    preferenceManager.getString(Constants.KEY_LOCALITY) + ", " +
+                                    preferenceManager.getString(Constants.KEY_COUNTRY) + " - " +
+                                    preferenceManager.getString(Constants.KEY_PINCODE) + " (Other)";
 
                             if (!isConnectedToInternet(PinOnMapActivity.this)) {
                                 showConnectToInternetDialog();
@@ -393,6 +411,12 @@ public class PinOnMapActivity extends AppCompatActivity implements OnMapReadyCal
                                             preferenceManager.putString(Constants.KEY_USER_ADDRESS, deliveryAddress);
 
                                             bottomSheetDialog.dismiss();
+
+                                            preferenceManager.putString(Constants.KEY_SUBLOCALITY, "");
+                                            preferenceManager.putString(Constants.KEY_LOCALITY, "");
+                                            preferenceManager.putString(Constants.KEY_COUNTRY, "");
+                                            preferenceManager.putString(Constants.KEY_PINCODE, "");
+
                                             onBackPressed();
                                         })
                                         .addOnFailureListener(e -> {

@@ -147,6 +147,10 @@ public class OrderAddressActivity extends AppCompatActivity {
         mobileInput.getEditText().setText(preferenceManager.getString(Constants.KEY_USER_MOBILE).substring(3, 13));
 
         changeAddressBtn.setOnClickListener(v -> {
+            preferenceManager.putString(Constants.KEY_SUBLOCALITY, "");
+            preferenceManager.putString(Constants.KEY_LOCALITY, "");
+            preferenceManager.putString(Constants.KEY_COUNTRY, "");
+            preferenceManager.putString(Constants.KEY_PINCODE, "");
             startActivity(new Intent(OrderAddressActivity.this, LocationPermissionActivity.class));
             CustomIntent.customType(OrderAddressActivity.this, "bottom-to-up");
         });

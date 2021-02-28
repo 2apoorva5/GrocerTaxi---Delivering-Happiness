@@ -42,8 +42,9 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:icon, android:allowBackup"
-        tools:targetApi="q">
-        <activity android:name=".TrackOrderActivity"></activity>
+        tools:targetApi="q"
+        android:extractNativeLibs="true">
+        <activity android:name=".TrackOrderActivity" />
         <activity android:name=".OrdersHistoryActivity" />
         <activity android:name=".OrderConfirmationActivity" />
         <activity android:name=".OrderSummaryActivity" />

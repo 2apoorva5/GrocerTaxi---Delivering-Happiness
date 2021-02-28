@@ -1,5 +1,8 @@
-apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
+plugins {
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+    id 'com.google.secrets_gradle_plugin' version '0.5'
+}
 
 android {
     compileSdkVersion 30
@@ -20,13 +23,6 @@ android {
         resConfig "en"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        Properties properties = new Properties()
-        if (rootProject.file("local.properties").exists()) {
-            properties.load(rootProject.file("local.properties").newDataInputStream())
-        }
-
-        manifestPlaceholders = [ mapsApiKey : properties.getProperty("MAPS_API_KEY", "") ]
 
         resValue "string", "google_maps_key",
                 (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
