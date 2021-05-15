@@ -21,7 +21,6 @@ import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -41,8 +40,7 @@ public class SignInActivity extends AppCompatActivity {
 
     private ImageView closeBtn;
     private TextInputLayout emailOrMobileField, passwordField;
-    private TextView forgotPassword, signUpBtn, privacyPolicy;
-    private MaterialCheckBox privacyPolicyCheckBox;
+    private TextView forgotPassword, signUpBtn;
     private ConstraintLayout signInBtn;
     private CardView signInBtnContainer;
     private ProgressBar progressBar;
@@ -68,7 +66,7 @@ public class SignInActivity extends AppCompatActivity {
         }
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        getWindow().setStatusBarColor(getColor(R.color.colorPrimary));
+        getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         initViews();
@@ -81,8 +79,6 @@ public class SignInActivity extends AppCompatActivity {
         emailOrMobileField = findViewById(R.id.sign_in_email_or_mobile_field);
         passwordField = findViewById(R.id.sign_in_password_field);
         forgotPassword = findViewById(R.id.forgot_password);
-        privacyPolicyCheckBox = findViewById(R.id.privacy_policy_check_box);
-        privacyPolicy = findViewById(R.id.privacy_policy);
         signInBtnContainer = findViewById(R.id.sign_in_btn_container);
         signInBtn = findViewById(R.id.sign_in_btn);
         progressBar = findViewById(R.id.progress_bar);
@@ -108,12 +104,9 @@ public class SignInActivity extends AppCompatActivity {
             progressBar.setVisibility(View.GONE);
             signInBtnContainer.setVisibility(View.VISIBLE);
             signInBtn.setEnabled(true);
-        });
 
-        privacyPolicy.setOnClickListener(view -> {
-            progressBar.setVisibility(View.GONE);
-            signInBtnContainer.setVisibility(View.VISIBLE);
-            signInBtn.setEnabled(true);
+            startActivity(new Intent(SignInActivity.this, ForgotPasswordActivity.class));
+            CustomIntent.customType(SignInActivity.this, "bottom-to-up");
         });
 
         signInBtn.setOnClickListener(view -> {
@@ -124,77 +117,40 @@ public class SignInActivity extends AppCompatActivity {
             if (!validateEmailOrMobile() | !validatePassword()) {
                 return;
             } else {
-                if (!privacyPolicyCheckBox.isChecked()) {
-                    YoYo.with(Techniques.Shake).duration(700).repeat(0).playOn(privacyPolicyCheckBox);
-                    YoYo.with(Techniques.Shake).duration(700).repeat(0).playOn(privacyPolicy);
-                    Alerter.create(SignInActivity.this)
-                            .setText("Review and accept that privacy policy first!")
-                            .setTextAppearance(R.style.AlertText)
-                            .setBackgroundColorRes(R.color.infoColor)
-                            .setIcon(R.drawable.ic_info)
-                            .setDuration(3000)
-                            .enableIconPulse(true)
-                            .enableVibration(true)
-                            .disableOutsideTouch()
-                            .enableProgress(true)
-                            .setProgressColorInt(getColor(android.R.color.white))
-                            .show();
-                } else {
-                    if (Patterns.EMAIL_ADDRESS.matcher(emailOrMobile).matches()) {
-                        emailOrMobileField.setError(null);
-                        emailOrMobileField.setErrorEnabled(false);
+                if (Patterns.EMAIL_ADDRESS.matcher(emailOrMobile).matches()) {
+                    emailOrMobileField.setError(null);
+                    emailOrMobileField.setErrorEnabled(false);
 
-                        if (!isConnectedToInternet(SignInActivity.this)) {
-                            showConnectToInternetDialog();
-                            return;
-                        } else {
-                            login(emailOrMobile);
-                        }
-                    } else if (emailOrMobile.matches("\\d{10}")) {
-                        emailOrMobileField.setError(null);
-                        emailOrMobileField.setErrorEnabled(false);
+                    if (!isConnectedToInternet(SignInActivity.this)) {
+                        showConnectToInternetDialog();
+                        return;
+                    } else {
+                        login(emailOrMobile);
+                    }
+                } else if (emailOrMobile.matches("\\d{10}")) {
+                    emailOrMobileField.setError(null);
+                    emailOrMobileField.setErrorEnabled(false);
 
-                        if (!isConnectedToInternet(SignInActivity.this)) {
-                            showConnectToInternetDialog();
-                            return;
-                        } else {
-                            signInBtnContainer.setVisibility(View.INVISIBLE);
-                            signInBtn.setEnabled(false);
-                            progressBar.setVisibility(View.VISIBLE);
+                    if (!isConnectedToInternet(SignInActivity.this)) {
+                        showConnectToInternetDialog();
+                        return;
+                    } else {
+                        signInBtnContainer.setVisibility(View.INVISIBLE);
+                        signInBtn.setEnabled(false);
+                        progressBar.setVisibility(View.VISIBLE);
 
-                            userRef.whereEqualTo(Constants.KEY_USER_MOBILE, "+91" + emailOrMobile)
-                                    .get().addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
-                                    if (documentSnapshots.isEmpty()) {
-                                        progressBar.setVisibility(View.GONE);
-                                        signInBtnContainer.setVisibility(View.VISIBLE);
-                                        signInBtn.setEnabled(true);
-
-                                        YoYo.with(Techniques.Shake).duration(700).repeat(0).playOn(emailOrMobileField);
-                                        Alerter.create(SignInActivity.this)
-                                                .setText("We didn't find any account with that mobile!")
-                                                .setTextAppearance(R.style.AlertText)
-                                                .setBackgroundColorRes(R.color.errorColor)
-                                                .setIcon(R.drawable.ic_error)
-                                                .setDuration(3000)
-                                                .enableIconPulse(true)
-                                                .enableVibration(true)
-                                                .disableOutsideTouch()
-                                                .enableProgress(true)
-                                                .setProgressColorInt(getColor(android.R.color.white))
-                                                .show();
-                                    } else {
-                                        String email = documentSnapshots.get(0).getString(Constants.KEY_USER_EMAIL).trim();
-                                        login(email);
-                                    }
-                                } else {
+                        userRef.whereEqualTo(Constants.KEY_USER_MOBILE, "+91" + emailOrMobile)
+                                .get().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+                                if (documentSnapshots.isEmpty()) {
                                     progressBar.setVisibility(View.GONE);
                                     signInBtnContainer.setVisibility(View.VISIBLE);
                                     signInBtn.setEnabled(true);
 
+                                    YoYo.with(Techniques.Shake).duration(700).repeat(0).playOn(emailOrMobileField);
                                     Alerter.create(SignInActivity.this)
-                                            .setText("Whoa! Something broke. Try again!")
+                                            .setText("We didn't find any account with that mobile!")
                                             .setTextAppearance(R.style.AlertText)
                                             .setBackgroundColorRes(R.color.errorColor)
                                             .setIcon(R.drawable.ic_error)
@@ -205,8 +161,11 @@ public class SignInActivity extends AppCompatActivity {
                                             .enableProgress(true)
                                             .setProgressColorInt(getColor(android.R.color.white))
                                             .show();
+                                } else {
+                                    String email = documentSnapshots.get(0).getString(Constants.KEY_USER_EMAIL).trim();
+                                    login(email);
                                 }
-                            }).addOnFailureListener(e -> {
+                            } else {
                                 progressBar.setVisibility(View.GONE);
                                 signInBtnContainer.setVisibility(View.VISIBLE);
                                 signInBtn.setEnabled(true);
@@ -223,13 +182,30 @@ public class SignInActivity extends AppCompatActivity {
                                         .enableProgress(true)
                                         .setProgressColorInt(getColor(android.R.color.white))
                                         .show();
-                            });
-                        }
-                    } else {
-                        YoYo.with(Techniques.Shake).duration(700).repeat(0).playOn(emailOrMobileField);
-                        emailOrMobileField.setError("Enter a valid email or mobile!");
-                        emailOrMobileField.requestFocus();
+                            }
+                        }).addOnFailureListener(e -> {
+                            progressBar.setVisibility(View.GONE);
+                            signInBtnContainer.setVisibility(View.VISIBLE);
+                            signInBtn.setEnabled(true);
+
+                            Alerter.create(SignInActivity.this)
+                                    .setText("Whoa! Something broke. Try again!")
+                                    .setTextAppearance(R.style.AlertText)
+                                    .setBackgroundColorRes(R.color.errorColor)
+                                    .setIcon(R.drawable.ic_error)
+                                    .setDuration(3000)
+                                    .enableIconPulse(true)
+                                    .enableVibration(true)
+                                    .disableOutsideTouch()
+                                    .enableProgress(true)
+                                    .setProgressColorInt(getColor(android.R.color.white))
+                                    .show();
+                        });
                     }
+                } else {
+                    YoYo.with(Techniques.Shake).duration(700).repeat(0).playOn(emailOrMobileField);
+                    emailOrMobileField.setError("Enter a valid email or mobile!");
+                    emailOrMobileField.requestFocus();
                 }
             }
         });
@@ -296,10 +272,16 @@ public class SignInActivity extends AppCompatActivity {
                                         preferenceManager.putString(Constants.KEY_USER_EMAIL, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_EMAIL));
                                         preferenceManager.putString(Constants.KEY_USER_MOBILE, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_MOBILE));
                                         preferenceManager.putString(Constants.KEY_USER_IMAGE, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_IMAGE));
+                                        preferenceManager.putString(Constants.KEY_USER_LOCATION, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_LOCATION));
                                         preferenceManager.putString(Constants.KEY_USER_ADDRESS, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_ADDRESS));
+                                        preferenceManager.putString(Constants.KEY_USER_LATITUDE, String.valueOf(task1.getResult().getDocuments().get(0).getDouble(Constants.KEY_USER_LATITUDE)));
+                                        preferenceManager.putString(Constants.KEY_USER_LONGITUDE, String.valueOf(task1.getResult().getDocuments().get(0).getDouble(Constants.KEY_USER_LONGITUDE)));
                                         preferenceManager.putString(Constants.KEY_USER_CITY, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_CITY));
                                         preferenceManager.putString(Constants.KEY_USER_LOCALITY, task1.getResult().getDocuments().get(0).getString(Constants.KEY_USER_LOCALITY));
                                         preferenceManager.putBoolean(Constants.KEY_USER_FIRST_ORDER, task1.getResult().getDocuments().get(0).getBoolean(Constants.KEY_USER_FIRST_ORDER));
+
+                                        preferenceManager.putString(Constants.KEY_COUPON, "");
+                                        preferenceManager.putString(Constants.KEY_COUPON_DISCOUNT_PERCENT, String.valueOf(0));
 
                                         preferenceManager.putString(Constants.KEY_ORDER_ID, "");
                                         preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
@@ -308,10 +290,16 @@ public class SignInActivity extends AppCompatActivity {
                                         preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
                                         preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
                                         preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LOCATION, "");
                                         preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LATITUDE, String.valueOf(0));
+                                        preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LONGITUDE, String.valueOf(0));
+                                        preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_DISTANCE, String.valueOf(0));
                                         preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
                                         preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
                                         preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+                                        preferenceManager.putString(Constants.KEY_ORDER_COUPON_APPLIED, "");
+                                        preferenceManager.putString(Constants.KEY_ORDER_COUPON_DISCOUNT, String.valueOf(0));
                                         preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
                                         preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
                                         preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
@@ -405,13 +393,16 @@ public class SignInActivity extends AppCompatActivity {
         });
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     private boolean isConnectedToInternet(SignInActivity signInActivity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) signInActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) signInActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if ((wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected())) {
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
             return true;
         } else {
             return false;

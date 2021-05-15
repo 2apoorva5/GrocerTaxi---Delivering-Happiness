@@ -137,11 +137,6 @@ public class OnBoardingActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        KeyboardVisibilityEvent.setEventListener(OnBoardingActivity.this, isOpen -> {
-            if (isOpen) {
-                UIUtil.hideKeyboard(OnBoardingActivity.this);
-            }
-        });
         finishAffinity();
     }
 }

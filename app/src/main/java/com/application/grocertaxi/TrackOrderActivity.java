@@ -1,8 +1,13 @@
 package com.application.grocertaxi;
 
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,13 +29,27 @@ import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Random;
+
+import dmax.dialog.SpotsDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class TrackOrderActivity extends AppCompatActivity {
@@ -39,13 +59,15 @@ public class TrackOrderActivity extends AppCompatActivity {
             orderNoOfItems, totalMRP, discountAmount, couponDiscount, deliveryCharges, textTipAdded, tipAmount, convenienceFee, totalPayable,
             orderID2, paymentMethod, orderPlacedTime, textDeliveredOn, orderCompletionTime, customerMobile, customerAddress2, instructions;
     private RecyclerView recyclerOrderItems;
-    private ConstraintLayout requestCancellationBtn;
+    private CardView requestCancellationBtnContainer;
+    private ConstraintLayout layoutContent, layoutNoInternet, retryBtn, requestCancellationBtn;
     private ProgressBar progressBar;
 
     private CollectionReference userOrdersRef;
     private FirestoreRecyclerAdapter<OrderItem, OrderItemViewHolder> orderItemAdapter;
 
     private PreferenceManager preferenceManager;
+    private AlertDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,12 +101,18 @@ public class TrackOrderActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        initViews();
-        initFirebase();
-        setActionOnViews();
-    }
+        progressDialog = new SpotsDialog.Builder().setContext(TrackOrderActivity.this)
+                .setMessage("Hold on..")
+                .setCancelable(false)
+                .setTheme(R.style.SpotsDialog)
+                .build();
 
-    private void initViews() {
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        layoutContent = findViewById(R.id.layout_content);
+        layoutNoInternet = findViewById(R.id.layout_no_internet);
+        retryBtn = findViewById(R.id.retry_btn);
+
         closeBtn = findViewById(R.id.close_btn);
         orderID = findViewById(R.id.order_id);
         orderStoreName = findViewById(R.id.order_store_name);
@@ -113,8 +141,26 @@ public class TrackOrderActivity extends AppCompatActivity {
         customerAddress2 = findViewById(R.id.customer_address2);
         instructions = findViewById(R.id.instructions);
 
+        requestCancellationBtnContainer = findViewById(R.id.request_cancellation_btn_container);
         requestCancellationBtn = findViewById(R.id.request_cancellation_btn);
         progressBar = findViewById(R.id.progress_bar);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkNetworkConnection();
+    }
+
+    private void checkNetworkConnection() {
+        if (!isConnectedToInternet(TrackOrderActivity.this)) {
+            layoutContent.setVisibility(View.GONE);
+            layoutNoInternet.setVisibility(View.VISIBLE);
+            retryBtn.setOnClickListener(v -> checkNetworkConnection());
+        } else {
+            initFirebase();
+            setActionOnViews();
+        }
     }
 
     private void initFirebase() {
@@ -134,15 +180,21 @@ public class TrackOrderActivity extends AppCompatActivity {
     }
 
     private void setActionOnViews() {
-        closeBtn.setOnClickListener(v -> {
-            onBackPressed();
-            finish();
-        });
+        layoutNoInternet.setVisibility(View.GONE);
+        layoutContent.setVisibility(View.VISIBLE);
 
-        requestCancellationBtn.setOnClickListener(v -> {
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
-        });
+        closeBtn.setOnClickListener(v -> onBackPressed());
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        progressBar.setVisibility(View.VISIBLE);
+        loadOrderDetails();
+        loadOrderItems();
     }
+
+    ////////////////////////////////////// LoadOrderDetails ////////////////////////////////////////
 
     private void loadOrderDetails() {
         final DocumentReference orderDocumentRef = userOrdersRef.document(preferenceManager.getString(Constants.KEY_ORDER));
@@ -222,6 +274,7 @@ public class TrackOrderActivity extends AppCompatActivity {
                     long no_of_items = documentSnapshot.getLong(Constants.KEY_ORDER_NO_OF_ITEMS);
                     double total_mrp = documentSnapshot.getDouble(Constants.KEY_ORDER_TOTAL_MRP);
                     double discount_amount = documentSnapshot.getDouble(Constants.KEY_ORDER_TOTAL_DISCOUNT);
+                    double coupon_discount = documentSnapshot.getDouble(Constants.KEY_ORDER_COUPON_DISCOUNT);
                     double delivery_charges = documentSnapshot.getDouble(Constants.KEY_ORDER_DELIVERY_CHARGES);
                     double tip_amount = documentSnapshot.getDouble(Constants.KEY_ORDER_TIP_AMOUNT);
                     double convenience_fee = documentSnapshot.getDouble(Constants.KEY_ORDER_CONVENIENCE_FEE);
@@ -235,6 +288,14 @@ public class TrackOrderActivity extends AppCompatActivity {
 
                     totalMRP.setText(String.format("₹ %s", total_mrp));
                     discountAmount.setText(String.format("₹ %s", discount_amount));
+
+                    if (coupon_discount == 0) {
+                        couponDiscount.setText("No coupon applied");
+                        couponDiscount.setTextColor(getColor(R.color.colorTextDark));
+                    } else {
+                        couponDiscount.setText(String.format("₹ %s", coupon_discount));
+                        couponDiscount.setTextColor(getColor(R.color.successColor));
+                    }
 
                     if (delivery_charges == 0) {
                         deliveryCharges.setText("FREE");
@@ -277,6 +338,175 @@ public class TrackOrderActivity extends AppCompatActivity {
                     } else {
                         instructions.setText(instruction);
                     }
+
+                    ///////////////////////// Request Cancellation Button //////////////////////////
+
+                    if (preferenceManager.getString(Constants.KEY_ORDER_TYPE).equals("Pending")) {
+                        requestCancellationBtnContainer.setCardBackgroundColor(getColor(R.color.errorColor));
+                        requestCancellationBtn.setEnabled(true);
+                        requestCancellationBtn.setOnClickListener(v -> {
+                            if(!isConnectedToInternet(TrackOrderActivity.this)) {
+                                showConnectToInternetDialog();
+                                return;
+                            } else {
+                                if(order_status.equals("Out for Delivery")) {
+                                    progressDialog.dismiss();
+                                    MaterialDialog materialDialog = new MaterialDialog.Builder(TrackOrderActivity.this)
+                                            .setTitle("Can't proceed!")
+                                            .setMessage("This order can't be cancelled since it is already out for delivery already.")
+                                            .setCancelable(false)
+                                            .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface1, which1) -> dialogInterface1.dismiss())
+                                            .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface1, which1) -> dialogInterface1.dismiss()).build();
+                                    materialDialog.show();
+                                } else {
+                                    MaterialDialog materialDialog1 = new MaterialDialog.Builder(TrackOrderActivity.this)
+                                            .setMessage("Are you sure you want to request a cancellation of this order?")
+                                            .setCancelable(false)
+                                            .setPositiveButton("Yes", R.drawable.ic_dialog_okay, (dialogInterface, which) -> {
+                                                dialogInterface.dismiss();
+                                                progressDialog.show();
+
+                                                Random random = new Random();
+                                                int number1 = random.nextInt(9000) + 1000;
+                                                int number2 = random.nextInt(9000) + 1000;
+                                                String request_id = "#" + number1 + number2;
+
+                                                Calendar calendar = Calendar.getInstance();
+                                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE , dd-MMM-yyyy hh:mm a");
+                                                String currentTime = simpleDateFormat.format(calendar.getTime());
+
+                                                HashMap<String, Object> newCancelRequest = new HashMap<>();
+                                                newCancelRequest.put("requestID", request_id);
+                                                newCancelRequest.put("orderID", preferenceManager.getString(Constants.KEY_ORDER));
+                                                newCancelRequest.put("placingTime", order_placing_time);
+                                                newCancelRequest.put("requestTime", currentTime);
+                                                newCancelRequest.put("requestTimestamp", FieldValue.serverTimestamp());
+
+                                                FirebaseFirestore.getInstance()
+                                                        .collection(Constants.KEY_COLLECTION_CITIES)
+                                                        .document(preferenceManager.getString(Constants.KEY_USER_CITY))
+                                                        .collection(Constants.KEY_COLLECTION_LOCALITIES)
+                                                        .document(preferenceManager.getString(Constants.KEY_USER_LOCALITY))
+                                                        .collection(Constants.KEY_COLLECTION_STORES)
+                                                        .document(documentSnapshot.getString(Constants.KEY_ORDER_FROM_STOREID))
+                                                        .get()
+                                                        .addOnCompleteListener(task -> {
+                                                            if(task.isSuccessful()) {
+                                                                if(task.getResult().exists()) {
+                                                                    FirebaseFirestore.getInstance()
+                                                                            .collection(Constants.KEY_COLLECTION_CITIES)
+                                                                            .document(preferenceManager.getString(Constants.KEY_USER_CITY))
+                                                                            .collection(Constants.KEY_COLLECTION_LOCALITIES)
+                                                                            .document(preferenceManager.getString(Constants.KEY_USER_LOCALITY))
+                                                                            .collection(Constants.KEY_COLLECTION_STORES)
+                                                                            .document(documentSnapshot.getString(Constants.KEY_ORDER_FROM_STOREID))
+                                                                            .collection(Constants.KEY_COLLECTION_CANCELLATION_REQUESTS)
+                                                                            .whereEqualTo("orderID", preferenceManager.getString(Constants.KEY_ORDER))
+                                                                            .get()
+                                                                            .addOnCompleteListener(task1 -> {
+                                                                                if(task1.isSuccessful()) {
+                                                                                    if(!task1.getResult().getDocuments().isEmpty() || task1.getResult().getDocuments().size() != 0) {
+                                                                                        progressDialog.dismiss();
+                                                                                        MaterialDialog materialDialog = new MaterialDialog.Builder(TrackOrderActivity.this)
+                                                                                                .setTitle("Already requested!")
+                                                                                                .setMessage("You've already requested for cancellation of this order. You'll get the response from the store soon!")
+                                                                                                .setCancelable(false)
+                                                                                                .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface1, which1) -> dialogInterface1.dismiss())
+                                                                                                .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface1, which1) -> dialogInterface1.dismiss()).build();
+                                                                                        materialDialog.show();
+                                                                                    } else {
+                                                                                        FirebaseFirestore.getInstance()
+                                                                                                .collection(Constants.KEY_COLLECTION_CITIES)
+                                                                                                .document(preferenceManager.getString(Constants.KEY_USER_CITY))
+                                                                                                .collection(Constants.KEY_COLLECTION_LOCALITIES)
+                                                                                                .document(preferenceManager.getString(Constants.KEY_USER_LOCALITY))
+                                                                                                .collection(Constants.KEY_COLLECTION_STORES)
+                                                                                                .document(documentSnapshot.getString(Constants.KEY_ORDER_FROM_STOREID))
+                                                                                                .collection(Constants.KEY_COLLECTION_CANCELLATION_REQUESTS)
+                                                                                                .document(request_id)
+                                                                                                .set(newCancelRequest)
+                                                                                                .addOnSuccessListener(aVoid -> {
+                                                                                                    progressDialog.dismiss();
+                                                                                                    Alerter.create(TrackOrderActivity.this)
+                                                                                                            .setText("Success! Cancellation request submitted.")
+                                                                                                            .setTextAppearance(R.style.AlertText)
+                                                                                                            .setBackgroundColorRes(R.color.successColor)
+                                                                                                            .setIcon(R.drawable.ic_dialog_okay)
+                                                                                                            .setDuration(3000)
+                                                                                                            .enableIconPulse(true)
+                                                                                                            .enableVibration(true)
+                                                                                                            .disableOutsideTouch()
+                                                                                                            .enableProgress(true)
+                                                                                                            .setProgressColorInt(getColor(android.R.color.white))
+                                                                                                            .show();
+                                                                                                }).addOnFailureListener(e -> {
+                                                                                            progressDialog.dismiss();
+                                                                                            Alerter.create(TrackOrderActivity.this)
+                                                                                                    .setText("Whoa! Something Broke. Try again!")
+                                                                                                    .setTextAppearance(R.style.AlertText)
+                                                                                                    .setBackgroundColorRes(R.color.errorColor)
+                                                                                                    .setIcon(R.drawable.ic_error)
+                                                                                                    .setDuration(3000)
+                                                                                                    .enableIconPulse(true)
+                                                                                                    .enableVibration(true)
+                                                                                                    .disableOutsideTouch()
+                                                                                                    .enableProgress(true)
+                                                                                                    .setProgressColorInt(getColor(android.R.color.white))
+                                                                                                    .show();
+                                                                                        });
+                                                                                    }
+                                                                                } else {
+                                                                                    progressDialog.dismiss();
+                                                                                    Alerter.create(TrackOrderActivity.this)
+                                                                                            .setText("Whoa! Something Broke. Try again!")
+                                                                                            .setTextAppearance(R.style.AlertText)
+                                                                                            .setBackgroundColorRes(R.color.errorColor)
+                                                                                            .setIcon(R.drawable.ic_error)
+                                                                                            .setDuration(3000)
+                                                                                            .enableIconPulse(true)
+                                                                                            .enableVibration(true)
+                                                                                            .disableOutsideTouch()
+                                                                                            .enableProgress(true)
+                                                                                            .setProgressColorInt(getColor(android.R.color.white))
+                                                                                            .show();
+                                                                                }
+                                                                            });
+                                                                } else {
+                                                                    progressDialog.dismiss();
+                                                                    MaterialDialog materialDialog2 = new MaterialDialog.Builder(TrackOrderActivity.this)
+                                                                            .setTitle("Can't proceed!")
+                                                                            .setMessage("You've to be in the same location where the store is to proceed with the request for cancellation.")
+                                                                            .setCancelable(false)
+                                                                            .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface1, which1) -> dialogInterface1.dismiss())
+                                                                            .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface1, which1) -> dialogInterface1.dismiss()).build();
+                                                                    materialDialog2.show();
+                                                                }
+                                                            } else {
+                                                                progressDialog.dismiss();
+                                                                Alerter.create(TrackOrderActivity.this)
+                                                                        .setText("Whoa! Something Broke. Try again!")
+                                                                        .setTextAppearance(R.style.AlertText)
+                                                                        .setBackgroundColorRes(R.color.errorColor)
+                                                                        .setIcon(R.drawable.ic_error)
+                                                                        .setDuration(3000)
+                                                                        .enableIconPulse(true)
+                                                                        .enableVibration(true)
+                                                                        .disableOutsideTouch()
+                                                                        .enableProgress(true)
+                                                                        .setProgressColorInt(getColor(android.R.color.white))
+                                                                        .show();
+                                                            }
+                                                        });
+                                            })
+                                            .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface1, which1) -> dialogInterface1.dismiss()).build();
+                                    materialDialog1.show();
+                                }
+                            }
+                        });
+                    } else {
+                        requestCancellationBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
+                        requestCancellationBtn.setEnabled(false);
+                    }
                 } else {
                     Alerter.create(TrackOrderActivity.this)
                             .setText("Whoa! Something broke. Try again!")
@@ -294,6 +524,8 @@ public class TrackOrderActivity extends AppCompatActivity {
             }
         });
     }
+
+    ///////////////////////////////////// LoadOrderItems ///////////////////////////////////////////
 
     private void loadOrderItems() {
         Query query = null;
@@ -385,21 +617,6 @@ public class TrackOrderActivity extends AppCompatActivity {
         recyclerOrderItems.setAdapter(orderItemAdapter);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        progressBar.setVisibility(View.VISIBLE);
-        loadOrderDetails();
-        loadOrderItems();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        CustomIntent.customType(TrackOrderActivity.this, "up-to-bottom");
-    }
-
     public static class OrderItemViewHolder extends RecyclerView.ViewHolder {
 
         ImageView orderItemProductImage;
@@ -415,5 +632,47 @@ public class TrackOrderActivity extends AppCompatActivity {
             orderItemProductMRP = itemView.findViewById(R.id.order_item_product_mrp);
             orderItemProductTotalPrice = itemView.findViewById(R.id.order_item_product_total_price);
         }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private boolean isConnectedToInternet(TrackOrderActivity trackOrderActivity) {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) trackOrderActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void showConnectToInternetDialog() {
+        MaterialDialog materialDialog = new MaterialDialog.Builder(TrackOrderActivity.this)
+                .setTitle("No Internet Connection!")
+                .setMessage("Please connect to a network first to proceed from here!")
+                .setCancelable(false)
+                .setAnimation(R.raw.no_internet_connection)
+                .setPositiveButton("Connect", R.drawable.ic_dialog_connect, (dialogInterface, which) -> {
+                    dialogInterface.dismiss();
+                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                })
+                .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+        materialDialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        CustomIntent.customType(TrackOrderActivity.this, "up-to-bottom");
     }
 }

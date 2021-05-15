@@ -3,33 +3,35 @@ package com.application.grocertaxi.Model;
 import com.google.firebase.Timestamp;
 
 public class Store {
-    private String storeID, storeName, storeOwner, storeEmail, storeMobile, storeAddress,
+    private String storeID, storeName, storeOwner, storeEmail, storeMobile, storeLocation, storeAddress,
             storeTiming, storeImage, storeSearchKeyword;
     private Timestamp storeTimestamp;
     private boolean storeStatus;
-    private double storeMinimumOrderValue, storeAverageRating, storeTotalRating;
+    private double storeLatitude, storeLongitude, storeMinimumOrderValue, storeAverageRating;
 
     public Store() {
     }
 
-    public Store(String storeID, String storeName, String storeOwner, String storeEmail,
-                 String storeMobile, String storeAddress, String storeTiming, String storeImage,
-                 String storeSearchKeyword, Timestamp storeTimestamp, boolean storeStatus,
-                 double storeMinimumOrderValue, double storeAverageRating, double storeTotalRating) {
+    public Store(String storeID, String storeName, String storeOwner, String storeEmail, String storeMobile,
+                 String storeLocation, String storeAddress, String storeTiming, String storeImage,
+                 String storeSearchKeyword, Timestamp storeTimestamp, boolean storeStatus, double storeLatitude,
+                 double storeLongitude, double storeMinimumOrderValue, double storeAverageRating) {
         this.storeID = storeID;
         this.storeName = storeName;
         this.storeOwner = storeOwner;
         this.storeEmail = storeEmail;
         this.storeMobile = storeMobile;
+        this.storeLocation = storeLocation;
         this.storeAddress = storeAddress;
         this.storeTiming = storeTiming;
         this.storeImage = storeImage;
         this.storeSearchKeyword = storeSearchKeyword;
         this.storeTimestamp = storeTimestamp;
         this.storeStatus = storeStatus;
+        this.storeLatitude = storeLatitude;
+        this.storeLongitude = storeLongitude;
         this.storeMinimumOrderValue = storeMinimumOrderValue;
         this.storeAverageRating = storeAverageRating;
-        this.storeTotalRating = storeTotalRating;
     }
 
     public String getStoreID() {
@@ -70,6 +72,14 @@ public class Store {
 
     public void setStoreMobile(String storeMobile) {
         this.storeMobile = storeMobile;
+    }
+
+    public String getStoreLocation() {
+        return storeLocation;
+    }
+
+    public void setStoreLocation(String storeLocation) {
+        this.storeLocation = storeLocation;
     }
 
     public String getStoreAddress() {
@@ -120,6 +130,22 @@ public class Store {
         this.storeStatus = storeStatus;
     }
 
+    public double getStoreLatitude() {
+        return storeLatitude;
+    }
+
+    public void setStoreLatitude(double storeLatitude) {
+        this.storeLatitude = storeLatitude;
+    }
+
+    public double getStoreLongitude() {
+        return storeLongitude;
+    }
+
+    public void setStoreLongitude(double storeLongitude) {
+        this.storeLongitude = storeLongitude;
+    }
+
     public double getStoreMinimumOrderValue() {
         return storeMinimumOrderValue;
     }
@@ -134,13 +160,5 @@ public class Store {
 
     public void setStoreAverageRating(double storeAverageRating) {
         this.storeAverageRating = storeAverageRating;
-    }
-
-    public double getStoreTotalRating() {
-        return storeTotalRating;
-    }
-
-    public void setStoreTotalRating(double storeTotalRating) {
-        this.storeTotalRating = storeTotalRating;
     }
 }

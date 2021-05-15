@@ -86,12 +86,10 @@ public class PendingOrdersFragment extends Fragment {
 
     private void loadPendingOrders() {
         Query query = userPendingOrdersRef.orderBy(Constants.KEY_ORDER_TIMESTAMP, Query.Direction.DESCENDING);
-
         PagedList.Config config = new PagedList.Config.Builder()
-                .setInitialLoadSizeHint(8)
+                .setInitialLoadSizeHint(4)
                 .setPageSize(4)
                 .build();
-
         FirestorePagingOptions<Order> options = new FirestorePagingOptions.Builder<Order>()
                 .setLifecycleOwner(getActivity())
                 .setQuery(query, config, Order.class)
@@ -102,7 +100,7 @@ public class PendingOrdersFragment extends Fragment {
             @NonNull
             @Override
             public PendingOrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_pending_order_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_pending_order, parent, false);
                 return new PendingOrderViewHolder(view);
             }
 
@@ -227,13 +225,16 @@ public class PendingOrdersFragment extends Fragment {
         loadPendingOrders();
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     private boolean isConnectedToInternet(Activity activity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if ((wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected())) {
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
             return true;
         } else {
             return false;

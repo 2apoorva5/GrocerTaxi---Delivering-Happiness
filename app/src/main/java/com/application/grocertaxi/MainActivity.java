@@ -3,7 +3,8 @@ package com.application.grocertaxi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Paint;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -13,8 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,16 +32,17 @@ import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.makeramen.roundedimageview.RoundedImageView;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 import com.shreyaspatil.MaterialDialog.MaterialDialog;
@@ -50,9 +50,6 @@ import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
 import com.smarteist.autoimageslider.SliderViewAdapter;
 import com.tapadoo.alerter.Alerter;
-
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import java.util.HashMap;
 
@@ -62,19 +59,18 @@ import maes.tech.intentanim.CustomIntent;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ImageView editLocationBtn, fruits, vegetables, foodGrains, dairy, bakery, beverages,
-            exploreAllProductsBtn, banner1, banner2, menuHome, menuCategory, menuStore, menuProfile, illustrationEmpty;
-    private TextView userLocation, greetings, viewAllStoresBtn, viewAllFruitsBtn,
-            viewAllVegBtn, viewAllFoodGrainsBtn, viewAllPCareBtn, textEmpty;
+    private ImageView editLocationBtn, fruits, vegetables, foodGrains, dairy, bakery, beverages;
+    private RoundedImageView exploreAllProductsBtn, safeDeliveryBanner;
+    private TextView userLocation, greetings, viewAllStoresBtn, viewAllFruitsBtn, viewAllVegBtn, viewAllFoodGrainsBtn, viewAllPCareBtn;
     private CircleImageView userProfilePic;
     private SliderView bannerSlider;
     private RecyclerView recyclerStores, recyclerFruits, recyclerVegetables, recyclerFoodGrains, recyclerPCare;
-    private ProgressBar storesProgressBar, fruitsProgressBar, vegProgressBar, foodGrainsProgressBar, pCareProgressBar;
-    private ConstraintLayout productSearchBtn, shopByCategoryLayout, categoryFruits, categoryVegetables, categoryFoodGrains,
-            categoryDairy, categoryBakery, categoryBeverages, viewAllCategoriesBtn, layoutFirstOrderOffers, offer1, offer2, offer3,
-            layoutStores, layoutFruits, layoutVegetables, layoutFoodGrains, layoutPCare, changeLocationBtn;
+    private ConstraintLayout layoutContent, layoutEmpty, layoutNoInternet, retryBtn,
+            productSearchBtn, categoryFruits, categoryVegetables, categoryFoodGrains,
+            categoryDairy, categoryBakery, categoryBeverages, viewAllCategoriesBtn, layoutFirstOrderOffers,
+            layoutFruits, layoutVegetables, layoutFoodGrains, layoutPCare, changeLocationBtn;
+    private BottomNavigationView bottomBar;
     private FloatingActionButton cartBtn;
-    private CardView layoutSafeDelivery, cartIndicator, changeLocationBtnContainer;
     private PullRefreshLayout pullRefreshLayout;
 
     private CollectionReference userRef, storesRef, cartRef, fruitsRef, vegetablesRef, foodGrainsRef, pCareRef;
@@ -84,11 +80,11 @@ public class MainActivity extends AppCompatActivity {
     private FirestoreRecyclerAdapter<Product, FoodGrainViewHolder> foodGrainAdapter;
     private FirestoreRecyclerAdapter<Product, PersonalCareViewHolder> personalCareAdapter;
 
-    private String cart_location;
-    private Shimmer shimmer1, shimmer2, shimmer3, shimmer4;
     int[] banners = {R.drawable.banner1, R.drawable.banner2, R.drawable.banner3,
             R.drawable.banner4, R.drawable.banner5, R.drawable.banner6};
     private BannerSliderAdapter bannerSliderAdapter;
+
+    private String cart_location;
     private PreferenceManager preferenceManager;
     private AlertDialog progressDialog;
 
@@ -130,20 +126,18 @@ public class MainActivity extends AppCompatActivity {
                 .setTheme(R.style.SpotsDialog)
                 .build();
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
 
-        initViews();
-        initFirebase();
-        setActionOnViews();
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
-        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                sendFCMTokenToDatabase(task.getResult().getToken());
-            }
-        });
-    }
+        layoutContent = findViewById(R.id.layout_content);
+        layoutNoInternet = findViewById(R.id.layout_no_internet);
+        retryBtn = findViewById(R.id.retry_btn);
 
-    private void initViews() {
+        pullRefreshLayout = findViewById(R.id.pull_refresh_layout);
+
         userLocation = findViewById(R.id.user_location);
         editLocationBtn = findViewById(R.id.edit_location_btn);
         greetings = findViewById(R.id.greetings);
@@ -152,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
 
         bannerSlider = findViewById(R.id.banner_slider);
 
-        shopByCategoryLayout = findViewById(R.id.explore_by_category_layout);
         fruits = findViewById(R.id.category_fruits_img);
         vegetables = findViewById(R.id.category_vegetables_img);
         foodGrains = findViewById(R.id.category_foodgrains_img);
@@ -168,54 +161,54 @@ public class MainActivity extends AppCompatActivity {
         viewAllCategoriesBtn = findViewById(R.id.view_all_categories_btn);
 
         layoutFirstOrderOffers = findViewById(R.id.layout_first_order_offers);
-        offer1 = findViewById(R.id.offer1);
-        offer2 = findViewById(R.id.offer2);
-        offer3 = findViewById(R.id.offer3);
-        layoutSafeDelivery = findViewById(R.id.layout_safe_delivery);
 
         //Store
-        layoutStores = findViewById(R.id.layout_stores);
         viewAllStoresBtn = findViewById(R.id.view_all_stores_btn);
         recyclerStores = findViewById(R.id.recycler_stores);
-        storesProgressBar = findViewById(R.id.stores_progress_bar);
         //Fruits
         layoutFruits = findViewById(R.id.layout_fruits);
         viewAllFruitsBtn = findViewById(R.id.view_all_fruits_btn);
         recyclerFruits = findViewById(R.id.recycler_fruits);
-        fruitsProgressBar = findViewById(R.id.fruits_progress_bar);
         //Vegetables
         layoutVegetables = findViewById(R.id.layout_vegetables);
         viewAllVegBtn = findViewById(R.id.view_all_veg_btn);
         recyclerVegetables = findViewById(R.id.recycler_vegetables);
-        vegProgressBar = findViewById(R.id.veg_progress_bar);
         //Food Grains
         layoutFoodGrains = findViewById(R.id.layout_foodgrains);
         viewAllFoodGrainsBtn = findViewById(R.id.view_all_foodgrains_btn);
         recyclerFoodGrains = findViewById(R.id.recycler_foodgrains);
-        foodGrainsProgressBar = findViewById(R.id.foodgrains_progress_bar);
         //Personal Care
         layoutPCare = findViewById(R.id.layout_pcare);
         viewAllPCareBtn = findViewById(R.id.view_all_pcare_btn);
         recyclerPCare = findViewById(R.id.recycler_pcare);
-        pCareProgressBar = findViewById(R.id.pcare_progress_bar);
 
         exploreAllProductsBtn = findViewById(R.id.explore_all_products_btn);
-        banner1 = findViewById(R.id.banner_image1);
-        banner2 = findViewById(R.id.banner_image2);
+        safeDeliveryBanner = findViewById(R.id.banner_image2);
 
-        pullRefreshLayout = findViewById(R.id.pull_refresh_layout);
-
-        menuHome = findViewById(R.id.menu_home);
-        menuCategory = findViewById(R.id.menu_category);
-        menuStore = findViewById(R.id.menu_store);
-        menuProfile = findViewById(R.id.menu_profile);
+        bottomBar = findViewById(R.id.bottom_bar);
         cartBtn = findViewById(R.id.cart_btn);
-        cartIndicator = findViewById(R.id.cart_indicator);
 
-        illustrationEmpty = findViewById(R.id.illustration_empty);
-        textEmpty = findViewById(R.id.text_empty);
-        changeLocationBtnContainer = findViewById(R.id.change_location_btn_container);
+        layoutEmpty = findViewById(R.id.layout_empty);
         changeLocationBtn = findViewById(R.id.change_location_btn);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkNetworkConnection();
+    }
+
+    private void checkNetworkConnection() {
+        if (!isConnectedToInternet(MainActivity.this)) {
+            layoutContent.setVisibility(View.GONE);
+            layoutEmpty.setVisibility(View.GONE);
+            layoutNoInternet.setVisibility(View.VISIBLE);
+            retryBtn.setOnClickListener(v -> checkNetworkConnection());
+        } else {
+            initFirebase();
+            sendFCMTokenToDatabase();
+            setActionOnViews();
+        }
     }
 
     private void initFirebase() {
@@ -264,12 +257,38 @@ public class MainActivity extends AppCompatActivity {
                 .collection(Constants.KEY_COLLECTION_CART);
     }
 
+    private void sendFCMTokenToDatabase() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        String refreshToken = task.getResult();
+                        HashMap<String, Object> token = new HashMap<>();
+                        token.put(Constants.KEY_USER_TOKEN, refreshToken);
+
+                        DocumentReference documentReference = userRef.document(preferenceManager.getString(Constants.KEY_USER_ID));
+                        documentReference.set(token, SetOptions.merge())
+                                .addOnSuccessListener(aVoid -> {
+                                })
+                                .addOnFailureListener(e -> Toast.makeText(MainActivity.this, "Some ERROR occurred!", Toast.LENGTH_SHORT).show());
+                    } else {
+                        Toast.makeText(MainActivity.this, "Some ERROR occurred!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
     private void setActionOnViews() {
-        storesProgressBar.setVisibility(View.VISIBLE);
-        fruitsProgressBar.setVisibility(View.VISIBLE);
-        vegProgressBar.setVisibility(View.VISIBLE);
-        foodGrainsProgressBar.setVisibility(View.VISIBLE);
-        pCareProgressBar.setVisibility(View.VISIBLE);
+        layoutNoInternet.setVisibility(View.GONE);
+        layoutContent.setVisibility(View.VISIBLE);
+        layoutEmpty.setVisibility(View.GONE);
+        pullRefreshLayout.setRefreshing(false);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
+        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorBackground));
+        pullRefreshLayout.setOnRefreshListener(this::checkNetworkConnection);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         userLocation.setText(cart_location);
 
@@ -292,9 +311,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         String name = preferenceManager.getString(Constants.KEY_USER_NAME);
         String[] splitName = name.split(" ", 2);
-
         greetings.setText(String.format("Hey, %s!", splitName[0]));
 
         if (preferenceManager.getString(Constants.KEY_USER_IMAGE).equals("") ||
@@ -314,15 +334,21 @@ public class MainActivity extends AppCompatActivity {
             CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
         });
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         productSearchBtn.setOnClickListener(view -> {
             startActivity(new Intent(MainActivity.this, SearchProductActivity.class));
             CustomIntent.customType(MainActivity.this, "bottom-to-up");
         });
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         bannerSliderAdapter = new BannerSliderAdapter(banners);
         bannerSlider.setSliderAdapter(bannerSliderAdapter);
         bannerSlider.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
         bannerSlider.startAutoCycle();
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         String cat_fruits = "https://firebasestorage.googleapis.com/v0/b/grocer-taxi.appspot.com/o/Categories%2Ffruits.png?alt=media&token=e682c6a7-16fe-47f1-b607-89b9b888b5d3";
         String cat_vegetables = "https://firebasestorage.googleapis.com/v0/b/grocer-taxi.appspot.com/o/Categories%2Fvegetables.png?alt=media&token=5794ffa7-f88e-4477-9068-cd1d9ab4b247";
@@ -379,16 +405,67 @@ public class MainActivity extends AppCompatActivity {
             CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
         });
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
+                .addSnapshotListener((documentSnapshot, error) -> {
+                    if (error != null) {
+                        Alerter.create(MainActivity.this)
+                                .setText("Whoa! Something broke. Try again!")
+                                .setTextAppearance(R.style.AlertText)
+                                .setBackgroundColorRes(R.color.errorColor)
+                                .setIcon(R.drawable.ic_error)
+                                .setDuration(3000)
+                                .enableIconPulse(true)
+                                .enableVibration(true)
+                                .disableOutsideTouch()
+                                .enableProgress(true)
+                                .setProgressColorInt(getColor(android.R.color.white))
+                                .show();
+                    } else {
+                        if (documentSnapshot != null && documentSnapshot.exists()) {
+                            boolean first_order = documentSnapshot.getBoolean(Constants.KEY_USER_FIRST_ORDER);
+
+                            if (first_order) {
+                                layoutFirstOrderOffers.setVisibility(View.VISIBLE);
+                            } else {
+                                layoutFirstOrderOffers.setVisibility(View.GONE);
+                            }
+                        } else {
+                            Alerter.create(MainActivity.this)
+                                    .setText("Whoa! Something Broke. Try again!")
+                                    .setTextAppearance(R.style.AlertText)
+                                    .setBackgroundColorRes(R.color.errorColor)
+                                    .setIcon(R.drawable.ic_error)
+                                    .setDuration(3000)
+                                    .enableIconPulse(true)
+                                    .enableVibration(true)
+                                    .disableOutsideTouch()
+                                    .enableProgress(true)
+                                    .setProgressColorInt(getColor(android.R.color.white))
+                                    .show();
+                        }
+                    }
+                });
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        loadStores();
         viewAllStoresBtn.setOnClickListener(view -> {
             startActivity(new Intent(MainActivity.this, StoresListActivity.class));
             CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
         });
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        loadFruits();
         viewAllFruitsBtn.setOnClickListener(view -> {
             preferenceManager.putString(Constants.KEY_CATEGORY, "Fruits");
             startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
             CustomIntent.customType(MainActivity.this, "left-to-right");
         });
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         exploreAllProductsBtn.setOnClickListener(v -> {
             preferenceManager.putString(Constants.KEY_CATEGORY, "");
@@ -396,44 +473,62 @@ public class MainActivity extends AppCompatActivity {
             CustomIntent.customType(MainActivity.this, "left-to-right");
         });
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        loadVegetables();
         viewAllVegBtn.setOnClickListener(view -> {
             preferenceManager.putString(Constants.KEY_CATEGORY, "Vegetables");
             startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
             CustomIntent.customType(MainActivity.this, "left-to-right");
         });
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        loadFoodGrains();
         viewAllFoodGrainsBtn.setOnClickListener(view -> {
             preferenceManager.putString(Constants.KEY_CATEGORY, "Food Grains");
             startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
             CustomIntent.customType(MainActivity.this, "left-to-right");
         });
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        loadPersonalCareProducts();
         viewAllPCareBtn.setOnClickListener(view -> {
             preferenceManager.putString(Constants.KEY_CATEGORY, "Personal Care");
             startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
             CustomIntent.customType(MainActivity.this, "left-to-right");
         });
 
-        menuHome.setOnClickListener(view -> {
-            return;
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        bottomBar.setSelectedItemId(R.id.menu_home);
+        bottomBar.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_home:
+                    break;
+                case R.id.menu_categories:
+                    startActivity(new Intent(MainActivity.this, CategoriesActivity.class));
+                    CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
+                    break;
+                case R.id.menu_stores:
+                    startActivity(new Intent(MainActivity.this, StoresListActivity.class));
+                    CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
+                    break;
+                case R.id.menu_profile:
+                    startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                    CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
+                    break;
+            }
+            return true;
         });
 
-        menuCategory.setOnClickListener(view -> {
-            startActivity(new Intent(MainActivity.this, CategoriesActivity.class));
-            CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
-        });
-
-        menuStore.setOnClickListener(view -> {
-            startActivity(new Intent(MainActivity.this, StoresListActivity.class));
-            CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
-        });
-
-        menuProfile.setOnClickListener(view -> {
-            startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-            CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
-        });
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         cartBtn.setOnClickListener(v -> {
+            preferenceManager.putString(Constants.KEY_COUPON, "");
+            preferenceManager.putString(Constants.KEY_COUPON_DISCOUNT_PERCENT, String.valueOf(0));
+
             preferenceManager.putString(Constants.KEY_ORDER_ID, "");
             preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
             preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, "");
@@ -441,10 +536,16 @@ public class MainActivity extends AppCompatActivity {
             preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
             preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
             preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LOCATION, "");
             preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LATITUDE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LONGITUDE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_DISTANCE, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_COUPON_APPLIED, "");
+            preferenceManager.putString(Constants.KEY_ORDER_COUPON_DISCOUNT, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
@@ -458,6 +559,7 @@ public class MainActivity extends AppCompatActivity {
             preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
             preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
             preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
+
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
             CustomIntent.customType(MainActivity.this, "bottom-to-up");
         });
@@ -477,7 +579,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public BannerSliderAdapter.Holder onCreateViewHolder(ViewGroup parent) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.layout_banner_item, parent, false);
+                    .inflate(R.layout.layout_banner, parent, false);
             return new BannerSliderAdapter.Holder(view);
         }
 
@@ -486,11 +588,13 @@ public class MainActivity extends AppCompatActivity {
             viewHolder.bannerImage.setImageResource(banners[position]);
             viewHolder.itemView.setOnClickListener(v -> {
                 if (position == 0) {
-                    startActivity(new Intent(MainActivity.this, StoresListActivity.class));
-                    CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
+                    preferenceManager.putString(Constants.KEY_CATEGORY, "Vegetables");
+                    startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
+                    CustomIntent.customType(MainActivity.this, "left-to-right");
                 } else if (position == 1) {
-                    startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-                    CustomIntent.customType(MainActivity.this, "fadein-to-fadeout");
+                    preferenceManager.putString(Constants.KEY_CATEGORY, "Fruits");
+                    startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
+                    CustomIntent.customType(MainActivity.this, "left-to-right");
                 } else if (position == 2) {
                     preferenceManager.putString(Constants.KEY_CATEGORY, "");
                     startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
@@ -512,22 +616,19 @@ public class MainActivity extends AppCompatActivity {
 
         public class Holder extends SliderViewAdapter.ViewHolder {
 
-            ImageView bannerImage;
+            RoundedImageView bannerImage;
 
             public Holder(View itemView) {
                 super(itemView);
-
                 bannerImage = itemView.findViewById(R.id.banner_image);
             }
         }
     }
 
-
-    ///////////////////////////////////// Load Stores Adapter //////////////////////////////////////
+    ///////////////////////////////////////// LoadStores ///////////////////////////////////////////
 
     private void loadStores() {
         Query query = storesRef.orderBy(Constants.KEY_STORE_AVERAGE_RATING, Query.Direction.DESCENDING).limit(5);
-
         FirestoreRecyclerOptions<Store> options = new FirestoreRecyclerOptions.Builder<Store>()
                 .setLifecycleOwner(MainActivity.this)
                 .setQuery(query, Store.class)
@@ -538,7 +639,7 @@ public class MainActivity extends AppCompatActivity {
             @NonNull
             @Override
             public StoreViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_home_store_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_home_store, parent, false);
                 return new StoreViewHolder(view);
             }
 
@@ -550,17 +651,20 @@ public class MainActivity extends AppCompatActivity {
                 holder.storeName.setText(model.getStoreName());
 
                 if (model.isStoreStatus()) {
+                    holder.storeImage.clearColorFilter();
+
                     holder.storeStatus.setText("Open");
                     holder.storeStatusContainer.setCardBackgroundColor(getColor(R.color.successColor));
                 } else {
+                    ColorMatrix matrix = new ColorMatrix();
+                    matrix.setSaturation(0);
+
+                    ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+                    holder.storeImage.setColorFilter(filter);
+
                     holder.storeStatus.setText("Closed");
                     holder.storeStatusContainer.setCardBackgroundColor(getColor(R.color.errorColor));
                 }
-
-                holder.storeRating.setVisibility(View.VISIBLE);
-                holder.storeRating.setText(String.valueOf(model.getStoreAverageRating()));
-                holder.storeRatingBar.setVisibility(View.VISIBLE);
-                holder.storeRatingBar.setRating((float) model.getStoreAverageRating());
 
                 holder.clickListenerStore.setOnClickListener(v -> {
                     preferenceManager.putString(Constants.KEY_STORE, model.getStoreID());
@@ -574,25 +678,9 @@ public class MainActivity extends AppCompatActivity {
                 super.onDataChanged();
 
                 pullRefreshLayout.setRefreshing(false);
-                storesProgressBar.setVisibility(View.GONE);
 
                 if (getItemCount() == 0) {
-                    productSearchBtn.setEnabled(false);
-                    bannerSlider.setVisibility(View.GONE);
-                    shopByCategoryLayout.setVisibility(View.GONE);
-                    layoutFirstOrderOffers.setVisibility(View.GONE);
-                    layoutSafeDelivery.setVisibility(View.GONE);
-                    layoutStores.setVisibility(View.GONE);
-                    layoutFruits.setVisibility(View.GONE);
-                    exploreAllProductsBtn.setVisibility(View.GONE);
-                    layoutVegetables.setVisibility(View.GONE);
-                    banner1.setVisibility(View.GONE);
-                    layoutFoodGrains.setVisibility(View.GONE);
-                    layoutPCare.setVisibility(View.GONE);
-                    banner2.setVisibility(View.GONE);
-                    illustrationEmpty.setVisibility(View.VISIBLE);
-                    textEmpty.setVisibility(View.VISIBLE);
-                    changeLocationBtnContainer.setVisibility(View.VISIBLE);
+                    layoutEmpty.setVisibility(View.VISIBLE);
                     changeLocationBtn.setOnClickListener(v -> {
                         if (!isConnectedToInternet(MainActivity.this)) {
                             showConnectToInternetDialog();
@@ -612,95 +700,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    productSearchBtn.setEnabled(true);
-                    bannerSlider.setVisibility(View.VISIBLE);
-                    shopByCategoryLayout.setVisibility(View.VISIBLE);
-                    userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
-                            .get().addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot documentSnapshot = task.getResult();
-                            if (documentSnapshot.exists()) {
-                                boolean first_order = documentSnapshot.getBoolean(Constants.KEY_USER_FIRST_ORDER);
-
-                                if (first_order) {
-                                    layoutFirstOrderOffers.setVisibility(View.VISIBLE);
-
-                                    offer1.setOnClickListener(v -> {
-                                        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
-                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_info2);
-                                        bottomSheetDialog.setCanceledOnTouchOutside(false);
-
-                                        ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
-                                        closeSheetBtn.setOnClickListener(v12 -> bottomSheetDialog.dismiss());
-
-                                        bottomSheetDialog.show();
-                                    });
-
-                                    offer2.setOnClickListener(v -> {
-                                        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
-                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_info3);
-                                        bottomSheetDialog.setCanceledOnTouchOutside(false);
-
-                                        ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
-                                        closeSheetBtn.setOnClickListener(v12 -> bottomSheetDialog.dismiss());
-
-                                        bottomSheetDialog.show();
-                                    });
-
-                                    offer3.setOnClickListener(v -> {
-                                        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
-                                        bottomSheetDialog.setContentView(R.layout.bottom_sheet_info1);
-                                        bottomSheetDialog.setCanceledOnTouchOutside(false);
-
-                                        ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
-                                        closeSheetBtn.setOnClickListener(v12 -> bottomSheetDialog.dismiss());
-
-                                        bottomSheetDialog.show();
-                                    });
-                                } else {
-                                    layoutFirstOrderOffers.setVisibility(View.GONE);
-                                }
-                            } else {
-                                Alerter.create(MainActivity.this)
-                                        .setText("Whoa! Something Broke. Try again!")
-                                        .setTextAppearance(R.style.AlertText)
-                                        .setBackgroundColorRes(R.color.errorColor)
-                                        .setIcon(R.drawable.ic_error)
-                                        .setDuration(3000)
-                                        .enableIconPulse(true)
-                                        .enableVibration(true)
-                                        .disableOutsideTouch()
-                                        .enableProgress(true)
-                                        .setProgressColorInt(getColor(android.R.color.white))
-                                        .show();
-                            }
-                        } else {
-                            Alerter.create(MainActivity.this)
-                                    .setText("Whoa! Something Broke. Try again!")
-                                    .setTextAppearance(R.style.AlertText)
-                                    .setBackgroundColorRes(R.color.errorColor)
-                                    .setIcon(R.drawable.ic_error)
-                                    .setDuration(3000)
-                                    .enableIconPulse(true)
-                                    .enableVibration(true)
-                                    .disableOutsideTouch()
-                                    .enableProgress(true)
-                                    .setProgressColorInt(getColor(android.R.color.white))
-                                    .show();
-                        }
-                    });
-                    layoutSafeDelivery.setVisibility(View.VISIBLE);
-                    layoutStores.setVisibility(View.VISIBLE);
-                    layoutFruits.setVisibility(View.VISIBLE);
-                    exploreAllProductsBtn.setVisibility(View.VISIBLE);
-                    layoutVegetables.setVisibility(View.VISIBLE);
-                    banner1.setVisibility(View.VISIBLE);
-                    layoutFoodGrains.setVisibility(View.VISIBLE);
-                    layoutPCare.setVisibility(View.VISIBLE);
-                    banner2.setVisibility(View.VISIBLE);
-                    illustrationEmpty.setVisibility(View.GONE);
-                    textEmpty.setVisibility(View.GONE);
-                    changeLocationBtnContainer.setVisibility(View.GONE);
+                    layoutEmpty.setVisibility(View.GONE);
                 }
             }
 
@@ -731,12 +731,30 @@ public class MainActivity extends AppCompatActivity {
         recyclerStores.setAdapter(storeAdapter);
     }
 
+    /////////////////////////////////////// StoreViewHolder ////////////////////////////////////////
 
-    ////////////////////////////////// Load Fruits Adapter /////////////////////////////////////////
+    public static class StoreViewHolder extends RecyclerView.ViewHolder {
+
+        ConstraintLayout clickListenerStore;
+        ImageView storeImage;
+        CardView storeStatusContainer;
+        TextView storeName, storeStatus;
+
+        public StoreViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            clickListenerStore = itemView.findViewById(R.id.click_listener);
+            storeImage = itemView.findViewById(R.id.store_image);
+            storeName = itemView.findViewById(R.id.store_name);
+            storeStatus = itemView.findViewById(R.id.store_status);
+            storeStatusContainer = itemView.findViewById(R.id.store_status_container);
+        }
+    }
+
+    ///////////////////////////////////////// LoadFruits ///////////////////////////////////////////
 
     private void loadFruits() {
-        Query query = fruitsRef.orderBy(Constants.KEY_PRODUCT_NAME, Query.Direction.ASCENDING).limit(8);
-
+        Query query = fruitsRef.orderBy(Constants.KEY_PRODUCT_OFFER, Query.Direction.DESCENDING).limit(5);
         FirestoreRecyclerOptions<Product> options = new FirestoreRecyclerOptions.Builder<Product>()
                 .setLifecycleOwner(MainActivity.this)
                 .setQuery(query, Product.class)
@@ -747,7 +765,7 @@ public class MainActivity extends AppCompatActivity {
             @NonNull
             @Override
             public FruitViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_horizontal_product_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_horizontal_product, parent, false);
                 return new FruitViewHolder(view);
             }
 
@@ -755,28 +773,26 @@ public class MainActivity extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull FruitViewHolder holder, int position, @NonNull Product model) {
                 Glide.with(holder.fruitImage.getContext()).load(model.getProductImage())
                         .placeholder(R.drawable.thumbnail).centerCrop().into(holder.fruitImage);
-
                 holder.fruitTypeImage.setImageResource(R.drawable.ic_veg);
+
+                ////////////////////////////////////////////////////////////////////////////////////
 
                 holder.fruitName.setText(model.getProductName());
                 holder.fruitUnit.setText(model.getProductUnit());
+                holder.fruitPrice.setText(String.format("₹ %s", model.getProductRetailPrice()));
 
-                if (model.getProductRetailPrice() == model.getProductMRP()) {
-                    holder.fruitMRP.setVisibility(View.GONE);
+                ////////////////////////////////////////////////////////////////////////////////////
+
+                if (model.getProductOffer() == 0) {
                     holder.fruitOffer.setVisibility(View.GONE);
                 } else {
-                    holder.fruitMRP.setVisibility(View.VISIBLE);
+                    Shimmer shimmer = new Shimmer();
                     holder.fruitOffer.setVisibility(View.VISIBLE);
-                    shimmer1 = new Shimmer();
-                    holder.fruitMRP.setText(String.format("₹ %s", model.getProductMRP()));
-                    holder.fruitMRP.setPaintFlags(holder.fruitMRP.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                    float offer = (float) (((model.getProductMRP() - model.getProductRetailPrice()) / model.getProductMRP()) * 100);
-                    String offer_value = ((int) offer) + "% off";
-                    holder.fruitOffer.setText(offer_value);
-                    shimmer1.start(holder.fruitOffer);
+                    holder.fruitOffer.setText(String.format("%d%% OFF", model.getProductOffer()));
+                    shimmer.start(holder.fruitOffer);
                 }
 
-                holder.fruitPrice.setText(String.format("₹ %s", model.getProductRetailPrice()));
+                ////////////////////////////////////////////////////////////////////////////////////
 
                 holder.clickListenerFruit.setOnClickListener(v -> {
                     preferenceManager.putString(Constants.KEY_PRODUCT, model.getProductID());
@@ -784,7 +800,12 @@ public class MainActivity extends AppCompatActivity {
                     CustomIntent.customType(MainActivity.this, "bottom-to-up");
                 });
 
+                ////////////////////////////////////////////////////////////////////////////////////
+
                 if (model.isProductInStock()) {
+                    holder.fruitImage.clearColorFilter();
+                    holder.fruitOffer.setVisibility(View.VISIBLE);
+
                     holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
                     holder.addToCartBtn.setEnabled(true);
                     holder.addToCartBtn.setOnClickListener(v -> {
@@ -810,6 +831,7 @@ public class MainActivity extends AppCompatActivity {
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_UNIT, model.getProductUnit());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_MRP, model.getProductMRP());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_RETAIL_PRICE, model.getProductRetailPrice());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_OFFER, model.getProductOffer());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, 1);
 
                             cartRef.get().addOnSuccessListener(queryDocumentSnapshots1 -> {
@@ -817,7 +839,6 @@ public class MainActivity extends AppCompatActivity {
                                     cartRef.document(cart_id).set(newCartItem)
                                             .addOnSuccessListener(aVoid -> {
                                                 progressDialog.dismiss();
-                                                cartIndicator.setVisibility(View.VISIBLE);
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Success! Your cart just got updated.")
                                                         .setTextAppearance(R.style.AlertText)
@@ -853,7 +874,7 @@ public class MainActivity extends AppCompatActivity {
                                             progressDialog.dismiss();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
-                                                    .setMessage("Your cart has already been setup for a store this item does not belong to. You must clear your cart first before proceeding with this item.")
+                                                    .setMessage("Your cart has already been setup for another store this item does not belong to. You must clear your cart first before proceeding with this item.")
                                                     .setCancelable(false)
                                                     .setPositiveButton("Go to Cart", R.drawable.ic_dialog_cart, (dialogInterface, which) -> {
                                                         dialogInterface.dismiss();
@@ -867,44 +888,54 @@ public class MainActivity extends AppCompatActivity {
                                                     .addOnCompleteListener(task -> {
                                                         if (task.isSuccessful()) {
                                                             if (task.getResult().exists()) {
-                                                                cartRef.document(cart_id)
-                                                                        .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
-                                                                                Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
-                                                                        .addOnSuccessListener(aVoid -> {
-                                                                            progressDialog.dismiss();
-                                                                            cartIndicator.setVisibility(View.VISIBLE);
-                                                                            Alerter.create(MainActivity.this)
-                                                                                    .setText("Success! Your cart just got updated.")
-                                                                                    .setTextAppearance(R.style.AlertText)
-                                                                                    .setBackgroundColorRes(R.color.successColor)
-                                                                                    .setIcon(R.drawable.ic_dialog_okay)
-                                                                                    .setDuration(3000)
-                                                                                    .enableIconPulse(true)
-                                                                                    .enableVibration(true)
-                                                                                    .disableOutsideTouch()
-                                                                                    .enableProgress(true)
-                                                                                    .setProgressColorInt(getColor(android.R.color.white))
-                                                                                    .show();
-                                                                        }).addOnFailureListener(e -> {
+                                                                long count = task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY);
+                                                                if (count < model.getProductUnitsInStock()) {
+                                                                    cartRef.document(cart_id)
+                                                                            .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
+                                                                                    Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
+                                                                            .addOnSuccessListener(aVoid -> {
+                                                                                progressDialog.dismiss();
+                                                                                Alerter.create(MainActivity.this)
+                                                                                        .setText("Success! Your cart just got updated.")
+                                                                                        .setTextAppearance(R.style.AlertText)
+                                                                                        .setBackgroundColorRes(R.color.successColor)
+                                                                                        .setIcon(R.drawable.ic_dialog_okay)
+                                                                                        .setDuration(3000)
+                                                                                        .enableIconPulse(true)
+                                                                                        .enableVibration(true)
+                                                                                        .disableOutsideTouch()
+                                                                                        .enableProgress(true)
+                                                                                        .setProgressColorInt(getColor(android.R.color.white))
+                                                                                        .show();
+                                                                            }).addOnFailureListener(e -> {
+                                                                        progressDialog.dismiss();
+                                                                        Alerter.create(MainActivity.this)
+                                                                                .setText("Whoa! Something Broke. Try again!")
+                                                                                .setTextAppearance(R.style.AlertText)
+                                                                                .setBackgroundColorRes(R.color.errorColor)
+                                                                                .setIcon(R.drawable.ic_error)
+                                                                                .setDuration(3000)
+                                                                                .enableIconPulse(true)
+                                                                                .enableVibration(true)
+                                                                                .disableOutsideTouch()
+                                                                                .enableProgress(true)
+                                                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                                                .show();
+                                                                    });
+                                                                } else {
                                                                     progressDialog.dismiss();
-                                                                    Alerter.create(MainActivity.this)
-                                                                            .setText("Whoa! Something Broke. Try again!")
-                                                                            .setTextAppearance(R.style.AlertText)
-                                                                            .setBackgroundColorRes(R.color.errorColor)
-                                                                            .setIcon(R.drawable.ic_error)
-                                                                            .setDuration(3000)
-                                                                            .enableIconPulse(true)
-                                                                            .enableVibration(true)
-                                                                            .disableOutsideTouch()
-                                                                            .enableProgress(true)
-                                                                            .setProgressColorInt(getColor(android.R.color.white))
-                                                                            .show();
-                                                                });
+                                                                    MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
+                                                                            .setTitle("Item cannot be added to your cart!")
+                                                                            .setMessage("The store doesn't have more of this product than the quantity you already have in your cart.")
+                                                                            .setCancelable(false)
+                                                                            .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface, which) -> dialogInterface.dismiss())
+                                                                            .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                                                                    materialDialog.show();
+                                                                }
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
                                                                         .addOnSuccessListener(aVoid -> {
                                                                             progressDialog.dismiss();
-                                                                            cartIndicator.setVisibility(View.VISIBLE);
                                                                             Alerter.create(MainActivity.this)
                                                                                     .setText("Success! Your cart just got updated.")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -999,6 +1030,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 } else {
+                    ColorMatrix matrix = new ColorMatrix();
+                    matrix.setSaturation(0);
+
+                    ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+                    holder.fruitImage.setColorFilter(filter);
+
+                    holder.fruitOffer.setVisibility(View.GONE);
+
                     holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
                     holder.addToCartBtn.setEnabled(false);
                 }
@@ -1009,7 +1048,6 @@ public class MainActivity extends AppCompatActivity {
                 super.onDataChanged();
 
                 pullRefreshLayout.setRefreshing(false);
-                fruitsProgressBar.setVisibility(View.GONE);
 
                 if (getItemCount() == 0) {
                     layoutFruits.setVisibility(View.GONE);
@@ -1045,12 +1083,35 @@ public class MainActivity extends AppCompatActivity {
         recyclerFruits.setAdapter(fruitAdapter);
     }
 
+    ////////////////////////////////////// FruitViewHolder /////////////////////////////////////////
 
-    /////////////////////////////////// Load Vegetables Adapter ////////////////////////////////////
+    public static class FruitViewHolder extends RecyclerView.ViewHolder {
+
+        CardView addToCartBtnContainer;
+        ConstraintLayout clickListenerFruit, addToCartBtn;
+        ImageView fruitImage, fruitTypeImage;
+        TextView fruitName, fruitPrice, fruitUnit;
+        ShimmerTextView fruitOffer;
+
+        public FruitViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            clickListenerFruit = itemView.findViewById(R.id.click_listener);
+            fruitImage = itemView.findViewById(R.id.product_image);
+            fruitOffer = itemView.findViewById(R.id.product_offer);
+            fruitTypeImage = itemView.findViewById(R.id.product_type);
+            fruitName = itemView.findViewById(R.id.product_name);
+            fruitUnit = itemView.findViewById(R.id.product_unit);
+            fruitPrice = itemView.findViewById(R.id.product_price);
+            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
+            addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
+        }
+    }
+
+    /////////////////////////////////////// LoadVegetables /////////////////////////////////////////
 
     private void loadVegetables() {
-        Query query = vegetablesRef.orderBy(Constants.KEY_PRODUCT_NAME, Query.Direction.ASCENDING).limit(8);
-
+        Query query = vegetablesRef.orderBy(Constants.KEY_PRODUCT_OFFER, Query.Direction.DESCENDING).limit(5);
         FirestoreRecyclerOptions<Product> options = new FirestoreRecyclerOptions.Builder<Product>()
                 .setLifecycleOwner(MainActivity.this)
                 .setQuery(query, Product.class)
@@ -1061,7 +1122,7 @@ public class MainActivity extends AppCompatActivity {
             @NonNull
             @Override
             public VegetableViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_horizontal_product_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_horizontal_product, parent, false);
                 return new VegetableViewHolder(view);
             }
 
@@ -1069,28 +1130,26 @@ public class MainActivity extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull VegetableViewHolder holder, int position, @NonNull Product model) {
                 Glide.with(holder.vegetableImage.getContext()).load(model.getProductImage())
                         .placeholder(R.drawable.thumbnail).centerCrop().into(holder.vegetableImage);
-
                 holder.vegetableTypeImage.setImageResource(R.drawable.ic_veg);
+
+                ////////////////////////////////////////////////////////////////////////////////////
 
                 holder.vegetableName.setText(model.getProductName());
                 holder.vegetableUnit.setText(model.getProductUnit());
+                holder.vegetablePrice.setText(String.format("₹ %s", model.getProductRetailPrice()));
 
-                if (model.getProductRetailPrice() == model.getProductMRP()) {
-                    holder.vegetableMRP.setVisibility(View.GONE);
+                ////////////////////////////////////////////////////////////////////////////////////
+
+                if (model.getProductOffer() == 0) {
                     holder.vegetableOffer.setVisibility(View.GONE);
                 } else {
-                    holder.vegetableMRP.setVisibility(View.VISIBLE);
+                    Shimmer shimmer = new Shimmer();
                     holder.vegetableOffer.setVisibility(View.VISIBLE);
-                    shimmer2 = new Shimmer();
-                    holder.vegetableMRP.setText(String.format("₹ %s", model.getProductMRP()));
-                    holder.vegetableMRP.setPaintFlags(holder.vegetableMRP.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                    float offer = (float) (((model.getProductMRP() - model.getProductRetailPrice()) / model.getProductMRP()) * 100);
-                    String offer_value = ((int) offer) + "% off";
-                    holder.vegetableOffer.setText(offer_value);
-                    shimmer2.start(holder.vegetableOffer);
+                    holder.vegetableOffer.setText(String.format("%d%% OFF", model.getProductOffer()));
+                    shimmer.start(holder.vegetableOffer);
                 }
 
-                holder.vegetablePrice.setText(String.format("₹ %s", model.getProductRetailPrice()));
+                ////////////////////////////////////////////////////////////////////////////////////
 
                 holder.clickListenerVegetable.setOnClickListener(v -> {
                     preferenceManager.putString(Constants.KEY_PRODUCT, model.getProductID());
@@ -1098,7 +1157,12 @@ public class MainActivity extends AppCompatActivity {
                     CustomIntent.customType(MainActivity.this, "bottom-to-up");
                 });
 
+                ////////////////////////////////////////////////////////////////////////////////////
+
                 if (model.isProductInStock()) {
+                    holder.vegetableImage.clearColorFilter();
+                    holder.vegetableOffer.setVisibility(View.VISIBLE);
+
                     holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
                     holder.addToCartBtn.setEnabled(true);
                     holder.addToCartBtn.setOnClickListener(v -> {
@@ -1124,6 +1188,7 @@ public class MainActivity extends AppCompatActivity {
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_UNIT, model.getProductUnit());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_MRP, model.getProductMRP());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_RETAIL_PRICE, model.getProductRetailPrice());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_OFFER, model.getProductOffer());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, 1);
 
                             cartRef.get().addOnSuccessListener(queryDocumentSnapshots1 -> {
@@ -1131,7 +1196,6 @@ public class MainActivity extends AppCompatActivity {
                                     cartRef.document(cart_id).set(newCartItem)
                                             .addOnSuccessListener(aVoid -> {
                                                 progressDialog.dismiss();
-                                                cartIndicator.setVisibility(View.VISIBLE);
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Success! Your cart just got updated.")
                                                         .setTextAppearance(R.style.AlertText)
@@ -1167,7 +1231,7 @@ public class MainActivity extends AppCompatActivity {
                                             progressDialog.dismiss();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
-                                                    .setMessage("Your cart has already been setup for a store this item does not belong to. You must clear your cart first before proceeding with this item.")
+                                                    .setMessage("Your cart has already been setup for another store this item does not belong to. You must clear your cart first before proceeding with this item.")
                                                     .setCancelable(false)
                                                     .setPositiveButton("Go to Cart", R.drawable.ic_dialog_cart, (dialogInterface, which) -> {
                                                         dialogInterface.dismiss();
@@ -1181,44 +1245,54 @@ public class MainActivity extends AppCompatActivity {
                                                     .addOnCompleteListener(task -> {
                                                         if (task.isSuccessful()) {
                                                             if (task.getResult().exists()) {
-                                                                cartRef.document(cart_id)
-                                                                        .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
-                                                                                Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
-                                                                        .addOnSuccessListener(aVoid -> {
-                                                                            progressDialog.dismiss();
-                                                                            cartIndicator.setVisibility(View.VISIBLE);
-                                                                            Alerter.create(MainActivity.this)
-                                                                                    .setText("Success! Your cart just got updated.")
-                                                                                    .setTextAppearance(R.style.AlertText)
-                                                                                    .setBackgroundColorRes(R.color.successColor)
-                                                                                    .setIcon(R.drawable.ic_dialog_okay)
-                                                                                    .setDuration(3000)
-                                                                                    .enableIconPulse(true)
-                                                                                    .enableVibration(true)
-                                                                                    .disableOutsideTouch()
-                                                                                    .enableProgress(true)
-                                                                                    .setProgressColorInt(getColor(android.R.color.white))
-                                                                                    .show();
-                                                                        }).addOnFailureListener(e -> {
+                                                                long count = task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY);
+                                                                if (count < model.getProductUnitsInStock()) {
+                                                                    cartRef.document(cart_id)
+                                                                            .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
+                                                                                    Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
+                                                                            .addOnSuccessListener(aVoid -> {
+                                                                                progressDialog.dismiss();
+                                                                                Alerter.create(MainActivity.this)
+                                                                                        .setText("Success! Your cart just got updated.")
+                                                                                        .setTextAppearance(R.style.AlertText)
+                                                                                        .setBackgroundColorRes(R.color.successColor)
+                                                                                        .setIcon(R.drawable.ic_dialog_okay)
+                                                                                        .setDuration(3000)
+                                                                                        .enableIconPulse(true)
+                                                                                        .enableVibration(true)
+                                                                                        .disableOutsideTouch()
+                                                                                        .enableProgress(true)
+                                                                                        .setProgressColorInt(getColor(android.R.color.white))
+                                                                                        .show();
+                                                                            }).addOnFailureListener(e -> {
+                                                                        progressDialog.dismiss();
+                                                                        Alerter.create(MainActivity.this)
+                                                                                .setText("Whoa! Something Broke. Try again!")
+                                                                                .setTextAppearance(R.style.AlertText)
+                                                                                .setBackgroundColorRes(R.color.errorColor)
+                                                                                .setIcon(R.drawable.ic_error)
+                                                                                .setDuration(3000)
+                                                                                .enableIconPulse(true)
+                                                                                .enableVibration(true)
+                                                                                .disableOutsideTouch()
+                                                                                .enableProgress(true)
+                                                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                                                .show();
+                                                                    });
+                                                                } else {
                                                                     progressDialog.dismiss();
-                                                                    Alerter.create(MainActivity.this)
-                                                                            .setText("Whoa! Something Broke. Try again!")
-                                                                            .setTextAppearance(R.style.AlertText)
-                                                                            .setBackgroundColorRes(R.color.errorColor)
-                                                                            .setIcon(R.drawable.ic_error)
-                                                                            .setDuration(3000)
-                                                                            .enableIconPulse(true)
-                                                                            .enableVibration(true)
-                                                                            .disableOutsideTouch()
-                                                                            .enableProgress(true)
-                                                                            .setProgressColorInt(getColor(android.R.color.white))
-                                                                            .show();
-                                                                });
+                                                                    MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
+                                                                            .setTitle("Item cannot be added to your cart!")
+                                                                            .setMessage("The store doesn't have more of this product than the quantity you already have in your cart.")
+                                                                            .setCancelable(false)
+                                                                            .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface, which) -> dialogInterface.dismiss())
+                                                                            .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                                                                    materialDialog.show();
+                                                                }
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
                                                                         .addOnSuccessListener(aVoid -> {
                                                                             progressDialog.dismiss();
-                                                                            cartIndicator.setVisibility(View.VISIBLE);
                                                                             Alerter.create(MainActivity.this)
                                                                                     .setText("Success! Your cart just got updated.")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -1313,6 +1387,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 } else {
+                    ColorMatrix matrix = new ColorMatrix();
+                    matrix.setSaturation(0);
+
+                    ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+                    holder.vegetableImage.setColorFilter(filter);
+
+                    holder.vegetableOffer.setVisibility(View.GONE);
+
                     holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
                     holder.addToCartBtn.setEnabled(false);
                 }
@@ -1323,7 +1405,6 @@ public class MainActivity extends AppCompatActivity {
                 super.onDataChanged();
 
                 pullRefreshLayout.setRefreshing(false);
-                vegProgressBar.setVisibility(View.GONE);
 
                 if (getItemCount() == 0) {
                     layoutVegetables.setVisibility(View.GONE);
@@ -1359,12 +1440,35 @@ public class MainActivity extends AppCompatActivity {
         recyclerVegetables.setAdapter(vegetableAdapter);
     }
 
+    /////////////////////////////////// VegetableViewHolder ////////////////////////////////////////
 
-    ////////////////////////////////// Load FoodGrains Adapter /////////////////////////////////////
+    public static class VegetableViewHolder extends RecyclerView.ViewHolder {
+
+        CardView addToCartBtnContainer;
+        ConstraintLayout clickListenerVegetable, addToCartBtn;
+        ImageView vegetableImage, vegetableTypeImage;
+        TextView vegetableName, vegetablePrice, vegetableUnit;
+        ShimmerTextView vegetableOffer;
+
+        public VegetableViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            clickListenerVegetable = itemView.findViewById(R.id.click_listener);
+            vegetableImage = itemView.findViewById(R.id.product_image);
+            vegetableTypeImage = itemView.findViewById(R.id.product_type);
+            vegetableOffer = itemView.findViewById(R.id.product_offer);
+            vegetableName = itemView.findViewById(R.id.product_name);
+            vegetableUnit = itemView.findViewById(R.id.product_unit);
+            vegetablePrice = itemView.findViewById(R.id.product_price);
+            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
+            addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
+        }
+    }
+
+    ////////////////////////////////////// LoadFoodGrains //////////////////////////////////////////
 
     private void loadFoodGrains() {
-        Query query = foodGrainsRef.orderBy(Constants.KEY_PRODUCT_NAME, Query.Direction.ASCENDING).limit(8);
-
+        Query query = foodGrainsRef.orderBy(Constants.KEY_PRODUCT_OFFER, Query.Direction.DESCENDING).limit(5);
         FirestoreRecyclerOptions<Product> options = new FirestoreRecyclerOptions.Builder<Product>()
                 .setLifecycleOwner(MainActivity.this)
                 .setQuery(query, Product.class)
@@ -1375,7 +1479,7 @@ public class MainActivity extends AppCompatActivity {
             @NonNull
             @Override
             public FoodGrainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_horizontal_product_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_horizontal_product, parent, false);
                 return new FoodGrainViewHolder(view);
             }
 
@@ -1383,28 +1487,26 @@ public class MainActivity extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull FoodGrainViewHolder holder, int position, @NonNull Product model) {
                 Glide.with(holder.foodGrainImage.getContext()).load(model.getProductImage())
                         .placeholder(R.drawable.thumbnail).centerCrop().into(holder.foodGrainImage);
-
                 holder.foodGrainTypeImage.setImageResource(R.drawable.ic_veg);
+
+                ////////////////////////////////////////////////////////////////////////////////////
 
                 holder.foodGrainName.setText(model.getProductName());
                 holder.foodGrainUnit.setText(model.getProductUnit());
+                holder.foodGrainPrice.setText(String.format("₹ %s", model.getProductRetailPrice()));
 
-                if (model.getProductRetailPrice() == model.getProductMRP()) {
-                    holder.foodGrainMRP.setVisibility(View.GONE);
+                ////////////////////////////////////////////////////////////////////////////////////
+
+                if (model.getProductOffer() == 0) {
                     holder.foodGrainOffer.setVisibility(View.GONE);
                 } else {
-                    holder.foodGrainMRP.setVisibility(View.VISIBLE);
+                    Shimmer shimmer = new Shimmer();
                     holder.foodGrainOffer.setVisibility(View.VISIBLE);
-                    shimmer3 = new Shimmer();
-                    holder.foodGrainMRP.setText(String.format("₹ %s", model.getProductMRP()));
-                    holder.foodGrainMRP.setPaintFlags(holder.foodGrainMRP.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                    float offer = (float) (((model.getProductMRP() - model.getProductRetailPrice()) / model.getProductMRP()) * 100);
-                    String offer_value = ((int) offer) + "% off";
-                    holder.foodGrainOffer.setText(offer_value);
-                    shimmer3.start(holder.foodGrainOffer);
+                    holder.foodGrainOffer.setText(String.format("%d%% OFF", model.getProductOffer()));
+                    shimmer.start(holder.foodGrainOffer);
                 }
 
-                holder.foodGrainPrice.setText(String.format("₹ %s", model.getProductRetailPrice()));
+                ////////////////////////////////////////////////////////////////////////////////////
 
                 holder.clickListenerFoodGrain.setOnClickListener(v -> {
                     preferenceManager.putString(Constants.KEY_PRODUCT, model.getProductID());
@@ -1412,7 +1514,12 @@ public class MainActivity extends AppCompatActivity {
                     CustomIntent.customType(MainActivity.this, "bottom-to-up");
                 });
 
+                ////////////////////////////////////////////////////////////////////////////////////
+
                 if (model.isProductInStock()) {
+                    holder.foodGrainImage.clearColorFilter();
+                    holder.foodGrainOffer.setVisibility(View.VISIBLE);
+
                     holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
                     holder.addToCartBtn.setEnabled(true);
                     holder.addToCartBtn.setOnClickListener(v -> {
@@ -1438,6 +1545,7 @@ public class MainActivity extends AppCompatActivity {
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_UNIT, model.getProductUnit());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_MRP, model.getProductMRP());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_RETAIL_PRICE, model.getProductRetailPrice());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_OFFER, model.getProductOffer());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, 1);
 
                             cartRef.get().addOnSuccessListener(queryDocumentSnapshots1 -> {
@@ -1445,7 +1553,6 @@ public class MainActivity extends AppCompatActivity {
                                     cartRef.document(cart_id).set(newCartItem)
                                             .addOnSuccessListener(aVoid -> {
                                                 progressDialog.dismiss();
-                                                cartIndicator.setVisibility(View.VISIBLE);
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Success! Your cart just got updated.")
                                                         .setTextAppearance(R.style.AlertText)
@@ -1481,7 +1588,7 @@ public class MainActivity extends AppCompatActivity {
                                             progressDialog.dismiss();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
-                                                    .setMessage("Your cart has already been setup for a store this item does not belong to. You must clear your cart first before proceeding with this item.")
+                                                    .setMessage("Your cart has already been setup for another store this item does not belong to. You must clear your cart first before proceeding with this item.")
                                                     .setCancelable(false)
                                                     .setPositiveButton("Go to Cart", R.drawable.ic_dialog_cart, (dialogInterface, which) -> {
                                                         dialogInterface.dismiss();
@@ -1495,44 +1602,54 @@ public class MainActivity extends AppCompatActivity {
                                                     .addOnCompleteListener(task -> {
                                                         if (task.isSuccessful()) {
                                                             if (task.getResult().exists()) {
-                                                                cartRef.document(cart_id)
-                                                                        .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
-                                                                                Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
-                                                                        .addOnSuccessListener(aVoid -> {
-                                                                            progressDialog.dismiss();
-                                                                            cartIndicator.setVisibility(View.VISIBLE);
-                                                                            Alerter.create(MainActivity.this)
-                                                                                    .setText("Success! Your cart just got updated.")
-                                                                                    .setTextAppearance(R.style.AlertText)
-                                                                                    .setBackgroundColorRes(R.color.successColor)
-                                                                                    .setIcon(R.drawable.ic_dialog_okay)
-                                                                                    .setDuration(3000)
-                                                                                    .enableIconPulse(true)
-                                                                                    .enableVibration(true)
-                                                                                    .disableOutsideTouch()
-                                                                                    .enableProgress(true)
-                                                                                    .setProgressColorInt(getColor(android.R.color.white))
-                                                                                    .show();
-                                                                        }).addOnFailureListener(e -> {
+                                                                long count = task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY);
+                                                                if (count < model.getProductUnitsInStock()) {
+                                                                    cartRef.document(cart_id)
+                                                                            .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
+                                                                                    Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
+                                                                            .addOnSuccessListener(aVoid -> {
+                                                                                progressDialog.dismiss();
+                                                                                Alerter.create(MainActivity.this)
+                                                                                        .setText("Success! Your cart just got updated.")
+                                                                                        .setTextAppearance(R.style.AlertText)
+                                                                                        .setBackgroundColorRes(R.color.successColor)
+                                                                                        .setIcon(R.drawable.ic_dialog_okay)
+                                                                                        .setDuration(3000)
+                                                                                        .enableIconPulse(true)
+                                                                                        .enableVibration(true)
+                                                                                        .disableOutsideTouch()
+                                                                                        .enableProgress(true)
+                                                                                        .setProgressColorInt(getColor(android.R.color.white))
+                                                                                        .show();
+                                                                            }).addOnFailureListener(e -> {
+                                                                        progressDialog.dismiss();
+                                                                        Alerter.create(MainActivity.this)
+                                                                                .setText("Whoa! Something Broke. Try again!")
+                                                                                .setTextAppearance(R.style.AlertText)
+                                                                                .setBackgroundColorRes(R.color.errorColor)
+                                                                                .setIcon(R.drawable.ic_error)
+                                                                                .setDuration(3000)
+                                                                                .enableIconPulse(true)
+                                                                                .enableVibration(true)
+                                                                                .disableOutsideTouch()
+                                                                                .enableProgress(true)
+                                                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                                                .show();
+                                                                    });
+                                                                } else {
                                                                     progressDialog.dismiss();
-                                                                    Alerter.create(MainActivity.this)
-                                                                            .setText("Whoa! Something Broke. Try again!")
-                                                                            .setTextAppearance(R.style.AlertText)
-                                                                            .setBackgroundColorRes(R.color.errorColor)
-                                                                            .setIcon(R.drawable.ic_error)
-                                                                            .setDuration(3000)
-                                                                            .enableIconPulse(true)
-                                                                            .enableVibration(true)
-                                                                            .disableOutsideTouch()
-                                                                            .enableProgress(true)
-                                                                            .setProgressColorInt(getColor(android.R.color.white))
-                                                                            .show();
-                                                                });
+                                                                    MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
+                                                                            .setTitle("Item cannot be added to your cart!")
+                                                                            .setMessage("The store doesn't have more of this product than the quantity you already have in your cart.")
+                                                                            .setCancelable(false)
+                                                                            .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface, which) -> dialogInterface.dismiss())
+                                                                            .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                                                                    materialDialog.show();
+                                                                }
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
                                                                         .addOnSuccessListener(aVoid -> {
                                                                             progressDialog.dismiss();
-                                                                            cartIndicator.setVisibility(View.VISIBLE);
                                                                             Alerter.create(MainActivity.this)
                                                                                     .setText("Success! Your cart just got updated.")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -1627,6 +1744,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 } else {
+                    ColorMatrix matrix = new ColorMatrix();
+                    matrix.setSaturation(0);
+
+                    ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+                    holder.foodGrainImage.setColorFilter(filter);
+
+                    holder.foodGrainOffer.setVisibility(View.GONE);
+
                     holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
                     holder.addToCartBtn.setEnabled(false);
                 }
@@ -1637,7 +1762,6 @@ public class MainActivity extends AppCompatActivity {
                 super.onDataChanged();
 
                 pullRefreshLayout.setRefreshing(false);
-                foodGrainsProgressBar.setVisibility(View.GONE);
 
                 if (getItemCount() == 0) {
                     layoutFoodGrains.setVisibility(View.GONE);
@@ -1673,12 +1797,35 @@ public class MainActivity extends AppCompatActivity {
         recyclerFoodGrains.setAdapter(foodGrainAdapter);
     }
 
+    ///////////////////////////////////// FoodGrainViewHolder //////////////////////////////////////
 
-    ///////////////////////////////// Load PersonalCare Adapter ////////////////////////////////////
+    public static class FoodGrainViewHolder extends RecyclerView.ViewHolder {
+
+        CardView addToCartBtnContainer;
+        ConstraintLayout clickListenerFoodGrain, addToCartBtn;
+        ImageView foodGrainImage, foodGrainTypeImage;
+        TextView foodGrainName, foodGrainPrice, foodGrainUnit;
+        ShimmerTextView foodGrainOffer;
+
+        public FoodGrainViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            clickListenerFoodGrain = itemView.findViewById(R.id.click_listener);
+            foodGrainImage = itemView.findViewById(R.id.product_image);
+            foodGrainTypeImage = itemView.findViewById(R.id.product_type);
+            foodGrainOffer = itemView.findViewById(R.id.product_offer);
+            foodGrainName = itemView.findViewById(R.id.product_name);
+            foodGrainUnit = itemView.findViewById(R.id.product_unit);
+            foodGrainPrice = itemView.findViewById(R.id.product_price);
+            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
+            addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
+        }
+    }
+
+    ///////////////////////////////////// LoadPersonalCare /////////////////////////////////////////
 
     private void loadPersonalCareProducts() {
-        Query query = pCareRef.orderBy(Constants.KEY_PRODUCT_NAME, Query.Direction.ASCENDING).limit(8);
-
+        Query query = pCareRef.orderBy(Constants.KEY_PRODUCT_OFFER, Query.Direction.DESCENDING).limit(5);
         FirestoreRecyclerOptions<Product> options = new FirestoreRecyclerOptions.Builder<Product>()
                 .setLifecycleOwner(MainActivity.this)
                 .setQuery(query, Product.class)
@@ -1689,7 +1836,7 @@ public class MainActivity extends AppCompatActivity {
             @NonNull
             @Override
             public PersonalCareViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_horizontal_product_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_horizontal_product, parent, false);
                 return new PersonalCareViewHolder(view);
             }
 
@@ -1697,28 +1844,26 @@ public class MainActivity extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull PersonalCareViewHolder holder, int position, @NonNull Product model) {
                 Glide.with(holder.pCareImage.getContext()).load(model.getProductImage())
                         .placeholder(R.drawable.thumbnail).centerCrop().into(holder.pCareImage);
-
                 holder.pCareTypeImage.setVisibility(View.GONE);
+
+                ////////////////////////////////////////////////////////////////////////////////////
 
                 holder.pCareName.setText(model.getProductName());
                 holder.pCareUnit.setText(model.getProductUnit());
+                holder.pCarePrice.setText(String.format("₹ %s", model.getProductRetailPrice()));
 
-                if (model.getProductRetailPrice() == model.getProductMRP()) {
-                    holder.pCareMRP.setVisibility(View.GONE);
+                ////////////////////////////////////////////////////////////////////////////////////
+
+                if (model.getProductOffer() == 0) {
                     holder.pCareOffer.setVisibility(View.GONE);
                 } else {
-                    holder.pCareMRP.setVisibility(View.VISIBLE);
+                    Shimmer shimmer = new Shimmer();
                     holder.pCareOffer.setVisibility(View.VISIBLE);
-                    shimmer4 = new Shimmer();
-                    holder.pCareMRP.setText(String.format("₹ %s", model.getProductMRP()));
-                    holder.pCareMRP.setPaintFlags(holder.pCareMRP.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                    float offer = (float) (((model.getProductMRP() - model.getProductRetailPrice()) / model.getProductMRP()) * 100);
-                    String offer_value = ((int) offer) + "% off";
-                    holder.pCareOffer.setText(offer_value);
-                    shimmer4.start(holder.pCareOffer);
+                    holder.pCareOffer.setText(String.format("%d%% OFF", model.getProductOffer()));
+                    shimmer.start(holder.pCareOffer);
                 }
 
-                holder.pCarePrice.setText(String.format("₹ %s", model.getProductRetailPrice()));
+                ////////////////////////////////////////////////////////////////////////////////////
 
                 holder.clickListenerPCare.setOnClickListener(v -> {
                     preferenceManager.putString(Constants.KEY_PRODUCT, model.getProductID());
@@ -1726,7 +1871,12 @@ public class MainActivity extends AppCompatActivity {
                     CustomIntent.customType(MainActivity.this, "bottom-to-up");
                 });
 
+                ////////////////////////////////////////////////////////////////////////////////////
+
                 if (model.isProductInStock()) {
+                    holder.pCareImage.clearColorFilter();
+                    holder.pCareOffer.setVisibility(View.VISIBLE);
+
                     holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
                     holder.addToCartBtn.setEnabled(true);
                     holder.addToCartBtn.setOnClickListener(v -> {
@@ -1752,6 +1902,7 @@ public class MainActivity extends AppCompatActivity {
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_UNIT, model.getProductUnit());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_MRP, model.getProductMRP());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_RETAIL_PRICE, model.getProductRetailPrice());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_OFFER, model.getProductOffer());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, 1);
 
                             cartRef.get().addOnSuccessListener(queryDocumentSnapshots1 -> {
@@ -1759,7 +1910,6 @@ public class MainActivity extends AppCompatActivity {
                                     cartRef.document(cart_id).set(newCartItem)
                                             .addOnSuccessListener(aVoid -> {
                                                 progressDialog.dismiss();
-                                                cartIndicator.setVisibility(View.VISIBLE);
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Success! Your cart just got updated.")
                                                         .setTextAppearance(R.style.AlertText)
@@ -1795,7 +1945,7 @@ public class MainActivity extends AppCompatActivity {
                                             progressDialog.dismiss();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
-                                                    .setMessage("Your cart has already been setup for a store this item does not belong to. You must clear your cart first before proceeding with this item.")
+                                                    .setMessage("Your cart has already been setup for another store this item does not belong to. You must clear your cart first before proceeding with this item.")
                                                     .setCancelable(false)
                                                     .setPositiveButton("Go to Cart", R.drawable.ic_dialog_cart, (dialogInterface, which) -> {
                                                         dialogInterface.dismiss();
@@ -1809,44 +1959,54 @@ public class MainActivity extends AppCompatActivity {
                                                     .addOnCompleteListener(task -> {
                                                         if (task.isSuccessful()) {
                                                             if (task.getResult().exists()) {
-                                                                cartRef.document(cart_id)
-                                                                        .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
-                                                                                Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
-                                                                        .addOnSuccessListener(aVoid -> {
-                                                                            progressDialog.dismiss();
-                                                                            cartIndicator.setVisibility(View.VISIBLE);
-                                                                            Alerter.create(MainActivity.this)
-                                                                                    .setText("Success! Your cart just got updated.")
-                                                                                    .setTextAppearance(R.style.AlertText)
-                                                                                    .setBackgroundColorRes(R.color.successColor)
-                                                                                    .setIcon(R.drawable.ic_dialog_okay)
-                                                                                    .setDuration(3000)
-                                                                                    .enableIconPulse(true)
-                                                                                    .enableVibration(true)
-                                                                                    .disableOutsideTouch()
-                                                                                    .enableProgress(true)
-                                                                                    .setProgressColorInt(getColor(android.R.color.white))
-                                                                                    .show();
-                                                                        }).addOnFailureListener(e -> {
+                                                                long count = task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY);
+                                                                if (count < model.getProductUnitsInStock()) {
+                                                                    cartRef.document(cart_id)
+                                                                            .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
+                                                                                    Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
+                                                                            .addOnSuccessListener(aVoid -> {
+                                                                                progressDialog.dismiss();
+                                                                                Alerter.create(MainActivity.this)
+                                                                                        .setText("Success! Your cart just got updated.")
+                                                                                        .setTextAppearance(R.style.AlertText)
+                                                                                        .setBackgroundColorRes(R.color.successColor)
+                                                                                        .setIcon(R.drawable.ic_dialog_okay)
+                                                                                        .setDuration(3000)
+                                                                                        .enableIconPulse(true)
+                                                                                        .enableVibration(true)
+                                                                                        .disableOutsideTouch()
+                                                                                        .enableProgress(true)
+                                                                                        .setProgressColorInt(getColor(android.R.color.white))
+                                                                                        .show();
+                                                                            }).addOnFailureListener(e -> {
+                                                                        progressDialog.dismiss();
+                                                                        Alerter.create(MainActivity.this)
+                                                                                .setText("Whoa! Something Broke. Try again!")
+                                                                                .setTextAppearance(R.style.AlertText)
+                                                                                .setBackgroundColorRes(R.color.errorColor)
+                                                                                .setIcon(R.drawable.ic_error)
+                                                                                .setDuration(3000)
+                                                                                .enableIconPulse(true)
+                                                                                .enableVibration(true)
+                                                                                .disableOutsideTouch()
+                                                                                .enableProgress(true)
+                                                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                                                .show();
+                                                                    });
+                                                                } else {
                                                                     progressDialog.dismiss();
-                                                                    Alerter.create(MainActivity.this)
-                                                                            .setText("Whoa! Something Broke. Try again!")
-                                                                            .setTextAppearance(R.style.AlertText)
-                                                                            .setBackgroundColorRes(R.color.errorColor)
-                                                                            .setIcon(R.drawable.ic_error)
-                                                                            .setDuration(3000)
-                                                                            .enableIconPulse(true)
-                                                                            .enableVibration(true)
-                                                                            .disableOutsideTouch()
-                                                                            .enableProgress(true)
-                                                                            .setProgressColorInt(getColor(android.R.color.white))
-                                                                            .show();
-                                                                });
+                                                                    MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
+                                                                            .setTitle("Item cannot be added to your cart!")
+                                                                            .setMessage("The store doesn't have more of this product than the quantity you already have in your cart.")
+                                                                            .setCancelable(false)
+                                                                            .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface, which) -> dialogInterface.dismiss())
+                                                                            .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                                                                    materialDialog.show();
+                                                                }
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
                                                                         .addOnSuccessListener(aVoid -> {
                                                                             progressDialog.dismiss();
-                                                                            cartIndicator.setVisibility(View.VISIBLE);
                                                                             Alerter.create(MainActivity.this)
                                                                                     .setText("Success! Your cart just got updated.")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -1941,6 +2101,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 } else {
+                    ColorMatrix matrix = new ColorMatrix();
+                    matrix.setSaturation(0);
+
+                    ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+                    holder.pCareImage.setColorFilter(filter);
+
+                    holder.pCareOffer.setVisibility(View.GONE);
+
                     holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
                     holder.addToCartBtn.setEnabled(false);
                 }
@@ -1951,7 +2119,6 @@ public class MainActivity extends AppCompatActivity {
                 super.onDataChanged();
 
                 pullRefreshLayout.setRefreshing(false);
-                pCareProgressBar.setVisibility(View.GONE);
 
                 if (getItemCount() == 0) {
                     layoutPCare.setVisibility(View.GONE);
@@ -1987,115 +2154,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerPCare.setAdapter(personalCareAdapter);
     }
 
-
-    /////////////////////////////////////// StoreViewHolder ////////////////////////////////////////
-
-    public static class StoreViewHolder extends RecyclerView.ViewHolder {
-
-        ConstraintLayout clickListenerStore;
-        ImageView storeImage;
-        CardView storeStatusContainer;
-        TextView storeName, storeRating, storeStatus;
-        RatingBar storeRatingBar;
-
-        public StoreViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            clickListenerStore = itemView.findViewById(R.id.click_listener_store);
-            storeImage = itemView.findViewById(R.id.store_image);
-            storeName = itemView.findViewById(R.id.store_name);
-            storeRating = itemView.findViewById(R.id.store_rating);
-            storeStatus = itemView.findViewById(R.id.store_status);
-            storeStatusContainer = itemView.findViewById(R.id.store_status_container);
-            storeRatingBar = itemView.findViewById(R.id.store_rating_bar);
-        }
-    }
-
-
-    ////////////////////////////////////// FruitViewHolder /////////////////////////////////////////
-
-    public static class FruitViewHolder extends RecyclerView.ViewHolder {
-
-        CardView addToCartBtnContainer;
-        ConstraintLayout clickListenerFruit, addToCartBtn;
-        ImageView fruitImage, fruitTypeImage;
-        TextView fruitName, fruitPrice, fruitMRP,
-                fruitUnit;
-        ShimmerTextView fruitOffer;
-
-        public FruitViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
-            clickListenerFruit = itemView.findViewById(R.id.click_listener_product);
-            addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
-            fruitImage = itemView.findViewById(R.id.product_image);
-            fruitTypeImage = itemView.findViewById(R.id.product_type_image);
-            fruitName = itemView.findViewById(R.id.product_name);
-            fruitPrice = itemView.findViewById(R.id.product_price);
-            fruitMRP = itemView.findViewById(R.id.product_mrp);
-            fruitOffer = itemView.findViewById(R.id.product_offer);
-            fruitUnit = itemView.findViewById(R.id.product_unit);
-        }
-    }
-
-
-    /////////////////////////////////// VegetableViewHolder ////////////////////////////////////////
-
-    public static class VegetableViewHolder extends RecyclerView.ViewHolder {
-
-        CardView addToCartBtnContainer;
-        ConstraintLayout clickListenerVegetable, addToCartBtn;
-        ImageView vegetableImage, vegetableTypeImage;
-        TextView vegetableName, vegetablePrice, vegetableMRP,
-                vegetableUnit;
-        ShimmerTextView vegetableOffer;
-
-        public VegetableViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
-            clickListenerVegetable = itemView.findViewById(R.id.click_listener_product);
-            addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
-            vegetableImage = itemView.findViewById(R.id.product_image);
-            vegetableTypeImage = itemView.findViewById(R.id.product_type_image);
-            vegetableName = itemView.findViewById(R.id.product_name);
-            vegetablePrice = itemView.findViewById(R.id.product_price);
-            vegetableMRP = itemView.findViewById(R.id.product_mrp);
-            vegetableOffer = itemView.findViewById(R.id.product_offer);
-            vegetableUnit = itemView.findViewById(R.id.product_unit);
-        }
-    }
-
-
-    ///////////////////////////////////// FoodGrainViewHolder //////////////////////////////////////
-
-    public static class FoodGrainViewHolder extends RecyclerView.ViewHolder {
-
-        CardView addToCartBtnContainer;
-        ConstraintLayout clickListenerFoodGrain, addToCartBtn;
-        ImageView foodGrainImage, foodGrainTypeImage;
-        TextView foodGrainName, foodGrainPrice, foodGrainMRP,
-                foodGrainUnit;
-        ShimmerTextView foodGrainOffer;
-
-        public FoodGrainViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
-            clickListenerFoodGrain = itemView.findViewById(R.id.click_listener_product);
-            addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
-            foodGrainImage = itemView.findViewById(R.id.product_image);
-            foodGrainTypeImage = itemView.findViewById(R.id.product_type_image);
-            foodGrainName = itemView.findViewById(R.id.product_name);
-            foodGrainPrice = itemView.findViewById(R.id.product_price);
-            foodGrainMRP = itemView.findViewById(R.id.product_mrp);
-            foodGrainOffer = itemView.findViewById(R.id.product_offer);
-            foodGrainUnit = itemView.findViewById(R.id.product_unit);
-        }
-    }
-
-
     //////////////////////////////////// PersonalCareViewHolder ////////////////////////////////////
 
     public static class PersonalCareViewHolder extends RecyclerView.ViewHolder {
@@ -2103,113 +2161,34 @@ public class MainActivity extends AppCompatActivity {
         CardView addToCartBtnContainer;
         ConstraintLayout clickListenerPCare, addToCartBtn;
         ImageView pCareImage, pCareTypeImage;
-        TextView pCareName, pCarePrice, pCareMRP,
-                pCareUnit;
+        TextView pCareName, pCarePrice, pCareUnit;
         ShimmerTextView pCareOffer;
 
         public PersonalCareViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
-            clickListenerPCare = itemView.findViewById(R.id.click_listener_product);
-            addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
+            clickListenerPCare = itemView.findViewById(R.id.click_listener);
             pCareImage = itemView.findViewById(R.id.product_image);
-            pCareTypeImage = itemView.findViewById(R.id.product_type_image);
-            pCareName = itemView.findViewById(R.id.product_name);
-            pCarePrice = itemView.findViewById(R.id.product_price);
-            pCareMRP = itemView.findViewById(R.id.product_mrp);
+            pCareTypeImage = itemView.findViewById(R.id.product_type);
             pCareOffer = itemView.findViewById(R.id.product_offer);
+            pCareName = itemView.findViewById(R.id.product_name);
             pCareUnit = itemView.findViewById(R.id.product_unit);
+            pCarePrice = itemView.findViewById(R.id.product_price);
+            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
+            addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
         }
     }
 
-    private void sendFCMTokenToDatabase(String token) {
-        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-        DocumentReference documentReference = firebaseFirestore.collection(Constants.KEY_COLLECTION_USERS)
-                .document(preferenceManager.getString(Constants.KEY_USER_ID));
-
-        documentReference.update(Constants.KEY_FCM_TOKEN, token)
-                .addOnSuccessListener(aVoid -> {
-                })
-                .addOnFailureListener(e -> Toast.makeText(MainActivity.this, "Some ERROR occurred!", Toast.LENGTH_SHORT).show());
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        loadStores();
-        loadFruits();
-        loadVegetables();
-        loadFoodGrains();
-        loadPersonalCareProducts();
-
-        cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (queryDocumentSnapshots.size() == 0) {
-                cartIndicator.setVisibility(View.GONE);
-            } else {
-                cartIndicator.setVisibility(View.VISIBLE);
-            }
-        }).addOnFailureListener(e -> {
-            Alerter.create(MainActivity.this)
-                    .setText("Whoa! Something Broke. Try again!")
-                    .setTextAppearance(R.style.AlertText)
-                    .setBackgroundColorRes(R.color.errorColor)
-                    .setIcon(R.drawable.ic_error)
-                    .setDuration(3000)
-                    .enableIconPulse(true)
-                    .enableVibration(true)
-                    .disableOutsideTouch()
-                    .enableProgress(true)
-                    .setProgressColorInt(getColor(android.R.color.white))
-                    .show();
-        });
-
-        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
-        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorBackground));
-        pullRefreshLayout.setOnRefreshListener(() -> {
-            if (!isConnectedToInternet(MainActivity.this)) {
-                pullRefreshLayout.setRefreshing(false);
-                showConnectToInternetDialog();
-                return;
-            } else {
-                loadStores();
-                loadFruits();
-                loadVegetables();
-                loadFoodGrains();
-                loadPersonalCareProducts();
-
-                cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots.size() == 0) {
-                        cartIndicator.setVisibility(View.GONE);
-                    } else {
-                        cartIndicator.setVisibility(View.VISIBLE);
-                    }
-                }).addOnFailureListener(e -> {
-                    Alerter.create(MainActivity.this)
-                            .setText("Whoa! Something Broke. Try again!")
-                            .setTextAppearance(R.style.AlertText)
-                            .setBackgroundColorRes(R.color.errorColor)
-                            .setIcon(R.drawable.ic_error)
-                            .setDuration(3000)
-                            .enableIconPulse(true)
-                            .enableVibration(true)
-                            .disableOutsideTouch()
-                            .enableProgress(true)
-                            .setProgressColorInt(getColor(android.R.color.white))
-                            .show();
-                });
-            }
-        });
-    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private boolean isConnectedToInternet(MainActivity mainActivity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) mainActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) mainActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if ((wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected())) {
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
             return true;
         } else {
             return false;
@@ -2233,11 +2212,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        KeyboardVisibilityEvent.setEventListener(MainActivity.this, isOpen -> {
-            if (isOpen) {
-                UIUtil.hideKeyboard(MainActivity.this);
-            }
-        });
         finishAffinity();
     }
 }

@@ -148,14 +148,14 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                 return;
                             } else {
                                 resendOTP();
+                                resendOtpBtn.setTextColor(getColor(R.color.colorViews));
                                 resendOtpBtn.setEnabled(false);
-                                resendOtpBtn.setTextColor(getColor(R.color.errorColor));
                                 count = 60;
                             }
                         });
                     } else {
-                        resendOtpBtn.setText(String.format("%d", count));
-                        resendOtpBtn.setAlpha(0.5f);
+                        resendOtpBtn.setText(String.format("Resend OTP in %d", count));
+                        resendOtpBtn.setTextColor(getColor(R.color.colorInactive));
                         resendOtpBtn.setEnabled(false);
                         count--;
                     }
@@ -237,7 +237,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
                         verifyBtn.setEnabled(true);
 
                         Alerter.create(VerifyOTPActivity.this)
-                                .setText("Too many requests at the moment. Try again after 5 hours now!")
+                                .setText("Too many OTP requests at the moment. Try again after 5 hours now!")
                                 .setTextAppearance(R.style.AlertText)
                                 .setBackgroundColorRes(R.color.infoColor)
                                 .setIcon(R.drawable.ic_info)
@@ -309,7 +309,10 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                         newUser.put(Constants.KEY_USER_EMAIL, email);
                                                         newUser.put(Constants.KEY_USER_MOBILE, mobile);
                                                         newUser.put(Constants.KEY_USER_IMAGE, imageValue);
+                                                        newUser.put(Constants.KEY_USER_LOCATION, "");
                                                         newUser.put(Constants.KEY_USER_ADDRESS, "");
+                                                        newUser.put(Constants.KEY_USER_LATITUDE, 0);
+                                                        newUser.put(Constants.KEY_USER_LONGITUDE, 0);
                                                         newUser.put(Constants.KEY_USER_CITY, "Dhanbad");
                                                         newUser.put(Constants.KEY_USER_LOCALITY, "Bekarbandh - LC Road");
                                                         newUser.put(Constants.KEY_USER_SEARCH_KEYWORD, name.toLowerCase());
@@ -331,10 +334,16 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                                     preferenceManager.putString(Constants.KEY_USER_EMAIL, email);
                                                                     preferenceManager.putString(Constants.KEY_USER_MOBILE, mobile);
                                                                     preferenceManager.putString(Constants.KEY_USER_IMAGE, imageValue);
+                                                                    preferenceManager.putString(Constants.KEY_USER_LOCATION, "");
                                                                     preferenceManager.putString(Constants.KEY_USER_ADDRESS, "");
+                                                                    preferenceManager.putString(Constants.KEY_USER_LATITUDE, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_USER_LONGITUDE, String.valueOf(0));
                                                                     preferenceManager.putString(Constants.KEY_USER_CITY, "Dhanbad");
                                                                     preferenceManager.putString(Constants.KEY_USER_LOCALITY, "Bekarbandh - LC Road");
                                                                     preferenceManager.putBoolean(Constants.KEY_USER_FIRST_ORDER, true);
+
+                                                                    preferenceManager.putString(Constants.KEY_COUPON, "");
+                                                                    preferenceManager.putString(Constants.KEY_COUPON_DISCOUNT_PERCENT, String.valueOf(0));
 
                                                                     preferenceManager.putString(Constants.KEY_ORDER_ID, "");
                                                                     preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
@@ -343,10 +352,16 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                                     preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
                                                                     preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
                                                                     preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LOCATION, "");
                                                                     preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LATITUDE, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LONGITUDE, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_DISTANCE, String.valueOf(0));
                                                                     preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
                                                                     preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
                                                                     preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_COUPON_APPLIED, "");
+                                                                    preferenceManager.putString(Constants.KEY_ORDER_COUPON_DISCOUNT, String.valueOf(0));
                                                                     preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
                                                                     preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
                                                                     preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
@@ -427,7 +442,10 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                     newUser.put(Constants.KEY_USER_EMAIL, email);
                                     newUser.put(Constants.KEY_USER_MOBILE, mobile);
                                     newUser.put(Constants.KEY_USER_IMAGE, "");
+                                    newUser.put(Constants.KEY_USER_LOCATION, "");
                                     newUser.put(Constants.KEY_USER_ADDRESS, "");
+                                    newUser.put(Constants.KEY_USER_LATITUDE, 0);
+                                    newUser.put(Constants.KEY_USER_LONGITUDE, 0);
                                     newUser.put(Constants.KEY_USER_CITY, "Dhanbad");
                                     newUser.put(Constants.KEY_USER_LOCALITY, "Bekarbandh - LC Road");
                                     newUser.put(Constants.KEY_USER_SEARCH_KEYWORD, name.toLowerCase());
@@ -449,10 +467,16 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                 preferenceManager.putString(Constants.KEY_USER_EMAIL, email);
                                                 preferenceManager.putString(Constants.KEY_USER_MOBILE, mobile);
                                                 preferenceManager.putString(Constants.KEY_USER_IMAGE, "");
+                                                preferenceManager.putString(Constants.KEY_USER_LOCATION, "");
                                                 preferenceManager.putString(Constants.KEY_USER_ADDRESS, "");
+                                                preferenceManager.putString(Constants.KEY_USER_LATITUDE, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_USER_LONGITUDE, String.valueOf(0));
                                                 preferenceManager.putString(Constants.KEY_USER_CITY, "Dhanbad");
                                                 preferenceManager.putString(Constants.KEY_USER_LOCALITY, "Bekarbandh - LC Road");
                                                 preferenceManager.putBoolean(Constants.KEY_USER_FIRST_ORDER, true);
+
+                                                preferenceManager.putString(Constants.KEY_COUPON, "");
+                                                preferenceManager.putString(Constants.KEY_COUPON_DISCOUNT_PERCENT, String.valueOf(0));
 
                                                 preferenceManager.putString(Constants.KEY_ORDER_ID, "");
                                                 preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
@@ -461,10 +485,16 @@ public class VerifyOTPActivity extends AppCompatActivity {
                                                 preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
                                                 preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
                                                 preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LOCATION, "");
                                                 preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LATITUDE, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LONGITUDE, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_DISTANCE, String.valueOf(0));
                                                 preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
                                                 preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
                                                 preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+                                                preferenceManager.putString(Constants.KEY_ORDER_COUPON_APPLIED, "");
+                                                preferenceManager.putString(Constants.KEY_ORDER_COUPON_DISCOUNT, String.valueOf(0));
                                                 preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
                                                 preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
                                                 preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
@@ -578,13 +608,16 @@ public class VerifyOTPActivity extends AppCompatActivity {
                 });
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     private boolean isConnectedToInternet(VerifyOTPActivity verifyOTPActivity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) verifyOTPActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) verifyOTPActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if ((wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected())) {
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
             return true;
         } else {
             return false;

@@ -4,8 +4,9 @@ import com.google.firebase.Timestamp;
 
 public class Product {
     private String productID, productStoreID, productStoreName, productCategory, productImage, productName,
-            productUnit, productDescription, productBrand, productMFGDate, productSearchKeyword;
+            productUnit, productDescription, productBrand, productMFGDate, productExpiryTime, productSearchKeyword;
     private boolean productInStock, productIsVeg;
+    private long productOffer, productUnitsInStock;
     private double productMRP, productRetailPrice;
     private Timestamp productTimestamp;
 
@@ -14,8 +15,9 @@ public class Product {
 
     public Product(String productID, String productStoreID, String productStoreName, String productCategory,
                    String productImage, String productName, String productUnit, String productDescription,
-                   String productBrand, String productMFGDate, String productSearchKeyword, boolean productInStock,
-                   boolean productIsVeg, double productMRP, double productRetailPrice, Timestamp productTimestamp) {
+                   String productBrand, String productMFGDate, String productExpiryTime, String productSearchKeyword,
+                   boolean productInStock, boolean productIsVeg, long productOffer, long productUnitsInStock,
+                   double productMRP, double productRetailPrice, Timestamp productTimestamp) {
         this.productID = productID;
         this.productStoreID = productStoreID;
         this.productStoreName = productStoreName;
@@ -26,9 +28,12 @@ public class Product {
         this.productDescription = productDescription;
         this.productBrand = productBrand;
         this.productMFGDate = productMFGDate;
+        this.productExpiryTime = productExpiryTime;
         this.productSearchKeyword = productSearchKeyword;
         this.productInStock = productInStock;
         this.productIsVeg = productIsVeg;
+        this.productOffer = productOffer;
+        this.productUnitsInStock = productUnitsInStock;
         this.productMRP = productMRP;
         this.productRetailPrice = productRetailPrice;
         this.productTimestamp = productTimestamp;
@@ -114,6 +119,14 @@ public class Product {
         this.productMFGDate = productMFGDate;
     }
 
+    public String getProductExpiryTime() {
+        return productExpiryTime;
+    }
+
+    public void setProductExpiryTime(String productExpiryTime) {
+        this.productExpiryTime = productExpiryTime;
+    }
+
     public String getProductSearchKeyword() {
         return productSearchKeyword;
     }
@@ -136,6 +149,22 @@ public class Product {
 
     public void setProductIsVeg(boolean productIsVeg) {
         this.productIsVeg = productIsVeg;
+    }
+
+    public long getProductOffer() {
+        return productOffer;
+    }
+
+    public void setProductOffer(long productOffer) {
+        this.productOffer = productOffer;
+    }
+
+    public long getProductUnitsInStock() {
+        return productUnitsInStock;
+    }
+
+    public void setProductUnitsInStock(long productUnitsInStock) {
+        this.productUnitsInStock = productUnitsInStock;
     }
 
     public double getProductMRP() {

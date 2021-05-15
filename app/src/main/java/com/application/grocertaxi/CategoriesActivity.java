@@ -1,22 +1,22 @@
 package com.application.grocertaxi;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.bumptech.glide.Glide;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.tapadoo.alerter.Alerter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
@@ -25,20 +25,15 @@ import maes.tech.intentanim.CustomIntent;
 
 public class CategoriesActivity extends AppCompatActivity {
 
-    private ImageView backBtn, fruits, vegetables, foodGrains, dairy, bakery, beverages, dryFruits, meatBacon,
-            noodlesPasta, snacks, kitchenOil, spices, sweets, babyCare, household, personalCare, petCare, stationary,
-            hardware, medical, sports, menuHome, menuCategory, menuStore, menuProfile;
-
-    private ConstraintLayout categoryFruits, categoryVegetables, categoryFoodGrains, categoryDairy, categoryBakery, categoryBeverages,
-            categoryDryFruits, categoryMeatBacon, categoryNoodlesPasta, categorySnacks, categoryKitchenOil, categorySpices,
-            categorySweets, categoryBabyCare, categoryHousehold, categoryPersonalCare, categoryPetCare, categoryStationary,
-            categoryHardware, categoryMedical, categorySports;
+    private ImageView fruits, vegetables, foodGrains, dairy, bakery, beverages, dryFruits, meatBacon, noodlesPasta, snacks,
+            kitchenOil, spices, sweets, babyCare, household, personalCare, petCare, stationary, hardware, medical, sports;
+    private ConstraintLayout layoutContent, layoutNoInternet, retryBtn,
+            categoryFruits, categoryVegetables, categoryFoodGrains, categoryDairy, categoryBakery, categoryBeverages, categoryDryFruits,
+            categoryMeatBacon, categoryNoodlesPasta, categorySnacks, categoryKitchenOil, categorySpices, categorySweets, categoryBabyCare,
+            categoryHousehold, categoryPersonalCare, categoryPetCare, categoryStationary, categoryHardware, categoryMedical, categorySports;
+    private BottomNavigationView bottomBar;
     private FloatingActionButton cartBtn;
-    private CardView cartIndicator;
 
-    private CollectionReference cartRef;
-
-    private String cart_location;
     private PreferenceManager preferenceManager;
 
     @Override
@@ -73,15 +68,12 @@ public class CategoriesActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
-        initViews();
-        initFirebase();
-        setActionOnViews();
-    }
+        layoutContent = findViewById(R.id.layout_content);
+        layoutNoInternet = findViewById(R.id.layout_no_internet);
+        retryBtn = findViewById(R.id.retry_btn);
 
-    private void initViews() {
-        backBtn = findViewById(R.id.back_btn);
         fruits = findViewById(R.id.category_fruits_img);
         vegetables = findViewById(R.id.category_vegetables_img);
         foodGrains = findViewById(R.id.category_foodgrains_img);
@@ -126,22 +118,31 @@ public class CategoriesActivity extends AppCompatActivity {
         categoryMedical = findViewById(R.id.category_medical);
         categorySports = findViewById(R.id.category_sports);
 
-        menuHome = findViewById(R.id.menu_home);
-        menuCategory = findViewById(R.id.menu_category);
-        menuStore = findViewById(R.id.menu_store);
-        menuProfile = findViewById(R.id.menu_profile);
+        bottomBar = findViewById(R.id.bottom_bar);
         cartBtn = findViewById(R.id.cart_btn);
-        cartIndicator = findViewById(R.id.cart_indicator);
     }
 
-    private void initFirebase() {
-        cartRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS)
-                .document(preferenceManager.getString(Constants.KEY_USER_ID))
-                .collection(Constants.KEY_COLLECTION_CART);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkNetworkConnection();
+    }
+
+    private void checkNetworkConnection() {
+        if (!isConnectedToInternet(CategoriesActivity.this)) {
+            layoutContent.setVisibility(View.GONE);
+            layoutNoInternet.setVisibility(View.VISIBLE);
+            retryBtn.setOnClickListener(v -> checkNetworkConnection());
+        } else {
+            setActionOnViews();
+        }
     }
 
     private void setActionOnViews() {
-        backBtn.setOnClickListener(view -> onBackPressed());
+        layoutNoInternet.setVisibility(View.GONE);
+        layoutContent.setVisibility(View.VISIBLE);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         String cat_fruits = "https://firebasestorage.googleapis.com/v0/b/grocer-taxi.appspot.com/o/Categories%2Ffruits.png?alt=media&token=e682c6a7-16fe-47f1-b607-89b9b888b5d3";
         String cat_vegetables = "https://firebasestorage.googleapis.com/v0/b/grocer-taxi.appspot.com/o/Categories%2Fvegetables.png?alt=media&token=5794ffa7-f88e-4477-9068-cd1d9ab4b247";
@@ -186,6 +187,8 @@ public class CategoriesActivity extends AppCompatActivity {
         Glide.with(CategoriesActivity.this).load(cat_hardware).centerCrop().into(hardware);
         Glide.with(CategoriesActivity.this).load(cat_medical).centerCrop().into(medical);
         Glide.with(CategoriesActivity.this).load(cat_sports).centerCrop().into(sports);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         categoryFruits.setOnClickListener(view -> {
             preferenceManager.putString(Constants.KEY_CATEGORY, "Fruits");
@@ -334,27 +337,36 @@ public class CategoriesActivity extends AppCompatActivity {
 
         });
 
-        menuHome.setOnClickListener(view -> {
-            startActivity(new Intent(CategoriesActivity.this, MainActivity.class));
-            CustomIntent.customType(CategoriesActivity.this, "fadein-to-fadeout");
-            finish();
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        bottomBar.setSelectedItemId(R.id.menu_categories);
+        bottomBar.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_home:
+                    startActivity(new Intent(CategoriesActivity.this, MainActivity.class));
+                    CustomIntent.customType(CategoriesActivity.this, "fadein-to-fadeout");
+                    finish();
+                    break;
+                case R.id.menu_categories:
+                    break;
+                case R.id.menu_stores:
+                    startActivity(new Intent(CategoriesActivity.this, StoresListActivity.class));
+                    CustomIntent.customType(CategoriesActivity.this, "fadein-to-fadeout");
+                    break;
+                case R.id.menu_profile:
+                    startActivity(new Intent(CategoriesActivity.this, ProfileActivity.class));
+                    CustomIntent.customType(CategoriesActivity.this, "fadein-to-fadeout");
+                    break;
+            }
+            return true;
         });
 
-        menuCategory.setOnClickListener(view -> {
-            return;
-        });
-
-        menuStore.setOnClickListener(view -> {
-            startActivity(new Intent(CategoriesActivity.this, StoresListActivity.class));
-            CustomIntent.customType(CategoriesActivity.this, "fadein-to-fadeout");
-        });
-
-        menuProfile.setOnClickListener(view -> {
-            startActivity(new Intent(CategoriesActivity.this, ProfileActivity.class));
-            CustomIntent.customType(CategoriesActivity.this, "fadein-to-fadeout");
-        });
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         cartBtn.setOnClickListener(v -> {
+            preferenceManager.putString(Constants.KEY_COUPON, "");
+            preferenceManager.putString(Constants.KEY_COUPON_DISCOUNT_PERCENT, String.valueOf(0));
+
             preferenceManager.putString(Constants.KEY_ORDER_ID, "");
             preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
             preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, "");
@@ -362,10 +374,16 @@ public class CategoriesActivity extends AppCompatActivity {
             preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
             preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
             preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LOCATION, "");
             preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LATITUDE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LONGITUDE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_DISTANCE, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_COUPON_APPLIED, "");
+            preferenceManager.putString(Constants.KEY_ORDER_COUPON_DISCOUNT, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
@@ -379,45 +397,32 @@ public class CategoriesActivity extends AppCompatActivity {
             preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
             preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
             preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
+
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
             CustomIntent.customType(CategoriesActivity.this, "bottom-to-up");
         });
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
-        cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (queryDocumentSnapshots.size() == 0) {
-                cartIndicator.setVisibility(View.GONE);
-            } else {
-                cartIndicator.setVisibility(View.VISIBLE);
-            }
-        }).addOnFailureListener(e -> {
-            Alerter.create(CategoriesActivity.this)
-                    .setText("Whoa! Something Broke. Try again!")
-                    .setTextAppearance(R.style.AlertText)
-                    .setBackgroundColorRes(R.color.errorColor)
-                    .setIcon(R.drawable.ic_error)
-                    .setDuration(3000)
-                    .enableIconPulse(true)
-                    .enableVibration(true)
-                    .disableOutsideTouch()
-                    .enableProgress(true)
-                    .setProgressColorInt(getColor(android.R.color.white))
-                    .show();
-        });
+    private boolean isConnectedToInternet(CategoriesActivity categoriesActivity) {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) categoriesActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        KeyboardVisibilityEvent.setEventListener(CategoriesActivity.this, isOpen -> {
-            if (isOpen) {
-                UIUtil.hideKeyboard(CategoriesActivity.this);
-            }
-        });
+        finish();
     }
 
     @Override

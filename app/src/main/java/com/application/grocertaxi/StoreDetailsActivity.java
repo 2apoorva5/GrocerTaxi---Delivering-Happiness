@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -17,7 +19,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -33,9 +34,12 @@ import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -53,19 +57,24 @@ import com.tapadoo.alerter.Alerter;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
+import java.util.HashMap;
+
 import de.mateware.snacky.Snacky;
 import maes.tech.intentanim.CustomIntent;
+import per.wsj.library.AndRatingBar;
 
 public class StoreDetailsActivity extends AppCompatActivity {
 
     private ImageView closeBtn, cartBtn, storeImage;
     private FloatingActionButton emailBtn, callBtn;
     private TextView storeStatus1, storeName, storeID, storeRating, storeOwner, storeAddress,
-            storeEmail, storeMobile, text, storeTiming, storeStatus2, storeMinimumOrderAmount;
-    private RatingBar storeRatingBar;
+            storeEmail, storeMobile, text, storeTiming, storeStatus2, storeMinimumOrderAmount, seeAllReviewsBtn;
+    private AndRatingBar storeRatingBar, ratingBar;
+    private TextInputLayout ratingComment;
     private RecyclerView recyclerCategories;
-    private CardView storeStatusContainer, cartIndicator;
-    private ProgressBar progressBar1, progressBar2;
+    private CardView storeStatusContainer, cartIndicator, saveBtnContainer;
+    private ConstraintLayout layoutContent, layoutNoInternet, retryBtn, saveBtn;
+    private ProgressBar progressBar, rateProgressBar;
     private PullRefreshLayout pullRefreshLayout;
 
     private CollectionReference storeRef, categoriesRef, cartRef;
@@ -106,14 +115,18 @@ public class StoreDetailsActivity extends AppCompatActivity {
         setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
 
-        initViews();
-        initFirebase();
-        setActionOnViews();
-    }
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void initViews() {
+        layoutContent = findViewById(R.id.layout_content);
+        layoutNoInternet = findViewById(R.id.layout_no_internet);
+        retryBtn = findViewById(R.id.retry_btn);
+
+        pullRefreshLayout = findViewById(R.id.pull_refresh_layout);
+
         closeBtn = findViewById(R.id.close_btn);
         cartBtn = findViewById(R.id.cart_btn);
         cartIndicator = findViewById(R.id.cart_indicator);
@@ -132,12 +145,34 @@ public class StoreDetailsActivity extends AppCompatActivity {
         storeMobile = findViewById(R.id.store_mobile);
         text = findViewById(R.id.text);
         recyclerCategories = findViewById(R.id.recycler_categories);
-        progressBar1 = findViewById(R.id.progress_bar1);
-        progressBar2 = findViewById(R.id.progress_bar2);
+        progressBar = findViewById(R.id.progress_bar);
         storeTiming = findViewById(R.id.store_timing);
         storeStatus2 = findViewById(R.id.store_status2);
         storeMinimumOrderAmount = findViewById(R.id.minimum_order_amount);
-        pullRefreshLayout = findViewById(R.id.pull_refresh_layout);
+
+        ratingBar = findViewById(R.id.rating_bar);
+        ratingComment = findViewById(R.id.rating_comment);
+        saveBtnContainer = findViewById(R.id.save_btn_container);
+        saveBtn = findViewById(R.id.save_btn);
+        rateProgressBar = findViewById(R.id.rate_progress_bar);
+        seeAllReviewsBtn = findViewById(R.id.see_all_reviews_btn);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkNetworkConnection();
+    }
+
+    private void checkNetworkConnection() {
+        if (!isConnectedToInternet(StoreDetailsActivity.this)) {
+            layoutContent.setVisibility(View.GONE);
+            layoutNoInternet.setVisibility(View.VISIBLE);
+            retryBtn.setOnClickListener(v -> checkNetworkConnection());
+        } else {
+            initFirebase();
+            setActionOnViews();
+        }
     }
 
     private void initFirebase() {
@@ -163,12 +198,372 @@ public class StoreDetailsActivity extends AppCompatActivity {
     }
 
     private void setActionOnViews() {
-        closeBtn.setOnClickListener(v -> {
-            onBackPressed();
-            finish();
+        layoutNoInternet.setVisibility(View.GONE);
+        layoutContent.setVisibility(View.VISIBLE);
+
+        pullRefreshLayout.setRefreshing(false);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        pullRefreshLayout.setColor(getColor(R.color.colorIconLight));
+        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorAccent));
+        pullRefreshLayout.setOnRefreshListener(this::checkNetworkConnection);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        closeBtn.setOnClickListener(v -> onBackPressed());
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        progressBar.setVisibility(View.VISIBLE);
+        loadStoreDetails();
+        loadCategories();
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        storeRef.document(preferenceManager.getString(Constants.KEY_STORE))
+                .collection(Constants.KEY_COLLECTION_REVIEWS)
+                .whereEqualTo("byUserID", preferenceManager.getString(Constants.KEY_USER_ID))
+                .addSnapshotListener((queryDocumentSnapshots1, error) -> {
+                    if (error != null) {
+                        Alerter.create(StoreDetailsActivity.this)
+                                .setText("Whoa! Something broke. Try again!")
+                                .setTextAppearance(R.style.AlertText)
+                                .setBackgroundColorRes(R.color.errorColor)
+                                .setIcon(R.drawable.ic_error)
+                                .setDuration(3000)
+                                .enableIconPulse(true)
+                                .enableVibration(true)
+                                .disableOutsideTouch()
+                                .enableProgress(true)
+                                .setProgressColorInt(getColor(android.R.color.white))
+                                .show();
+                    } else {
+                        if (queryDocumentSnapshots1.size() == 0 || queryDocumentSnapshots1.isEmpty()) {
+                            ratingBar.setRating((float) 0);
+                            ratingComment.getEditText().setText("");
+
+                            KeyboardVisibilityEvent.setEventListener(StoreDetailsActivity.this, isOpen -> {
+                                if (!isOpen) {
+                                    ratingComment.clearFocus();
+                                }
+                            });
+
+                            saveBtn.setOnClickListener(v -> {
+                                if (ratingBar.getRating() == 0) {
+                                    YoYo.with(Techniques.Shake).duration(700).repeat(1).playOn(ratingBar);
+                                } else {
+                                    if (!isConnectedToInternet(StoreDetailsActivity.this)) {
+                                        showConnectToInternetDialog();
+                                        return;
+                                    } else {
+                                        String[] split = preferenceManager.getString(Constants.KEY_USER_ID).split("-", 2);
+                                        String review_id = "#" + split[1];
+
+                                        HashMap<String, Object> newReview = new HashMap<>();
+                                        newReview.put("reviewID", review_id);
+                                        newReview.put("rating", Math.round(((double) ratingBar.getRating()) * 100.0) / 100.0);
+                                        newReview.put("comment", ratingComment.getEditText().getText().toString().trim());
+                                        newReview.put("byUserID", preferenceManager.getString(Constants.KEY_USER_ID));
+                                        newReview.put("byUserName", preferenceManager.getString(Constants.KEY_USER_NAME));
+
+                                        saveBtnContainer.setVisibility(View.INVISIBLE);
+                                        saveBtn.setEnabled(false);
+                                        rateProgressBar.setVisibility(View.VISIBLE);
+
+                                        storeRef.document(preferenceManager.getString(Constants.KEY_STORE))
+                                                .collection(Constants.KEY_COLLECTION_REVIEWS)
+                                                .document(review_id)
+                                                .set(newReview)
+                                                .addOnSuccessListener(aVoid ->
+                                                        storeRef.document(preferenceManager.getString(Constants.KEY_STORE))
+                                                                .collection(Constants.KEY_COLLECTION_REVIEWS)
+                                                                .addSnapshotListener((queryDocumentSnapshots2, error1) -> {
+                                                                    if (error1 != null) {
+                                                                        rateProgressBar.setVisibility(View.GONE);
+                                                                        saveBtn.setEnabled(true);
+                                                                        saveBtnContainer.setVisibility(View.VISIBLE);
+
+                                                                        Alerter.create(StoreDetailsActivity.this)
+                                                                                .setText("Whoa! Something broke. Try again!")
+                                                                                .setTextAppearance(R.style.AlertText)
+                                                                                .setBackgroundColorRes(R.color.errorColor)
+                                                                                .setIcon(R.drawable.ic_error)
+                                                                                .setDuration(3000)
+                                                                                .enableIconPulse(true)
+                                                                                .enableVibration(true)
+                                                                                .disableOutsideTouch()
+                                                                                .enableProgress(true)
+                                                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                                                .show();
+                                                                    } else {
+                                                                        if (queryDocumentSnapshots2.size() != 0 && !queryDocumentSnapshots2.isEmpty()) {
+                                                                            int count = queryDocumentSnapshots2.size();
+                                                                            double total_rating = 0;
+
+                                                                            for (int i = 0; i < queryDocumentSnapshots2.size(); i++) {
+                                                                                total_rating += Math.round(queryDocumentSnapshots2.getDocuments().get(i).getDouble("rating") * 100.0) / 100.0;
+                                                                            }
+
+                                                                            double average_rating = Math.round((total_rating / count) * 100.0) / 100.0;
+
+                                                                            storeRef.document(preferenceManager.getString(Constants.KEY_STORE))
+                                                                                    .update(Constants.KEY_STORE_AVERAGE_RATING, average_rating)
+                                                                                    .addOnSuccessListener(aVoid1 -> {
+                                                                                        rateProgressBar.setVisibility(View.GONE);
+                                                                                        saveBtn.setEnabled(true);
+                                                                                        saveBtnContainer.setVisibility(View.VISIBLE);
+
+                                                                                        Alerter.create(StoreDetailsActivity.this)
+                                                                                                .setText("Your review has been submitted. Thanks for the feedback!")
+                                                                                                .setTextAppearance(R.style.AlertText)
+                                                                                                .setBackgroundColorRes(R.color.successColor)
+                                                                                                .setIcon(R.drawable.ic_dialog_okay)
+                                                                                                .setDuration(3000)
+                                                                                                .enableIconPulse(true)
+                                                                                                .enableVibration(true)
+                                                                                                .disableOutsideTouch()
+                                                                                                .enableProgress(true)
+                                                                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                                                                .show();
+                                                                                    }).addOnFailureListener(e -> {
+                                                                                rateProgressBar.setVisibility(View.GONE);
+                                                                                saveBtn.setEnabled(true);
+                                                                                saveBtnContainer.setVisibility(View.VISIBLE);
+
+                                                                                Alerter.create(StoreDetailsActivity.this)
+                                                                                        .setText("Whoa! Something broke. Try again!")
+                                                                                        .setTextAppearance(R.style.AlertText)
+                                                                                        .setBackgroundColorRes(R.color.errorColor)
+                                                                                        .setIcon(R.drawable.ic_error)
+                                                                                        .setDuration(3000)
+                                                                                        .enableIconPulse(true)
+                                                                                        .enableVibration(true)
+                                                                                        .disableOutsideTouch()
+                                                                                        .enableProgress(true)
+                                                                                        .setProgressColorInt(getColor(android.R.color.white))
+                                                                                        .show();
+                                                                            });
+                                                                        } else {
+                                                                            rateProgressBar.setVisibility(View.GONE);
+                                                                            saveBtn.setEnabled(true);
+                                                                            saveBtnContainer.setVisibility(View.VISIBLE);
+
+                                                                            Alerter.create(StoreDetailsActivity.this)
+                                                                                    .setText("Whoa! Something broke. Try again!")
+                                                                                    .setTextAppearance(R.style.AlertText)
+                                                                                    .setBackgroundColorRes(R.color.errorColor)
+                                                                                    .setIcon(R.drawable.ic_error)
+                                                                                    .setDuration(3000)
+                                                                                    .enableIconPulse(true)
+                                                                                    .enableVibration(true)
+                                                                                    .disableOutsideTouch()
+                                                                                    .enableProgress(true)
+                                                                                    .setProgressColorInt(getColor(android.R.color.white))
+                                                                                    .show();
+                                                                        }
+                                                                    }
+                                                                })).addOnFailureListener(e -> {
+                                            rateProgressBar.setVisibility(View.GONE);
+                                            saveBtn.setEnabled(true);
+                                            saveBtnContainer.setVisibility(View.VISIBLE);
+
+                                            Alerter.create(StoreDetailsActivity.this)
+                                                    .setText("Whoa! Something broke. Try again!")
+                                                    .setTextAppearance(R.style.AlertText)
+                                                    .setBackgroundColorRes(R.color.errorColor)
+                                                    .setIcon(R.drawable.ic_error)
+                                                    .setDuration(3000)
+                                                    .enableIconPulse(true)
+                                                    .enableVibration(true)
+                                                    .disableOutsideTouch()
+                                                    .enableProgress(true)
+                                                    .setProgressColorInt(getColor(android.R.color.white))
+                                                    .show();
+                                        });
+                                    }
+                                }
+                            });
+                        } else {
+                            double rating = queryDocumentSnapshots1.getDocuments().get(0).getDouble("rating");
+                            String comment = queryDocumentSnapshots1.getDocuments().get(0).getString("comment");
+
+                            ratingBar.setRating((float) rating);
+                            ratingComment.getEditText().setText(comment);
+
+                            KeyboardVisibilityEvent.setEventListener(StoreDetailsActivity.this, isOpen -> {
+                                if (!isOpen) {
+                                    ratingComment.clearFocus();
+                                }
+                            });
+
+                            saveBtn.setOnClickListener(v -> {
+                                if (ratingBar.getRating() == 0) {
+                                    YoYo.with(Techniques.Shake).duration(700).repeat(1).playOn(ratingBar);
+                                } else {
+                                    if (!isConnectedToInternet(StoreDetailsActivity.this)) {
+                                        showConnectToInternetDialog();
+                                        return;
+                                    } else {
+                                        String[] split = preferenceManager.getString(Constants.KEY_USER_ID).split("-", 2);
+                                        String review_id = "#" + split[1];
+
+                                        saveBtnContainer.setVisibility(View.INVISIBLE);
+                                        saveBtn.setEnabled(false);
+                                        rateProgressBar.setVisibility(View.VISIBLE);
+
+                                        storeRef.document(preferenceManager.getString(Constants.KEY_STORE))
+                                                .collection(Constants.KEY_COLLECTION_REVIEWS)
+                                                .document(review_id)
+                                                .update("rating", Math.round(((double) ratingBar.getRating()) * 100.0) / 100.0,
+                                                        "comment", ratingComment.getEditText().getText().toString().trim())
+                                                .addOnSuccessListener(aVoid ->
+                                                        storeRef.document(preferenceManager.getString(Constants.KEY_STORE))
+                                                                .collection(Constants.KEY_COLLECTION_REVIEWS)
+                                                                .addSnapshotListener((queryDocumentSnapshots2, error1) -> {
+                                                                    if (error1 != null) {
+                                                                        rateProgressBar.setVisibility(View.GONE);
+                                                                        saveBtn.setEnabled(true);
+                                                                        saveBtnContainer.setVisibility(View.VISIBLE);
+
+                                                                        Alerter.create(StoreDetailsActivity.this)
+                                                                                .setText("Whoa! Something broke. Try again!")
+                                                                                .setTextAppearance(R.style.AlertText)
+                                                                                .setBackgroundColorRes(R.color.errorColor)
+                                                                                .setIcon(R.drawable.ic_error)
+                                                                                .setDuration(3000)
+                                                                                .enableIconPulse(true)
+                                                                                .enableVibration(true)
+                                                                                .disableOutsideTouch()
+                                                                                .enableProgress(true)
+                                                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                                                .show();
+                                                                    } else {
+                                                                        if (queryDocumentSnapshots2.size() != 0 && !queryDocumentSnapshots2.isEmpty()) {
+                                                                            int count = queryDocumentSnapshots2.size();
+                                                                            double total_rating = 0;
+
+                                                                            for (int i = 0; i < queryDocumentSnapshots2.size(); i++) {
+                                                                                total_rating += Math.round(queryDocumentSnapshots2.getDocuments().get(i).getDouble("rating") * 100.0) / 100.0;
+                                                                            }
+
+                                                                            double average_rating = Math.round((total_rating / count) * 100.0) / 100.0;
+
+                                                                            storeRef.document(preferenceManager.getString(Constants.KEY_STORE))
+                                                                                    .update(Constants.KEY_STORE_AVERAGE_RATING, average_rating)
+                                                                                    .addOnSuccessListener(aVoid1 -> {
+                                                                                        rateProgressBar.setVisibility(View.GONE);
+                                                                                        saveBtn.setEnabled(true);
+                                                                                        saveBtnContainer.setVisibility(View.VISIBLE);
+
+                                                                                        Alerter.create(StoreDetailsActivity.this)
+                                                                                                .setText("Your review has been submitted. Thanks for the feedback!")
+                                                                                                .setTextAppearance(R.style.AlertText)
+                                                                                                .setBackgroundColorRes(R.color.successColor)
+                                                                                                .setIcon(R.drawable.ic_dialog_okay)
+                                                                                                .setDuration(3000)
+                                                                                                .enableIconPulse(true)
+                                                                                                .enableVibration(true)
+                                                                                                .disableOutsideTouch()
+                                                                                                .enableProgress(true)
+                                                                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                                                                .show();
+                                                                                    }).addOnFailureListener(e -> {
+                                                                                rateProgressBar.setVisibility(View.GONE);
+                                                                                saveBtn.setEnabled(true);
+                                                                                saveBtnContainer.setVisibility(View.VISIBLE);
+
+                                                                                Alerter.create(StoreDetailsActivity.this)
+                                                                                        .setText("Whoa! Something broke. Try again!")
+                                                                                        .setTextAppearance(R.style.AlertText)
+                                                                                        .setBackgroundColorRes(R.color.errorColor)
+                                                                                        .setIcon(R.drawable.ic_error)
+                                                                                        .setDuration(3000)
+                                                                                        .enableIconPulse(true)
+                                                                                        .enableVibration(true)
+                                                                                        .disableOutsideTouch()
+                                                                                        .enableProgress(true)
+                                                                                        .setProgressColorInt(getColor(android.R.color.white))
+                                                                                        .show();
+                                                                            });
+                                                                        } else {
+                                                                            rateProgressBar.setVisibility(View.GONE);
+                                                                            saveBtn.setEnabled(true);
+                                                                            saveBtnContainer.setVisibility(View.VISIBLE);
+
+                                                                            Alerter.create(StoreDetailsActivity.this)
+                                                                                    .setText("Whoa! Something broke. Try again!")
+                                                                                    .setTextAppearance(R.style.AlertText)
+                                                                                    .setBackgroundColorRes(R.color.errorColor)
+                                                                                    .setIcon(R.drawable.ic_error)
+                                                                                    .setDuration(3000)
+                                                                                    .enableIconPulse(true)
+                                                                                    .enableVibration(true)
+                                                                                    .disableOutsideTouch()
+                                                                                    .enableProgress(true)
+                                                                                    .setProgressColorInt(getColor(android.R.color.white))
+                                                                                    .show();
+                                                                        }
+                                                                    }
+                                                                })).addOnFailureListener(e -> {
+                                            rateProgressBar.setVisibility(View.GONE);
+                                            saveBtn.setEnabled(true);
+                                            saveBtnContainer.setVisibility(View.VISIBLE);
+
+                                            Alerter.create(StoreDetailsActivity.this)
+                                                    .setText("Whoa! Something broke. Try again!")
+                                                    .setTextAppearance(R.style.AlertText)
+                                                    .setBackgroundColorRes(R.color.errorColor)
+                                                    .setIcon(R.drawable.ic_error)
+                                                    .setDuration(3000)
+                                                    .enableIconPulse(true)
+                                                    .enableVibration(true)
+                                                    .disableOutsideTouch()
+                                                    .enableProgress(true)
+                                                    .setProgressColorInt(getColor(android.R.color.white))
+                                                    .show();
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        seeAllReviewsBtn.setOnClickListener(v -> {
+            startActivity(new Intent(StoreDetailsActivity.this, StoreReviewsActivity.class));
+            CustomIntent.customType(StoreDetailsActivity.this, "bottom-to-up");
+        });
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (queryDocumentSnapshots.size() == 0) {
+                cartIndicator.setVisibility(View.GONE);
+            } else {
+                cartIndicator.setVisibility(View.VISIBLE);
+            }
+        }).addOnFailureListener(e -> {
+            Alerter.create(StoreDetailsActivity.this)
+                    .setText("Whoa! Something Broke. Try again!")
+                    .setTextAppearance(R.style.AlertText)
+                    .setBackgroundColorRes(R.color.errorColor)
+                    .setIcon(R.drawable.ic_error)
+                    .setDuration(3000)
+                    .enableIconPulse(true)
+                    .enableVibration(true)
+                    .disableOutsideTouch()
+                    .enableProgress(true)
+                    .setProgressColorInt(getColor(android.R.color.white))
+                    .show();
         });
 
         cartBtn.setOnClickListener(v -> {
+            preferenceManager.putString(Constants.KEY_COUPON, "");
+            preferenceManager.putString(Constants.KEY_COUPON_DISCOUNT_PERCENT, String.valueOf(0));
+
             preferenceManager.putString(Constants.KEY_ORDER_ID, "");
             preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
             preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, "");
@@ -176,10 +571,16 @@ public class StoreDetailsActivity extends AppCompatActivity {
             preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
             preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
             preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LOCATION, "");
             preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LATITUDE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LONGITUDE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_DISTANCE, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_COUPON_APPLIED, "");
+            preferenceManager.putString(Constants.KEY_ORDER_COUPON_DISCOUNT, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
             preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
@@ -193,16 +594,19 @@ public class StoreDetailsActivity extends AppCompatActivity {
             preferenceManager.putString(Constants.KEY_ORDER_COMPLETION_TIME, "");
             preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
             preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
+
             startActivity(new Intent(getApplicationContext(), CartActivity.class));
             CustomIntent.customType(StoreDetailsActivity.this, "bottom-to-up");
         });
     }
 
+    //////////////////////////////////// Load Store Details ////////////////////////////////////////
+
     private void loadStoreDetails() {
         final DocumentReference productDocumentRef = storeRef.document(preferenceManager.getString(Constants.KEY_STORE));
         productDocumentRef.addSnapshotListener((documentSnapshot, error) -> {
             if (error != null) {
-                progressBar2.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 pullRefreshLayout.setRefreshing(false);
                 Alerter.create(StoreDetailsActivity.this)
                         .setText("Whoa! Something broke. Try again!")
@@ -217,7 +621,7 @@ public class StoreDetailsActivity extends AppCompatActivity {
                         .setProgressColorInt(getColor(android.R.color.white))
                         .show();
             } else {
-                progressBar2.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 pullRefreshLayout.setRefreshing(false);
                 if (documentSnapshot != null && documentSnapshot.exists()) {
                     Uri store_img = Uri.parse(documentSnapshot.getString(Constants.KEY_STORE_IMAGE));
@@ -233,23 +637,39 @@ public class StoreDetailsActivity extends AppCompatActivity {
                     String store_timing = documentSnapshot.getString(Constants.KEY_STORE_TIMING);
                     double min_order_amount = documentSnapshot.getDouble(Constants.KEY_STORE_MINIMUM_ORDER_VALUE);
 
+                    ////////////////////////////////////////////////////////////////////////////////
+
                     Glide.with(storeImage.getContext()).load(store_img)
                             .placeholder(R.drawable.thumbnail).centerCrop().into(storeImage);
 
+                    ////////////////////////////////////////////////////////////////////////////////
+
                     if (store_status) {
+                        storeImage.clearColorFilter();
+
                         storeStatus1.setText("Open");
                         storeStatus2.setText("Store's Open");
                         storeStatus2.setTextColor(getColor(R.color.successColor));
                         storeStatusContainer.setCardBackgroundColor(getColor(R.color.successColor));
                     } else {
+                        ColorMatrix matrix = new ColorMatrix();
+                        matrix.setSaturation(0);
+
+                        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+                        storeImage.setColorFilter(filter);
+
                         storeStatus1.setText("Closed");
                         storeStatus2.setText("Store's Closed");
                         storeStatus2.setTextColor(getColor(R.color.errorColor));
                         storeStatusContainer.setCardBackgroundColor(getColor(R.color.errorColor));
                     }
 
+                    ////////////////////////////////////////////////////////////////////////////////
+
                     storeName.setText(store_name);
                     storeID.setText(store_id);
+
+                    ////////////////////////////////////////////////////////////////////////////////
 
                     if (rating == 0) {
                         storeRating.setVisibility(View.GONE);
@@ -260,6 +680,8 @@ public class StoreDetailsActivity extends AppCompatActivity {
                         storeRatingBar.setVisibility(View.VISIBLE);
                         storeRatingBar.setRating((float) rating);
                     }
+
+                    ////////////////////////////////////////////////////////////////////////////////
 
                     storeOwner.setText(store_owner);
                     storeAddress.setText(store_address);
@@ -330,6 +752,8 @@ public class StoreDetailsActivity extends AppCompatActivity {
                         materialDialog.show();
                     });
 
+                    ////////////////////////////////////////////////////////////////////////////////
+
                     storeTiming.setText(store_timing);
                     storeMinimumOrderAmount.setText(String.format("₹ %s", min_order_amount));
                 } else {
@@ -366,6 +790,8 @@ public class StoreDetailsActivity extends AppCompatActivity {
         });
     }
 
+    /////////////////////////////////////// Load Categories ////////////////////////////////////////
+
     private void loadCategories() {
         Query query = categoriesRef.orderBy(Constants.KEY_CATEGORY_NAME, Query.Direction.ASCENDING);
 
@@ -379,7 +805,7 @@ public class StoreDetailsActivity extends AppCompatActivity {
             @NonNull
             @Override
             public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_store_category_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_store_category, parent, false);
                 return new CategoryViewHolder(view);
             }
 
@@ -486,7 +912,6 @@ public class StoreDetailsActivity extends AppCompatActivity {
                 super.onDataChanged();
 
                 pullRefreshLayout.setRefreshing(false);
-                progressBar1.setVisibility(View.GONE);
 
                 if (getItemCount() == 0) {
                     recyclerCategories.setAdapter(null);
@@ -528,6 +953,8 @@ public class StoreDetailsActivity extends AppCompatActivity {
         recyclerCategories.setAdapter(categoryAdapter);
     }
 
+    ///////////////////////////////////// CategoryViewHolder ///////////////////////////////////////
+
     public static class CategoryViewHolder extends RecyclerView.ViewHolder {
 
         ConstraintLayout clickListener;
@@ -543,13 +970,16 @@ public class StoreDetailsActivity extends AppCompatActivity {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     private boolean isConnectedToInternet(StoreDetailsActivity storeDetailsActivity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) storeDetailsActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) storeDetailsActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if ((wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected())) {
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
             return true;
         } else {
             return false;
@@ -570,73 +1000,6 @@ public class StoreDetailsActivity extends AppCompatActivity {
         materialDialog.show();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        progressBar2.setVisibility(View.VISIBLE);
-        loadStoreDetails();
-        progressBar1.setVisibility(View.VISIBLE);
-        loadCategories();
-
-        cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (queryDocumentSnapshots.size() == 0) {
-                cartIndicator.setVisibility(View.GONE);
-            } else {
-                cartIndicator.setVisibility(View.VISIBLE);
-            }
-        }).addOnFailureListener(e -> {
-            Alerter.create(StoreDetailsActivity.this)
-                    .setText("Whoa! Something Broke. Try again!")
-                    .setTextAppearance(R.style.AlertText)
-                    .setBackgroundColorRes(R.color.errorColor)
-                    .setIcon(R.drawable.ic_error)
-                    .setDuration(3000)
-                    .enableIconPulse(true)
-                    .enableVibration(true)
-                    .disableOutsideTouch()
-                    .enableProgress(true)
-                    .setProgressColorInt(getColor(android.R.color.white))
-                    .show();
-        });
-
-        pullRefreshLayout.setColor(getColor(R.color.colorBackground));
-        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorAccent));
-        pullRefreshLayout.setOnRefreshListener(() -> {
-            if (!isConnectedToInternet(StoreDetailsActivity.this)) {
-                pullRefreshLayout.setRefreshing(false);
-                showConnectToInternetDialog();
-                return;
-            } else {
-                progressBar2.setVisibility(View.VISIBLE);
-                loadStoreDetails();
-                progressBar1.setVisibility(View.VISIBLE);
-                loadCategories();
-
-                cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location).get().addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots.size() == 0) {
-                        cartIndicator.setVisibility(View.GONE);
-                    } else {
-                        cartIndicator.setVisibility(View.VISIBLE);
-                    }
-                }).addOnFailureListener(e -> {
-                    Alerter.create(StoreDetailsActivity.this)
-                            .setText("Whoa! Something Broke. Try again!")
-                            .setTextAppearance(R.style.AlertText)
-                            .setBackgroundColorRes(R.color.errorColor)
-                            .setIcon(R.drawable.ic_error)
-                            .setDuration(3000)
-                            .enableIconPulse(true)
-                            .enableVibration(true)
-                            .disableOutsideTouch()
-                            .enableProgress(true)
-                            .setProgressColorInt(getColor(android.R.color.white))
-                            .show();
-                });
-            }
-        });
-    }
-
     public static void setWindowFlag(StoreDetailsActivity storeDetailsActivity, final int bits, boolean on) {
         Window window = storeDetailsActivity.getWindow();
         WindowManager.LayoutParams layoutParams = window.getAttributes();
@@ -652,11 +1015,12 @@ public class StoreDetailsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        KeyboardVisibilityEvent.setEventListener(StoreDetailsActivity.this, isOpen -> {
-            if (isOpen) {
-                UIUtil.hideKeyboard(StoreDetailsActivity.this);
-            }
-        });
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
         CustomIntent.customType(StoreDetailsActivity.this, "up-to-bottom");
     }
 }

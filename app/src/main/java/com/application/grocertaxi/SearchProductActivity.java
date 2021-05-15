@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -62,10 +64,10 @@ import maes.tech.intentanim.CustomIntent;
 
 public class SearchProductActivity extends AppCompatActivity {
 
-    private ImageView actionBtn, speechToText, illustrationSearch;
+    private ImageView actionBtn, speechToText;
     private AutoCompleteTextView inputProductSearch;
     private RecyclerView recyclerProducts;
-    private TextView textSearch;
+    private ConstraintLayout layoutSearch, layoutEmpty, layoutNoInternet, retryBtn;
     private ProgressBar progressBar;
 
     private CollectionReference productsRef, cartRef;
@@ -73,7 +75,6 @@ public class SearchProductActivity extends AppCompatActivity {
     List<String> productsList;
 
     private String cart_location;
-    private Shimmer shimmer;
     private PreferenceManager preferenceManager;
     private static int LAST_POSITION = -1;
     private AlertDialog progressDialog;
@@ -116,21 +117,41 @@ public class SearchProductActivity extends AppCompatActivity {
                 .setTheme(R.style.SpotsDialog)
                 .build();
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
 
-        initViews();
-        initFirebase();
-        setActionOnViews();
-    }
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void initViews() {
         actionBtn = findViewById(R.id.action_btn);
         speechToText = findViewById(R.id.speech_to_text);
-        illustrationSearch = findViewById(R.id.illustration_search);
         inputProductSearch = findViewById(R.id.input_product_search_field);
         recyclerProducts = findViewById(R.id.recycler_products);
-        textSearch = findViewById(R.id.text_search);
+        layoutSearch = findViewById(R.id.layout_search);
+        layoutEmpty = findViewById(R.id.layout_empty);
         progressBar = findViewById(R.id.progress_bar);
+        layoutNoInternet = findViewById(R.id.layout_no_internet);
+        retryBtn = findViewById(R.id.retry_btn);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkNetworkConnection();
+    }
+
+    private void checkNetworkConnection() {
+        if (!isConnectedToInternet(SearchProductActivity.this)) {
+            inputProductSearch.setEnabled(false);
+            speechToText.setEnabled(false);
+            layoutSearch.setVisibility(View.GONE);
+            layoutEmpty.setVisibility(View.GONE);
+            layoutNoInternet.setVisibility(View.VISIBLE);
+            retryBtn.setOnClickListener(v -> checkNetworkConnection());
+        } else {
+            initFirebase();
+            setActionOnViews();
+        }
     }
 
     private void initFirebase() {
@@ -147,6 +168,12 @@ public class SearchProductActivity extends AppCompatActivity {
     }
 
     private void setActionOnViews() {
+        layoutNoInternet.setVisibility(View.GONE);
+        inputProductSearch.setEnabled(true);
+        speechToText.setEnabled(true);
+        layoutEmpty.setVisibility(View.GONE);
+        layoutSearch.setVisibility(View.VISIBLE);
+
         inputProductSearch.requestFocus();
 
         KeyboardVisibilityEvent.setEventListener(SearchProductActivity.this, isOpen -> {
@@ -162,10 +189,11 @@ public class SearchProductActivity extends AppCompatActivity {
                 actionBtn.setOnClickListener(v -> {
                     UIUtil.hideKeyboard(SearchProductActivity.this);
                     onBackPressed();
-                    finish();
                 });
             }
         });
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         speechToText.setOnClickListener(view -> {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -192,28 +220,31 @@ public class SearchProductActivity extends AppCompatActivity {
             }
         });
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         productsList = new ArrayList<>();
         productsRef.get().addOnSuccessListener(queryDocumentSnapshots -> {
             for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                 productsList.add(documentSnapshot.getString(Constants.KEY_PRODUCT_NAME));
             }
-        }).addOnFailureListener(e -> {
-            Alerter.create(SearchProductActivity.this)
-                    .setText("Whoa! Something broke. Try again!")
-                    .setTextAppearance(R.style.AlertText)
-                    .setBackgroundColorRes(R.color.errorColor)
-                    .setIcon(R.drawable.ic_error)
-                    .setDuration(3000)
-                    .enableIconPulse(true)
-                    .enableVibration(true)
-                    .disableOutsideTouch()
-                    .enableProgress(true)
-                    .setProgressColorInt(getColor(android.R.color.white))
-                    .show();
-        });
+        }).addOnFailureListener(e ->
+                Alerter.create(SearchProductActivity.this)
+                .setText("Whoa! Something broke. Try again!")
+                .setTextAppearance(R.style.AlertText)
+                .setBackgroundColorRes(R.color.errorColor)
+                .setIcon(R.drawable.ic_error)
+                .setDuration(3000)
+                .enableIconPulse(true)
+                .enableVibration(true)
+                .disableOutsideTouch()
+                .enableProgress(true)
+                .setProgressColorInt(getColor(android.R.color.white))
+                .show());
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(SearchProductActivity.this, R.layout.layout_search_text, productsList);
         inputProductSearch.setAdapter(adapter);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         inputProductSearch.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -224,8 +255,8 @@ public class SearchProductActivity extends AppCompatActivity {
                     recyclerProducts.setLayoutManager(null);
                     recyclerProducts.setAdapter(null);
 
-                    illustrationSearch.setVisibility(View.VISIBLE);
-                    textSearch.setVisibility(View.VISIBLE);
+                    layoutSearch.setVisibility(View.VISIBLE);
+                    layoutEmpty.setVisibility(View.GONE);
                     progressBar.setVisibility(View.GONE);
                     Alerter.create(SearchProductActivity.this)
                             .setText("Type something in the search bar")
@@ -241,8 +272,7 @@ public class SearchProductActivity extends AppCompatActivity {
                             .show();
                 } else {
                     UIUtil.hideKeyboard(SearchProductActivity.this);
-                    illustrationSearch.setVisibility(View.GONE);
-                    textSearch.setVisibility(View.GONE);
+                    layoutSearch.setVisibility(View.GONE);
                     progressBar.setVisibility(View.VISIBLE);
 
                     Query query = productsRef.orderBy(Constants.KEY_PRODUCT_SEARCH_KEYWORD, Query.Direction.ASCENDING)
@@ -250,7 +280,7 @@ public class SearchProductActivity extends AppCompatActivity {
                             .endAt(inputProductSearch.getText().toString().toLowerCase().trim() + "\uf8ff");
 
                     PagedList.Config config = new PagedList.Config.Builder()
-                            .setInitialLoadSizeHint(8)
+                            .setInitialLoadSizeHint(4)
                             .setPageSize(4)
                             .build();
 
@@ -267,13 +297,76 @@ public class SearchProductActivity extends AppCompatActivity {
         });
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case 123:
+                if (resultCode == RESULT_OK && data != null) {
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    inputProductSearch.setText(result.get(0));
+                    inputProductSearch.clearFocus();
+
+                    if (inputProductSearch.getText().toString().isEmpty()) {
+                        UIUtil.hideKeyboard(SearchProductActivity.this);
+
+                        recyclerProducts.setHasFixedSize(true);
+                        recyclerProducts.setLayoutManager(null);
+                        recyclerProducts.setAdapter(null);
+
+                        layoutSearch.setVisibility(View.VISIBLE);
+                        layoutEmpty.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.GONE);
+                        Alerter.create(SearchProductActivity.this)
+                                .setText("Type something in the search bar")
+                                .setTextAppearance(R.style.AlertText)
+                                .setBackgroundColorRes(R.color.errorColor)
+                                .setIcon(R.drawable.ic_error)
+                                .setDuration(3000)
+                                .enableIconPulse(true)
+                                .enableVibration(true)
+                                .disableOutsideTouch()
+                                .enableProgress(true)
+                                .setProgressColorInt(getColor(android.R.color.white))
+                                .show();
+                    } else {
+                        UIUtil.hideKeyboard(SearchProductActivity.this);
+                        layoutSearch.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.VISIBLE);
+
+                        Query query = productsRef.orderBy(Constants.KEY_PRODUCT_SEARCH_KEYWORD, Query.Direction.ASCENDING)
+                                .startAt(inputProductSearch.getText().toString().toLowerCase().trim())
+                                .endAt(inputProductSearch.getText().toString().toLowerCase().trim() + "\uf8ff");
+
+                        PagedList.Config config = new PagedList.Config.Builder()
+                                .setInitialLoadSizeHint(4)
+                                .setPageSize(4)
+                                .build();
+
+                        FirestorePagingOptions<Product> options = new FirestorePagingOptions.Builder<Product>()
+                                .setLifecycleOwner(SearchProductActivity.this)
+                                .setQuery(query, config, Product.class)
+                                .build();
+
+                        loadProducts(options);
+                    }
+                }
+                break;
+        }
+    }
+
+    ///////////////////////////////////////// Load Products ////////////////////////////////////////
+
     private void loadProducts(FirestorePagingOptions<Product> options) {
         productAdapter = new FirestorePagingAdapter<Product, ProductViewHolder>(options) {
 
             @NonNull
             @Override
             public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_product_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_product, parent, false);
                 return new ProductViewHolder(view);
             }
 
@@ -281,6 +374,8 @@ public class SearchProductActivity extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull ProductViewHolder holder, int position, @NonNull Product model) {
                 Glide.with(holder.productImage.getContext()).load(model.getProductImage())
                         .placeholder(R.drawable.thumbnail).centerCrop().into(holder.productImage);
+
+                ////////////////////////////////////////////////////////////////////////////////////
 
                 if (model.getProductCategory().equals("Baby Care") || model.getProductCategory().equals("Household") ||
                         model.getProductCategory().equals("Personal Care") || model.getProductCategory().equals("Stationary") ||
@@ -295,25 +390,29 @@ public class SearchProductActivity extends AppCompatActivity {
                     }
                 }
 
+                ////////////////////////////////////////////////////////////////////////////////////
+
                 holder.productName.setText(model.getProductName());
                 holder.productUnit.setText(model.getProductUnit());
                 holder.productCategory.setText(model.getProductCategory());
                 holder.productPrice.setText(String.format("₹ %s", model.getProductRetailPrice()));
 
-                if (model.getProductRetailPrice() == model.getProductMRP()) {
+                ////////////////////////////////////////////////////////////////////////////////////
+
+                if (model.getProductOffer() == 0) {
                     holder.productMRP.setVisibility(View.GONE);
                     holder.productOffer.setVisibility(View.GONE);
                 } else {
                     holder.productMRP.setVisibility(View.VISIBLE);
-                    holder.productOffer.setVisibility(View.VISIBLE);
-                    shimmer = new Shimmer();
                     holder.productMRP.setText(String.format("₹ %s", model.getProductMRP()));
                     holder.productMRP.setPaintFlags(holder.productMRP.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                    float offer = (float) (((model.getProductMRP() - model.getProductRetailPrice()) / model.getProductMRP()) * 100);
-                    String offer_value = ((int) offer) + "% off";
-                    holder.productOffer.setText(offer_value);
+                    Shimmer shimmer = new Shimmer();
+                    holder.productOffer.setVisibility(View.VISIBLE);
+                    holder.productOffer.setText(String.format("%d%% OFF", model.getProductOffer()));
                     shimmer.start(holder.productOffer);
                 }
+
+                ////////////////////////////////////////////////////////////////////////////////////
 
                 holder.clickListener.setOnClickListener(v -> {
                     preferenceManager.putString(Constants.KEY_PRODUCT, model.getProductID());
@@ -321,9 +420,22 @@ public class SearchProductActivity extends AppCompatActivity {
                     CustomIntent.customType(SearchProductActivity.this, "bottom-to-up");
                 });
 
+                ////////////////////////////////////////////////////////////////////////////////////
+
                 if (model.isProductInStock()) {
+                    holder.productImage.clearColorFilter();
+                    holder.productOffer.setVisibility(View.VISIBLE);
+
                     holder.productStatus.setText("In Stock");
                     holder.productStatus.setTextColor(getColor(R.color.successColor));
+
+                    holder.productUnitInStock.setVisibility(View.VISIBLE);
+                    if (model.getProductUnitsInStock() >= 1 && model.getProductUnitsInStock() <= 5) {
+                        holder.productUnitInStock.setText(String.format("(Hurry! Only %d left)", model.getProductUnitsInStock()));
+                    } else if (model.getProductUnitsInStock() > 5) {
+                        holder.productUnitInStock.setText(String.format("(%d units left)", model.getProductUnitsInStock()));
+                    }
+
                     holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
                     holder.addToCartBtn.setEnabled(true);
                     holder.addToCartBtn.setOnClickListener(v -> {
@@ -349,6 +461,7 @@ public class SearchProductActivity extends AppCompatActivity {
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_UNIT, model.getProductUnit());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_MRP, model.getProductMRP());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_RETAIL_PRICE, model.getProductRetailPrice());
+                            newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_OFFER, model.getProductOffer());
                             newCartItem.put(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, 1);
 
                             cartRef.get().addOnSuccessListener(queryDocumentSnapshots1 -> {
@@ -391,7 +504,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                             progressDialog.dismiss();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(SearchProductActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
-                                                    .setMessage("Your cart has already been setup for a store this item does not belong to. You must clear your cart first before proceeding with this item.")
+                                                    .setMessage("Your cart has already been setup for another store this item does not belong to. You must clear your cart first before proceeding with this item.")
                                                     .setCancelable(false)
                                                     .setPositiveButton("Go to Cart", R.drawable.ic_dialog_cart, (dialogInterface, which) -> {
                                                         dialogInterface.dismiss();
@@ -405,38 +518,50 @@ public class SearchProductActivity extends AppCompatActivity {
                                                     .addOnCompleteListener(task -> {
                                                         if (task.isSuccessful()) {
                                                             if (task.getResult().exists()) {
-                                                                cartRef.document(cart_id)
-                                                                        .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
-                                                                                Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
-                                                                        .addOnSuccessListener(aVoid -> {
-                                                                            progressDialog.dismiss();
-                                                                            Alerter.create(SearchProductActivity.this)
-                                                                                    .setText("Success! Your cart just got updated.")
-                                                                                    .setTextAppearance(R.style.AlertText)
-                                                                                    .setBackgroundColorRes(R.color.successColor)
-                                                                                    .setIcon(R.drawable.ic_dialog_okay)
-                                                                                    .setDuration(3000)
-                                                                                    .enableIconPulse(true)
-                                                                                    .enableVibration(true)
-                                                                                    .disableOutsideTouch()
-                                                                                    .enableProgress(true)
-                                                                                    .setProgressColorInt(getColor(android.R.color.white))
-                                                                                    .show();
-                                                                        }).addOnFailureListener(e -> {
+                                                                long count = task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY);
+                                                                if (count <= model.getProductUnitsInStock()) {
+                                                                    cartRef.document(cart_id)
+                                                                            .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
+                                                                                    Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
+                                                                            .addOnSuccessListener(aVoid -> {
+                                                                                progressDialog.dismiss();
+                                                                                Alerter.create(SearchProductActivity.this)
+                                                                                        .setText("Success! Your cart just got updated.")
+                                                                                        .setTextAppearance(R.style.AlertText)
+                                                                                        .setBackgroundColorRes(R.color.successColor)
+                                                                                        .setIcon(R.drawable.ic_dialog_okay)
+                                                                                        .setDuration(3000)
+                                                                                        .enableIconPulse(true)
+                                                                                        .enableVibration(true)
+                                                                                        .disableOutsideTouch()
+                                                                                        .enableProgress(true)
+                                                                                        .setProgressColorInt(getColor(android.R.color.white))
+                                                                                        .show();
+                                                                            }).addOnFailureListener(e -> {
+                                                                        progressDialog.dismiss();
+                                                                        Alerter.create(SearchProductActivity.this)
+                                                                                .setText("Whoa! Something Broke. Try again!")
+                                                                                .setTextAppearance(R.style.AlertText)
+                                                                                .setBackgroundColorRes(R.color.errorColor)
+                                                                                .setIcon(R.drawable.ic_error)
+                                                                                .setDuration(3000)
+                                                                                .enableIconPulse(true)
+                                                                                .enableVibration(true)
+                                                                                .disableOutsideTouch()
+                                                                                .enableProgress(true)
+                                                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                                                .show();
+                                                                    });
+                                                                } else {
                                                                     progressDialog.dismiss();
-                                                                    Alerter.create(SearchProductActivity.this)
-                                                                            .setText("Whoa! Something Broke. Try again!")
-                                                                            .setTextAppearance(R.style.AlertText)
-                                                                            .setBackgroundColorRes(R.color.errorColor)
-                                                                            .setIcon(R.drawable.ic_error)
-                                                                            .setDuration(3000)
-                                                                            .enableIconPulse(true)
-                                                                            .enableVibration(true)
-                                                                            .disableOutsideTouch()
-                                                                            .enableProgress(true)
-                                                                            .setProgressColorInt(getColor(android.R.color.white))
-                                                                            .show();
-                                                                });
+                                                                    MaterialDialog materialDialog = new MaterialDialog.Builder(SearchProductActivity.this)
+                                                                            .setTitle("Item can't be further added to your cart!")
+                                                                            .setMessage("The store doesn't have more of this product than the quantity you already have in your cart.")
+                                                                            .setCancelable(false)
+                                                                            .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface, which) -> dialogInterface.dismiss())
+                                                                            .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                                                                    materialDialog.show();
+                                                                }
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
                                                                         .addOnSuccessListener(aVoid -> {
@@ -535,8 +660,18 @@ public class SearchProductActivity extends AppCompatActivity {
                         }
                     });
                 } else {
+                    ColorMatrix matrix = new ColorMatrix();
+                    matrix.setSaturation(0);
+
+                    ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+                    holder.productImage.setColorFilter(filter);
+
+                    holder.productOffer.setVisibility(View.GONE);
+
                     holder.productStatus.setText("Out of Stock");
                     holder.productStatus.setTextColor(getColor(R.color.errorColor));
+                    holder.productUnitInStock.setVisibility(View.GONE);
+
                     holder.addToCartBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
                     holder.addToCartBtn.setEnabled(false);
                 }
@@ -563,24 +698,25 @@ public class SearchProductActivity extends AppCompatActivity {
                     case LOADING_INITIAL:
                     case LOADING_MORE:
                         progressBar.setVisibility(View.VISIBLE);
-                        illustrationSearch.setVisibility(View.GONE);
-                        textSearch.setVisibility(View.GONE);
+                        layoutSearch.setVisibility(View.GONE);
+                        layoutEmpty.setVisibility(View.GONE);
                         break;
                     case LOADED:
                     case FINISHED:
                         progressBar.setVisibility(View.GONE);
 
                         if (getItemCount() == 0) {
-                            illustrationSearch.setVisibility(View.VISIBLE);
-                            illustrationSearch.setImageResource(R.drawable.illustration_empty1);
-                            textSearch.setVisibility(View.VISIBLE);
-                            textSearch.setText("Nothing here");
+                            layoutSearch.setVisibility(View.GONE);
+                            layoutEmpty.setVisibility(View.VISIBLE);
                         } else {
-                            illustrationSearch.setVisibility(View.GONE);
-                            textSearch.setVisibility(View.GONE);
+                            layoutSearch.setVisibility(View.GONE);
+                            layoutEmpty.setVisibility(View.GONE);
                         }
                         break;
                     case ERROR:
+                        progressBar.setVisibility(View.GONE);
+                        layoutSearch.setVisibility(View.GONE);
+                        layoutEmpty.setVisibility(View.GONE);
                         Alerter.create(SearchProductActivity.this)
                                 .setText("Whoa! Something Broke. Try again!")
                                 .setTextAppearance(R.style.AlertText)
@@ -605,12 +741,14 @@ public class SearchProductActivity extends AppCompatActivity {
         recyclerProducts.setAdapter(productAdapter);
     }
 
+    //////////////////////////////////// ProductViewHolder /////////////////////////////////////////
+
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
 
         CardView addToCartBtnContainer;
         ConstraintLayout clickListener, addToCartBtn;
         ImageView productImage, productTypeImage;
-        TextView productName, productUnit, productCategory, productStatus, productPrice, productMRP;
+        TextView productName, productUnit, productCategory, productStatus, productUnitInStock, productPrice, productMRP;
         ShimmerTextView productOffer;
 
         public ProductViewHolder(@NonNull View itemView) {
@@ -618,86 +756,30 @@ public class SearchProductActivity extends AppCompatActivity {
 
             clickListener = itemView.findViewById(R.id.click_listener);
             productImage = itemView.findViewById(R.id.product_image);
-            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
-            addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
-            productTypeImage = itemView.findViewById(R.id.product_type_image);
+            productTypeImage = itemView.findViewById(R.id.product_type);
             productOffer = itemView.findViewById(R.id.product_offer);
             productName = itemView.findViewById(R.id.product_name);
             productUnit = itemView.findViewById(R.id.product_unit);
             productCategory = itemView.findViewById(R.id.product_category);
-            productStatus = itemView.findViewById(R.id.product_in_stock);
+            productStatus = itemView.findViewById(R.id.product_status);
+            productUnitInStock = itemView.findViewById(R.id.product_unit_in_stock);
             productPrice = itemView.findViewById(R.id.product_price);
             productMRP = itemView.findViewById(R.id.product_mrp);
+            addToCartBtnContainer = itemView.findViewById(R.id.add_to_cart_btn_container);
+            addToCartBtn = itemView.findViewById(R.id.add_to_cart_btn);
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-            case 123:
-                if (resultCode == RESULT_OK && data != null) {
-                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    inputProductSearch.setText(result.get(0));
-                    inputProductSearch.clearFocus();
-
-                    if (inputProductSearch.getText().toString().isEmpty()) {
-                        UIUtil.hideKeyboard(SearchProductActivity.this);
-
-                        recyclerProducts.setHasFixedSize(true);
-                        recyclerProducts.setLayoutManager(null);
-                        recyclerProducts.setAdapter(null);
-
-                        illustrationSearch.setVisibility(View.VISIBLE);
-                        textSearch.setVisibility(View.VISIBLE);
-                        progressBar.setVisibility(View.GONE);
-                        Alerter.create(SearchProductActivity.this)
-                                .setText("Type something in the search bar")
-                                .setTextAppearance(R.style.AlertText)
-                                .setBackgroundColorRes(R.color.errorColor)
-                                .setIcon(R.drawable.ic_error)
-                                .setDuration(3000)
-                                .enableIconPulse(true)
-                                .enableVibration(true)
-                                .disableOutsideTouch()
-                                .enableProgress(true)
-                                .setProgressColorInt(getColor(android.R.color.white))
-                                .show();
-                    } else {
-                        UIUtil.hideKeyboard(SearchProductActivity.this);
-                        illustrationSearch.setVisibility(View.GONE);
-                        textSearch.setVisibility(View.GONE);
-                        progressBar.setVisibility(View.VISIBLE);
-
-                        Query query = productsRef.orderBy(Constants.KEY_PRODUCT_SEARCH_KEYWORD, Query.Direction.ASCENDING)
-                                .startAt(inputProductSearch.getText().toString().toLowerCase().trim())
-                                .endAt(inputProductSearch.getText().toString().toLowerCase().trim() + "\uf8ff");
-
-                        PagedList.Config config = new PagedList.Config.Builder()
-                                .setInitialLoadSizeHint(8)
-                                .setPageSize(4)
-                                .build();
-
-                        FirestorePagingOptions<Product> options = new FirestorePagingOptions.Builder<Product>()
-                                .setLifecycleOwner(SearchProductActivity.this)
-                                .setQuery(query, config, Product.class)
-                                .build();
-
-                        loadProducts(options);
-                    }
-                }
-                break;
-        }
-    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private boolean isConnectedToInternet(SearchProductActivity searchProductActivity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) searchProductActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) searchProductActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if ((wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected())) {
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
             return true;
         } else {
             return false;
@@ -726,6 +808,12 @@ public class SearchProductActivity extends AppCompatActivity {
                 UIUtil.hideKeyboard(SearchProductActivity.this);
             }
         });
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
         CustomIntent.customType(SearchProductActivity.this, "up-to-bottom");
     }
 }

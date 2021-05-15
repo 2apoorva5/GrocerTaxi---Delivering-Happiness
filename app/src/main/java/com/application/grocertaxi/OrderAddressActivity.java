@@ -3,6 +3,7 @@ package com.application.grocertaxi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -42,9 +43,9 @@ public class OrderAddressActivity extends AppCompatActivity {
     private TextInputLayout nameInput, mobileInput, deliveryAddress, instructions;
     private TextView changeAddressBtn;
     private ChipGroup paymentMethodChipGroup;
-    private ConstraintLayout proceedBtn;
+    private ConstraintLayout layoutContent, layoutNoInternet, retryBtn, proceedBtn;
 
-    private CollectionReference userRef;
+    private CollectionReference userRef, storeRef;
 
     private PreferenceManager preferenceManager;
     private AlertDialog progressDialog;
@@ -87,33 +88,12 @@ public class OrderAddressActivity extends AppCompatActivity {
                 .setTheme(R.style.SpotsDialog)
                 .build();
 
-        initViews();
-        initFirebase();
-        setActionOnViews();
-    }
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (preferenceManager.getString(Constants.KEY_USER_ADDRESS).equals("") ||
-                preferenceManager.getString(Constants.KEY_USER_ADDRESS).length() == 0 ||
-                preferenceManager.getString(Constants.KEY_USER_ADDRESS).isEmpty() ||
-                preferenceManager.getString(Constants.KEY_USER_ADDRESS) == null) {
-            deliveryAddress.getEditText().setEnabled(false);
-            deliveryAddress.setEndIconActivated(false);
-            deliveryAddress.getEditText().setText("No address added yet");
-            changeAddressBtn.setText("Add Address");
-            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
-        } else {
-            deliveryAddress.getEditText().setEnabled(false);
-            deliveryAddress.setEndIconActivated(false);
-            deliveryAddress.getEditText().setText(preferenceManager.getString(Constants.KEY_USER_ADDRESS));
-            changeAddressBtn.setText("Change Address");
-            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, preferenceManager.getString(Constants.KEY_USER_ADDRESS));
-        }
-    }
+        layoutContent = findViewById(R.id.layout_content);
+        layoutNoInternet = findViewById(R.id.layout_no_internet);
+        retryBtn = findViewById(R.id.retry_btn);
 
-    private void initViews() {
         backBtn = findViewById(R.id.back_btn);
         nameInput = findViewById(R.id.name);
         mobileInput = findViewById(R.id.mobile);
@@ -125,15 +105,66 @@ public class OrderAddressActivity extends AppCompatActivity {
         proceedBtn = findViewById(R.id.proceed_btn);
     }
 
+    private void checkNetworkConnection() {
+        if (!isConnectedToInternet(OrderAddressActivity.this)) {
+            layoutContent.setVisibility(View.GONE);
+            layoutNoInternet.setVisibility(View.VISIBLE);
+            retryBtn.setOnClickListener(v -> checkNetworkConnection());
+        } else {
+            initFirebase();
+            setActionOnViews();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkNetworkConnection();
+
+        if (preferenceManager.getString(Constants.KEY_USER_ADDRESS).equals("") ||
+                preferenceManager.getString(Constants.KEY_USER_ADDRESS).length() == 0 ||
+                preferenceManager.getString(Constants.KEY_USER_ADDRESS).isEmpty() ||
+                preferenceManager.getString(Constants.KEY_USER_ADDRESS) == null) {
+            deliveryAddress.getEditText().setEnabled(false);
+            deliveryAddress.setEndIconActivated(false);
+            deliveryAddress.getEditText().setText("No address added yet");
+            changeAddressBtn.setText("Add Address");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LOCATION, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LATITUDE, String.valueOf(0));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LONGITUDE, String.valueOf(0));
+        } else {
+            deliveryAddress.getEditText().setEnabled(false);
+            deliveryAddress.setEndIconActivated(false);
+            deliveryAddress.getEditText().setText(preferenceManager.getString(Constants.KEY_USER_ADDRESS));
+            changeAddressBtn.setText("Change Address");
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LOCATION, preferenceManager.getString(Constants.KEY_USER_LOCATION));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, preferenceManager.getString(Constants.KEY_USER_ADDRESS));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LATITUDE, preferenceManager.getString(Constants.KEY_USER_LATITUDE));
+            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LONGITUDE, preferenceManager.getString(Constants.KEY_USER_LONGITUDE));
+        }
+    }
+
     private void initFirebase() {
         userRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS);
+
+        storeRef = FirebaseFirestore.getInstance()
+                .collection(Constants.KEY_COLLECTION_CITIES)
+                .document(preferenceManager.getString(Constants.KEY_USER_CITY))
+                .collection(Constants.KEY_COLLECTION_LOCALITIES)
+                .document(preferenceManager.getString(Constants.KEY_USER_LOCALITY))
+                .collection(Constants.KEY_COLLECTION_STORES);
     }
 
     private void setActionOnViews() {
-        backBtn.setOnClickListener(v -> {
-            onBackPressed();
-            finish();
-        });
+        layoutNoInternet.setVisibility(View.GONE);
+        layoutContent.setVisibility(View.VISIBLE);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        backBtn.setOnClickListener(v -> onBackPressed());
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         KeyboardVisibilityEvent.setEventListener(OrderAddressActivity.this, isOpen -> {
             if (!isOpen) {
@@ -143,14 +174,20 @@ public class OrderAddressActivity extends AppCompatActivity {
             }
         });
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         nameInput.getEditText().setText(preferenceManager.getString(Constants.KEY_USER_NAME));
         mobileInput.getEditText().setText(preferenceManager.getString(Constants.KEY_USER_MOBILE).substring(3, 13));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         changeAddressBtn.setOnClickListener(v -> {
             preferenceManager.putString(Constants.KEY_SUBLOCALITY, "");
             preferenceManager.putString(Constants.KEY_LOCALITY, "");
             preferenceManager.putString(Constants.KEY_COUNTRY, "");
             preferenceManager.putString(Constants.KEY_PINCODE, "");
+            preferenceManager.putString(Constants.KEY_LATITUDE, "");
+            preferenceManager.putString(Constants.KEY_LONGITUDE, "");
             startActivity(new Intent(OrderAddressActivity.this, LocationPermissionActivity.class));
             CustomIntent.customType(OrderAddressActivity.this, "bottom-to-up");
         });
@@ -165,6 +202,8 @@ public class OrderAddressActivity extends AppCompatActivity {
 
             bottomSheetDialog.show();
         });
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         proceedBtn.setOnClickListener(v -> {
             UIUtil.hideKeyboard(OrderAddressActivity.this);
@@ -201,68 +240,133 @@ public class OrderAddressActivity extends AppCompatActivity {
                         } else {
                             progressDialog.show();
 
-                            userRef.document(preferenceManager.getString(Constants.KEY_USER_ID)).get()
+                            storeRef.document(preferenceManager.getString(Constants.KEY_ORDER_FROM_STOREID))
+                                    .get()
                                     .addOnCompleteListener(task -> {
-                                        if(task.isSuccessful()) {
-                                            DocumentSnapshot documentSnapshot = task.getResult();
-                                            if (documentSnapshot.exists()) {
-                                                boolean first_order = documentSnapshot.getBoolean(Constants.KEY_USER_FIRST_ORDER);
+                                        if (task.isSuccessful()) {
+                                            if (task.getResult().exists()) {
+                                                double storeLatitude = task.getResult().getDouble(Constants.KEY_STORE_LATITUDE);
+                                                double storeLongitude = task.getResult().getDouble(Constants.KEY_STORE_LONGITUDE);
 
-                                                if (first_order) {
-                                                    Random random = new Random();
-                                                    int number1 = random.nextInt(9000) + 1000;
-                                                    int number2 = random.nextInt(9000) + 1000;
-                                                    int number3 = random.nextInt(9000) + 1000;
+                                                double userLatitude = Double.parseDouble(preferenceManager.getString(Constants.KEY_USER_LATITUDE));
+                                                double userLongitude = Double.parseDouble(preferenceManager.getString(Constants.KEY_USER_LONGITUDE));
 
-                                                    preferenceManager.putString(Constants.KEY_ORDER_ID, String.format("#%d%d%d", number1, number2, number3));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, preferenceManager.getString(Constants.KEY_USER_ID));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, preferenceManager.getString(Constants.KEY_USER_NAME));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, name);
-                                                    preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, mobile);
-                                                    preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, instruction);
-                                                    preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "Online Payment");
+                                                float[] results = new float[1];
+                                                Location.distanceBetween(storeLatitude, storeLongitude, userLatitude, userLongitude, results);
+                                                float distance = results[0];
 
-                                                    double total_payable = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
-                                                            + Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TIP_AMOUNT));
+                                                double kilometre = Math.round((distance / 1000) * 100.0) / 100.0;
 
-                                                    preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
+                                                if (kilometre <= 5) {
+                                                    userRef.document(preferenceManager.getString(Constants.KEY_USER_ID)).get()
+                                                            .addOnCompleteListener(task1 -> {
+                                                                if (task1.isSuccessful()) {
+                                                                    DocumentSnapshot documentSnapshot = task1.getResult();
+                                                                    if (documentSnapshot.exists()) {
+                                                                        boolean first_order = documentSnapshot.getBoolean(Constants.KEY_USER_FIRST_ORDER);
 
-                                                    progressDialog.dismiss();
+                                                                        if (first_order) {
+                                                                            Random random = new Random();
+                                                                            int number1 = random.nextInt(9000) + 1000;
+                                                                            int number2 = random.nextInt(9000) + 1000;
+                                                                            int number3 = random.nextInt(9000) + 1000;
 
-                                                    startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
-                                                    CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
-                                                    finish();
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_ID, String.format("#%d%d%d", number1, number2, number3));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, preferenceManager.getString(Constants.KEY_USER_ID));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, preferenceManager.getString(Constants.KEY_USER_NAME));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, name);
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, mobile);
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_DISTANCE, String.valueOf(kilometre));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, instruction);
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "Online Payment");
+
+                                                                            double total_payable = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
+                                                                                    + Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TIP_AMOUNT));
+
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
+
+                                                                            progressDialog.dismiss();
+
+                                                                            startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
+                                                                            CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
+                                                                            finish();
+                                                                        } else {
+                                                                            Random random = new Random();
+                                                                            int number1 = random.nextInt(9000) + 1000;
+                                                                            int number2 = random.nextInt(9000) + 1000;
+                                                                            int number3 = random.nextInt(9000) + 1000;
+
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_ID, String.format("#%d%d%d", number1, number2, number3));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, preferenceManager.getString(Constants.KEY_USER_ID));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, preferenceManager.getString(Constants.KEY_USER_NAME));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, name);
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, mobile);
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_DISTANCE, String.valueOf(kilometre));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, instruction);
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "Online Payment");
+
+                                                                            double sub_total = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
+                                                                                    + Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TIP_AMOUNT));
+
+                                                                            double convenience_fee = Math.round((0.02 * sub_total) * 100.0) / 100.0;
+                                                                            double total_payable = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
+                                                                                    + Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TIP_AMOUNT))
+                                                                                    + convenience_fee;
+
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(convenience_fee));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
+
+                                                                            progressDialog.dismiss();
+
+                                                                            startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
+                                                                            CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
+                                                                            finish();
+                                                                        }
+                                                                    } else {
+                                                                        progressDialog.dismiss();
+
+                                                                        Alerter.create(OrderAddressActivity.this)
+                                                                                .setText("Whoa! Something broke. Try again!")
+                                                                                .setTextAppearance(R.style.AlertText)
+                                                                                .setBackgroundColorRes(R.color.errorColor)
+                                                                                .setIcon(R.drawable.ic_error)
+                                                                                .setDuration(3000)
+                                                                                .enableIconPulse(true)
+                                                                                .enableVibration(true)
+                                                                                .disableOutsideTouch()
+                                                                                .enableProgress(true)
+                                                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                                                .show();
+                                                                    }
+                                                                } else {
+                                                                    progressDialog.dismiss();
+
+                                                                    Alerter.create(OrderAddressActivity.this)
+                                                                            .setText("Whoa! Something broke. Try again!")
+                                                                            .setTextAppearance(R.style.AlertText)
+                                                                            .setBackgroundColorRes(R.color.errorColor)
+                                                                            .setIcon(R.drawable.ic_error)
+                                                                            .setDuration(3000)
+                                                                            .enableIconPulse(true)
+                                                                            .enableVibration(true)
+                                                                            .disableOutsideTouch()
+                                                                            .enableProgress(true)
+                                                                            .setProgressColorInt(getColor(android.R.color.white))
+                                                                            .show();
+                                                                }
+                                                            });
                                                 } else {
-                                                    Random random = new Random();
-                                                    int number1 = random.nextInt(9000) + 1000;
-                                                    int number2 = random.nextInt(9000) + 1000;
-                                                    int number3 = random.nextInt(9000) + 1000;
-
-                                                    preferenceManager.putString(Constants.KEY_ORDER_ID, String.format("#%d%d%d", number1, number2, number3));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, preferenceManager.getString(Constants.KEY_USER_ID));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, preferenceManager.getString(Constants.KEY_USER_NAME));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, name);
-                                                    preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, mobile);
-                                                    preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, instruction);
-                                                    preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "Online Payment");
-
-                                                    double sub_total = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
-                                                            + Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TIP_AMOUNT));
-
-                                                    double convenience_fee = Math.round((0.02 * sub_total) * 100.0) / 100.0;
-                                                    double total_payable = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
-                                                            + Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TIP_AMOUNT))
-                                                            + convenience_fee;
-
-                                                    preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(convenience_fee));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
-
                                                     progressDialog.dismiss();
-
-                                                    startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
-                                                    CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
-                                                    finish();
+                                                    MaterialDialog materialDialog = new MaterialDialog.Builder(OrderAddressActivity.this)
+                                                            .setTitle("Ahan! Can't proceed!")
+                                                            .setMessage("The delivery address should be in a distance of 5 kilometres from the store.")
+                                                            .setCancelable(false)
+                                                            .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface, which) -> {
+                                                                dialogInterface.dismiss();
+                                                            })
+                                                            .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                                                    materialDialog.show();
                                                 }
                                             } else {
                                                 progressDialog.dismiss();
@@ -305,63 +409,128 @@ public class OrderAddressActivity extends AppCompatActivity {
                         } else {
                             progressDialog.show();
 
-                            userRef.document(preferenceManager.getString(Constants.KEY_USER_ID)).get()
+                            storeRef.document(preferenceManager.getString(Constants.KEY_ORDER_FROM_STOREID))
+                                    .get()
                                     .addOnCompleteListener(task -> {
-                                        if(task.isSuccessful()) {
-                                            DocumentSnapshot documentSnapshot = task.getResult();
-                                            if (documentSnapshot.exists()) {
-                                                boolean first_order = documentSnapshot.getBoolean(Constants.KEY_USER_FIRST_ORDER);
+                                        if (task.isSuccessful()) {
+                                            if (task.getResult().exists()) {
+                                                double storeLatitude = task.getResult().getDouble(Constants.KEY_STORE_LATITUDE);
+                                                double storeLongitude = task.getResult().getDouble(Constants.KEY_STORE_LONGITUDE);
 
-                                                if (first_order) {
-                                                    Random random = new Random();
-                                                    int number1 = random.nextInt(9000) + 1000;
-                                                    int number2 = random.nextInt(9000) + 1000;
-                                                    int number3 = random.nextInt(9000) + 1000;
+                                                double userLatitude = Double.parseDouble(preferenceManager.getString(Constants.KEY_USER_LATITUDE));
+                                                double userLongitude = Double.parseDouble(preferenceManager.getString(Constants.KEY_USER_LONGITUDE));
 
-                                                    preferenceManager.putString(Constants.KEY_ORDER_ID, String.format("#%d%d%d", number1, number2, number3));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, preferenceManager.getString(Constants.KEY_USER_ID));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, preferenceManager.getString(Constants.KEY_USER_NAME));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, name);
-                                                    preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, mobile);
-                                                    preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, instruction);
-                                                    preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "Pay on Delivery");
+                                                float[] results = new float[1];
+                                                Location.distanceBetween(storeLatitude, storeLongitude, userLatitude, userLongitude, results);
+                                                float distance = results[0];
 
-                                                    double total_payable = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
-                                                            + Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TIP_AMOUNT));
+                                                double kilometre = Math.round((distance / 1000) * 100.0) / 100.0;
 
-                                                    preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
+                                                if (kilometre <= 5) {
+                                                    userRef.document(preferenceManager.getString(Constants.KEY_USER_ID)).get()
+                                                            .addOnCompleteListener(task1 -> {
+                                                                if (task1.isSuccessful()) {
+                                                                    DocumentSnapshot documentSnapshot = task1.getResult();
+                                                                    if (documentSnapshot.exists()) {
+                                                                        boolean first_order = documentSnapshot.getBoolean(Constants.KEY_USER_FIRST_ORDER);
 
-                                                    progressDialog.dismiss();
+                                                                        if (first_order) {
+                                                                            Random random = new Random();
+                                                                            int number1 = random.nextInt(9000) + 1000;
+                                                                            int number2 = random.nextInt(9000) + 1000;
+                                                                            int number3 = random.nextInt(9000) + 1000;
 
-                                                    startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
-                                                    CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
-                                                    finish();
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_ID, String.format("#%d%d%d", number1, number2, number3));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, preferenceManager.getString(Constants.KEY_USER_ID));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, preferenceManager.getString(Constants.KEY_USER_NAME));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, name);
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, mobile);
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_DISTANCE, String.valueOf(kilometre));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, instruction);
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "Pay on Delivery");
+
+                                                                            double total_payable = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
+                                                                                    + Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TIP_AMOUNT));
+
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
+
+                                                                            progressDialog.dismiss();
+
+                                                                            startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
+                                                                            CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
+                                                                            finish();
+                                                                        } else {
+                                                                            Random random = new Random();
+                                                                            int number1 = random.nextInt(9000) + 1000;
+                                                                            int number2 = random.nextInt(9000) + 1000;
+                                                                            int number3 = random.nextInt(9000) + 1000;
+
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_ID, String.format("#%d%d%d", number1, number2, number3));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, preferenceManager.getString(Constants.KEY_USER_ID));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, preferenceManager.getString(Constants.KEY_USER_NAME));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, name);
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, mobile);
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_DISTANCE, String.valueOf(kilometre));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, instruction);
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "Pay on Delivery");
+
+                                                                            double total_payable = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
+                                                                                    + Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TIP_AMOUNT));
+
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
+                                                                            preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
+
+                                                                            progressDialog.dismiss();
+
+                                                                            startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
+                                                                            CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
+                                                                            finish();
+                                                                        }
+                                                                    } else {
+                                                                        progressDialog.dismiss();
+
+                                                                        Alerter.create(OrderAddressActivity.this)
+                                                                                .setText("Whoa! Something broke. Try again!")
+                                                                                .setTextAppearance(R.style.AlertText)
+                                                                                .setBackgroundColorRes(R.color.errorColor)
+                                                                                .setIcon(R.drawable.ic_error)
+                                                                                .setDuration(3000)
+                                                                                .enableIconPulse(true)
+                                                                                .enableVibration(true)
+                                                                                .disableOutsideTouch()
+                                                                                .enableProgress(true)
+                                                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                                                .show();
+                                                                    }
+                                                                } else {
+                                                                    progressDialog.dismiss();
+
+                                                                    Alerter.create(OrderAddressActivity.this)
+                                                                            .setText("Whoa! Something broke. Try again!")
+                                                                            .setTextAppearance(R.style.AlertText)
+                                                                            .setBackgroundColorRes(R.color.errorColor)
+                                                                            .setIcon(R.drawable.ic_error)
+                                                                            .setDuration(3000)
+                                                                            .enableIconPulse(true)
+                                                                            .enableVibration(true)
+                                                                            .disableOutsideTouch()
+                                                                            .enableProgress(true)
+                                                                            .setProgressColorInt(getColor(android.R.color.white))
+                                                                            .show();
+                                                                }
+                                                            });
                                                 } else {
-                                                    Random random = new Random();
-                                                    int number1 = random.nextInt(9000) + 1000;
-                                                    int number2 = random.nextInt(9000) + 1000;
-                                                    int number3 = random.nextInt(9000) + 1000;
-
-                                                    preferenceManager.putString(Constants.KEY_ORDER_ID, String.format("#%d%d%d", number1, number2, number3));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, preferenceManager.getString(Constants.KEY_USER_ID));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_BY_USERNAME, preferenceManager.getString(Constants.KEY_USER_NAME));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, name);
-                                                    preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, mobile);
-                                                    preferenceManager.putString(Constants.KEY_ORDER_INSTRUCTIONS, instruction);
-                                                    preferenceManager.putString(Constants.KEY_ORDER_PAYMENT_MODE, "Pay on Delivery");
-
-                                                    double total_payable = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))
-                                                            + Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TIP_AMOUNT));
-
-                                                    preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
-                                                    preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
-
                                                     progressDialog.dismiss();
-
-                                                    startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
-                                                    CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
-                                                    finish();
+                                                    MaterialDialog materialDialog = new MaterialDialog.Builder(OrderAddressActivity.this)
+                                                            .setTitle("Ahan! Can't proceed!")
+                                                            .setMessage("The delivery address should be in a distance of 5 kilometres from the store.")
+                                                            .setCancelable(false)
+                                                            .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface, which) -> {
+                                                                dialogInterface.dismiss();
+                                                            })
+                                                            .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                                                    materialDialog.show();
                                                 }
                                             } else {
                                                 progressDialog.dismiss();
@@ -449,13 +618,16 @@ public class OrderAddressActivity extends AppCompatActivity {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     private boolean isConnectedToInternet(OrderAddressActivity orderAddressActivity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) orderAddressActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) orderAddressActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if ((wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected())) {
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
             return true;
         } else {
             return false;
@@ -484,6 +656,12 @@ public class OrderAddressActivity extends AppCompatActivity {
                 UIUtil.hideKeyboard(OrderAddressActivity.this);
             }
         });
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
         CustomIntent.customType(OrderAddressActivity.this, "right-to-left");
     }
 }

@@ -80,12 +80,10 @@ public class CompletedOrdersFragment extends Fragment {
 
     private void loadCompletedOrders() {
         Query query = userCompletedOrdersRef.orderBy(Constants.KEY_ORDER_TIMESTAMP, Query.Direction.DESCENDING);
-
         PagedList.Config config = new PagedList.Config.Builder()
-                .setInitialLoadSizeHint(8)
+                .setInitialLoadSizeHint(4)
                 .setPageSize(4)
                 .build();
-
         FirestorePagingOptions<Order> options = new FirestorePagingOptions.Builder<Order>()
                 .setLifecycleOwner(getActivity())
                 .setQuery(query, config, Order.class)
@@ -96,14 +94,14 @@ public class CompletedOrdersFragment extends Fragment {
             @NonNull
             @Override
             public CompletedOrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_pending_order_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_completed_order, parent, false);
                 return new CompletedOrderViewHolder(view);
             }
 
             @Override
             protected void onBindViewHolder(@NonNull CompletedOrderViewHolder holder, int position, @NonNull Order model) {
                 holder.orderID.setText(model.getOrderID());
-                holder.orderCompletedTime.setText(String.format("Delivered on %s", model.getOrderPlacedTime()));
+                holder.orderCompletedTime.setText(String.format("Delivered on %s", model.getOrderCompletionTime()));
 
                 if (model.getOrderNoOfItems() == 1) {
                     holder.noOfItems.setText(String.format("%d Item", model.getOrderNoOfItems()));
@@ -212,13 +210,16 @@ public class CompletedOrdersFragment extends Fragment {
         loadCompletedOrders();
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     private boolean isConnectedToInternet(Activity activity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if ((wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected())) {
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
             return true;
         } else {
             return false;

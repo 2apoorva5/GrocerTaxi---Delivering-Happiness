@@ -1,18 +1,22 @@
 package com.application.grocertaxi;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import com.application.grocertaxi.Fragments.CancelledOrdersFragment;
 import com.application.grocertaxi.Fragments.CompletedOrdersFragment;
@@ -32,6 +36,8 @@ public class OrdersHistoryActivity extends AppCompatActivity {
 
     private ViewPager viewPager;
     private TabLayout tabLayout;
+
+    private ConstraintLayout layoutContent, layoutNoInternet, retryBtn;
 
     private PendingOrdersFragment pendingOrdersFragment;
     private CompletedOrdersFragment completedOrdersFragment;
@@ -71,8 +77,42 @@ public class OrdersHistoryActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        initViews();
-        setActionOnViews();
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        layoutContent = findViewById(R.id.layout_content);
+        layoutNoInternet = findViewById(R.id.layout_no_internet);
+        retryBtn = findViewById(R.id.retry_btn);
+
+        backBtn = findViewById(R.id.back_btn);
+        viewPager = findViewById(R.id.view_pager);
+        tabLayout = findViewById(R.id.tab_layout);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkNetworkConnection();
+    }
+
+    private void checkNetworkConnection() {
+        if (!isConnectedToInternet(OrdersHistoryActivity.this)) {
+            layoutContent.setVisibility(View.GONE);
+            layoutNoInternet.setVisibility(View.VISIBLE);
+            retryBtn.setOnClickListener(v -> checkNetworkConnection());
+        } else {
+            setActionOnViews();
+        }
+    }
+
+    private void setActionOnViews() {
+        layoutNoInternet.setVisibility(View.GONE);
+        layoutContent.setVisibility(View.VISIBLE);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        backBtn.setOnClickListener(v -> onBackPressed());
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         pendingOrdersFragment = new PendingOrdersFragment();
         completedOrdersFragment = new CompletedOrdersFragment();
@@ -85,19 +125,6 @@ public class OrdersHistoryActivity extends AppCompatActivity {
         viewPagerAdapter.addFragment(completedOrdersFragment, "Completed");
         viewPagerAdapter.addFragment(cancelledOrdersFragment, "Cancelled");
         viewPager.setAdapter(viewPagerAdapter);
-    }
-
-    private void initViews() {
-        backBtn = findViewById(R.id.back_btn);
-        viewPager = findViewById(R.id.view_pager);
-        tabLayout = findViewById(R.id.tab_layout);
-    }
-
-    private void setActionOnViews() {
-        backBtn.setOnClickListener(v -> {
-            onBackPressed();
-            finish();
-        });
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -132,9 +159,31 @@ public class OrdersHistoryActivity extends AppCompatActivity {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private boolean isConnectedToInternet(OrdersHistoryActivity ordersHistoryActivity) {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) ordersHistoryActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
         CustomIntent.customType(OrdersHistoryActivity.this, "right-to-left");
     }
 }

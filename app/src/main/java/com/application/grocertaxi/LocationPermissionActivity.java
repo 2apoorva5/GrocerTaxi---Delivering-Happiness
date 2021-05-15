@@ -76,7 +76,7 @@ public class LocationPermissionActivity extends AppCompatActivity {
         setActionOnViews();
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            startActivity(new Intent(getApplicationContext(), PinOnMapActivity.class));
+            startActivity(new Intent(getApplicationContext(), DeliveryAddressActivity.class));
             CustomIntent.customType(LocationPermissionActivity.this, "bottom-to-up");
             finish();
         } else {
@@ -90,10 +90,7 @@ public class LocationPermissionActivity extends AppCompatActivity {
     }
 
     private void setActionOnViews() {
-        backBtn.setOnClickListener(v -> {
-            onBackPressed();
-            finish();
-        });
+        backBtn.setOnClickListener(v -> onBackPressed());
 
         grantBtn.setOnClickListener(v -> {
             if (!isConnectedToInternet(LocationPermissionActivity.this)) {
@@ -105,7 +102,7 @@ public class LocationPermissionActivity extends AppCompatActivity {
                         .withListener(new PermissionListener() {
                             @Override
                             public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-                                startActivity(new Intent(getApplicationContext(), PinOnMapActivity.class));
+                                startActivity(new Intent(getApplicationContext(), DeliveryAddressActivity.class));
                                 CustomIntent.customType(LocationPermissionActivity.this, "bottom-to-up");
                                 finish();
                             }
@@ -145,13 +142,16 @@ public class LocationPermissionActivity extends AppCompatActivity {
         });
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     private boolean isConnectedToInternet(LocationPermissionActivity locationPermissionActivity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) locationPermissionActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) locationPermissionActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if ((wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected())) {
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
             return true;
         } else {
             return false;
@@ -175,11 +175,12 @@ public class LocationPermissionActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        KeyboardVisibilityEvent.setEventListener(LocationPermissionActivity.this, isOpen -> {
-            if (isOpen) {
-                UIUtil.hideKeyboard(LocationPermissionActivity.this);
-            }
-        });
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
         CustomIntent.customType(LocationPermissionActivity.this, "up-to-bottom");
     }
 }

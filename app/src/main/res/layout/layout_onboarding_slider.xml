@@ -7,9 +7,9 @@
 
     <ImageView
         android:id="@+id/illustration_on_boarding"
-        android:layout_width="320dp"
-        android:layout_height="320dp"
-        android:layout_marginTop="56dp"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:layout_marginTop="72dp"
         android:src="@drawable/illustration_onboarding1"
         android:scaleType="centerInside"
         android:contentDescription="@string/app_name"

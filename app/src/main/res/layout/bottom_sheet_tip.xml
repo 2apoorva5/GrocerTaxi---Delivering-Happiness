@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet_tip"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -23,10 +24,7 @@
             android:layout_marginTop="24dp"
             android:contentDescription="@string/app_name"
             android:scaleType="centerCrop"
-            android:src="@drawable/delivery_guy"
-            app:civ_border_color="@color/colorPrimary"
-            app:civ_border_width="2dp"
-            app:civ_circle_background_color="@color/colorPrimary"
+            android:src="@drawable/img_delivery_guy"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -37,7 +35,7 @@
             android:layout_marginHorizontal="16dp"
             android:fontFamily="@font/montserrat"
             android:includeFontPadding="false"
-            android:text="Add tip to support your delivery hero"
+            android:text="@string/add_tip_to_support_your_delivery_hero"
             android:textAlignment="textStart"
             android:textAllCaps="false"
             android:textColor="@color/colorTextDark"
@@ -57,16 +55,17 @@
             android:alpha="0.75"
             android:fontFamily="@font/montserrat"
             android:includeFontPadding="false"
-            android:text="Your delivery hero risks his life to deliver your grocery safely &amp; timely in the times of crisis."
+            android:text="@string/your_delivery_hero_risks_his_life_to_deliver_your_grocery_safely_amp_timely_in_the_times_of_crisis"
             android:textAlignment="textStart"
             android:textAllCaps="false"
             android:textColor="@color/colorTextDark"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/img_delivery_guy"
-            app:layout_constraintTop_toBottomOf="@id/text_tip_title" />
+            app:layout_constraintTop_toBottomOf="@id/text_tip_title"
+            tools:ignore="SmallSp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -85,12 +84,12 @@
         app:singleSelection="true">
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/tip25_chip"
+            android:id="@+id/tip10_chip"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checkable="true"
-            android:text="+ ₹ 25"
+            android:text="@string/_10"
             android:textAppearance="@style/ChipText"
             android:textColor="@color/chip_text_color"
             app:chipBackgroundColor="@color/chip_background_color"
@@ -98,17 +97,15 @@
             app:chipEndPadding="8dp"
             app:chipMinHeight="40dp"
             app:chipStartPadding="8dp"
-            app:chipStrokeColor="@color/chip_stroke_color"
-            app:chipStrokeWidth="1dp"
             app:rippleColor="@color/colorAccent" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/tip50_chip"
+            android:id="@+id/tip20_chip"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checkable="true"
-            android:text="+ ₹ 50"
+            android:text="@string/_20"
             android:textAppearance="@style/ChipText"
             android:textColor="@color/chip_text_color"
             app:chipBackgroundColor="@color/chip_background_color"
@@ -116,17 +113,15 @@
             app:chipEndPadding="8dp"
             app:chipMinHeight="40dp"
             app:chipStartPadding="8dp"
-            app:chipStrokeColor="@color/chip_stroke_color"
-            app:chipStrokeWidth="1dp"
             app:rippleColor="@color/colorAccent" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/tip100_chip"
+            android:id="@+id/tip30_chip"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checkable="true"
-            android:text="+ ₹ 100"
+            android:text="@string/_30"
             android:textAppearance="@style/ChipText"
             android:textColor="@color/chip_text_color"
             app:chipBackgroundColor="@color/chip_background_color"
@@ -134,8 +129,6 @@
             app:chipEndPadding="8dp"
             app:chipMinHeight="40dp"
             app:chipStartPadding="8dp"
-            app:chipStrokeColor="@color/chip_stroke_color"
-            app:chipStrokeWidth="1dp"
             app:rippleColor="@color/colorAccent" />
 
     </com.google.android.material.chip.ChipGroup>
@@ -182,7 +175,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat"
                 android:includeFontPadding="false"
-                android:text="Checkout"
+                android:text="@string/checkout"
                 android:textAlignment="center"
                 android:textAllCaps="false"
                 android:textColor="@color/colorTextDark"

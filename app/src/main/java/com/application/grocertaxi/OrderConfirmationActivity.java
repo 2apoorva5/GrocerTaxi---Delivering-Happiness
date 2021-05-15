@@ -26,10 +26,10 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.razorpay.Checkout;
 import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -42,7 +42,7 @@ public class OrderConfirmationActivity extends AppCompatActivity {
     private View viewBetween2;
     private CardView view3;
     private TextView textPlaced, orderID;
-    private ConstraintLayout layoutConfirmation, continueBtn, trackBtn;
+    private ConstraintLayout layoutContent, layoutNoInternet, retryBtn, layoutConfirmation, continueBtn, trackBtn;
     private ProgressBar progressBar;
 
     private CollectionReference userRef, storeRef, cartRef;
@@ -81,12 +81,12 @@ public class OrderConfirmationActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        initViews();
-        initFirebase();
-        setActionOnViews();
-    }
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void initViews() {
+        layoutContent = findViewById(R.id.layout_content);
+        layoutNoInternet = findViewById(R.id.layout_no_internet);
+        retryBtn = findViewById(R.id.retry_btn);
+
         backBtn = findViewById(R.id.back_btn);
         imgView3 = findViewById(R.id.img_view3);
         viewBetween2 = findViewById(R.id.view_between2);
@@ -97,6 +97,23 @@ public class OrderConfirmationActivity extends AppCompatActivity {
         continueBtn = findViewById(R.id.continue_btn);
         trackBtn = findViewById(R.id.track_btn);
         progressBar = findViewById(R.id.progress_bar);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkNetworkConnection();
+    }
+
+    private void checkNetworkConnection() {
+        if (!isConnectedToInternet(OrderConfirmationActivity.this)) {
+            layoutContent.setVisibility(View.GONE);
+            layoutNoInternet.setVisibility(View.VISIBLE);
+            retryBtn.setOnClickListener(v -> checkNetworkConnection());
+        } else {
+            initFirebase();
+            setActionOnViews();
+        }
     }
 
     private void initFirebase() {
@@ -116,10 +133,14 @@ public class OrderConfirmationActivity extends AppCompatActivity {
 
     @SuppressLint("ResourceAsColor")
     private void setActionOnViews() {
-        backBtn.setOnClickListener(v -> {
-            onBackPressed();
-            finish();
-        });
+        layoutNoInternet.setVisibility(View.GONE);
+        layoutContent.setVisibility(View.VISIBLE);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        backBtn.setOnClickListener(v -> onBackPressed());
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         if (!isConnectedToInternet(OrderConfirmationActivity.this)) {
             showConnectToInternetDialog();
@@ -145,10 +166,16 @@ public class OrderConfirmationActivity extends AppCompatActivity {
             newOrder.put(Constants.KEY_ORDER_FROM_STORENAME, preferenceManager.getString(Constants.KEY_ORDER_FROM_STORENAME));
             newOrder.put(Constants.KEY_ORDER_CUSTOMER_NAME, preferenceManager.getString(Constants.KEY_ORDER_CUSTOMER_NAME));
             newOrder.put(Constants.KEY_ORDER_CUSTOMER_MOBILE, preferenceManager.getString(Constants.KEY_ORDER_CUSTOMER_MOBILE));
+            newOrder.put(Constants.KEY_ORDER_DELIVERY_LOCATION, preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_LOCATION));
             newOrder.put(Constants.KEY_ORDER_DELIVERY_ADDRESS, preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_ADDRESS));
+            newOrder.put(Constants.KEY_ORDER_DELIVERY_LATITUDE, Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_LATITUDE)));
+            newOrder.put(Constants.KEY_ORDER_DELIVERY_LONGITUDE, Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_LONGITUDE)));
+            newOrder.put(Constants.KEY_ORDER_DELIVERY_DISTANCE, Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_DISTANCE)));
             newOrder.put(Constants.KEY_ORDER_NO_OF_ITEMS, Integer.valueOf(preferenceManager.getString(Constants.KEY_ORDER_NO_OF_ITEMS)));
             newOrder.put(Constants.KEY_ORDER_TOTAL_MRP, Double.valueOf(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_MRP)));
             newOrder.put(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, Double.valueOf(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)));
+            newOrder.put(Constants.KEY_ORDER_COUPON_APPLIED, preferenceManager.getString(Constants.KEY_ORDER_COUPON_APPLIED));
+            newOrder.put(Constants.KEY_ORDER_COUPON_DISCOUNT, Double.valueOf(preferenceManager.getString(Constants.KEY_ORDER_COUPON_DISCOUNT)));
             newOrder.put(Constants.KEY_ORDER_TOTAL_DISCOUNT, Double.valueOf(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_DISCOUNT)));
             newOrder.put(Constants.KEY_ORDER_DELIVERY_CHARGES, Double.valueOf(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_CHARGES)));
             newOrder.put(Constants.KEY_ORDER_TIP_AMOUNT, Double.valueOf(preferenceManager.getString(Constants.KEY_ORDER_TIP_AMOUNT)));
@@ -223,6 +250,8 @@ public class OrderConfirmationActivity extends AppCompatActivity {
                                                                                                             ss.setSpan(fcs, 39, 52, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                                                                                                             orderID.setText(ss);
+
+                                                                                                            Checkout.clearUserData(OrderConfirmationActivity.this);
 
                                                                                                             continueBtn.setOnClickListener(v -> {
                                                                                                                 startActivity(new Intent(OrderConfirmationActivity.this, MainActivity.class));
@@ -406,13 +435,16 @@ public class OrderConfirmationActivity extends AppCompatActivity {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     private boolean isConnectedToInternet(OrderConfirmationActivity orderConfirmationActivity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) orderConfirmationActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) orderConfirmationActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if ((wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected())) {
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
             return true;
         } else {
             return false;
@@ -436,12 +468,16 @@ public class OrderConfirmationActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        CustomIntent.customType(OrderConfirmationActivity.this, "right-to-left");
+        finish();
     }
 
     @Override
     public void finish() {
         super.finish();
+        CustomIntent.customType(OrderConfirmationActivity.this, "right-to-left");
+
+        preferenceManager.putString(Constants.KEY_COUPON, "");
+        preferenceManager.putString(Constants.KEY_COUPON_DISCOUNT_PERCENT, String.valueOf(0));
 
         preferenceManager.putString(Constants.KEY_ORDER_ID, "");
         preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
@@ -450,11 +486,16 @@ public class OrderConfirmationActivity extends AppCompatActivity {
         preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
         preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
         preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+        preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LOCATION, "");
         preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+        preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LATITUDE, String.valueOf(0));
+        preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LONGITUDE, String.valueOf(0));
+        preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_DISTANCE, String.valueOf(0));
         preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
         preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
         preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
-        preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
+        preferenceManager.putString(Constants.KEY_ORDER_COUPON_APPLIED, "");
+        preferenceManager.putString(Constants.KEY_ORDER_COUPON_DISCOUNT, String.valueOf(0));
         preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
         preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
         preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(0));

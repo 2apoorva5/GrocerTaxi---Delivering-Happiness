@@ -7,565 +7,425 @@
     android:background="@color/colorBackground"
     tools:context=".MainActivity">
 
-    <com.baoyz.widget.PullRefreshLayout
-        android:id="@+id/pull_refresh_layout"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:refreshType="smartisan">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/nested_scroll_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/colorBackground"
-            android:fillViewport="true"
-            android:scrollbars="none"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <com.baoyz.widget.PullRefreshLayout
+            android:id="@+id/pull_refresh_layout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:refreshType="smartisan">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/nested_scroll_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingBottom="144dp">
-
-                <ImageView
-                    android:id="@+id/icon_location"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginStart="16dp"
-                    android:contentDescription="@string/app_name"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_address"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/user_location"
-                    app:tint="@color/colorIconDark" />
-
-                <TextView
-                    android:id="@+id/user_location"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="24dp"
-                    android:layout_marginEnd="16dp"
-                    android:ellipsize="end"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:text="Locality, City"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="13sp"
-                    android:textStyle="normal"
-                    app:layout_constraintEnd_toStartOf="@+id/edit_location_btn"
-                    app:layout_constraintStart_toEndOf="@id/icon_location"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/edit_location_btn"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="12dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:contentDescription="@string/app_name"
-                    android:focusable="true"
-                    android:padding="6dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_edit"
-                    app:layout_constraintBottom_toBottomOf="@+id/user_location"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/user_location"
-                    app:tint="@color/colorIconDark" />
-
-                <TextView
-                    android:id="@+id/greetings"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="32dp"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:includeFontPadding="false"
-                    android:text="Hey, Apoorva!"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="20sp"
-                    android:textStyle="normal"
-                    app:layout_constraintEnd_toStartOf="@+id/user_profile_pic"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/user_location" />
-
-                <TextView
-                    android:id="@+id/greetings_secondary"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="12dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="How can we help you?"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorInactive"
-                    android:textSize="14sp"
-                    android:textStyle="normal"
-                    app:layout_constraintEnd_toStartOf="@+id/user_profile_pic"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/greetings" />
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/user_profile_pic"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/illustration_user_avatar"
-                    app:civ_border_color="@color/colorIconDark"
-                    app:civ_border_width="1dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/greetings_secondary"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/greetings" />
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/product_search_btn_container"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="24dp"
-                    app:cardBackgroundColor="@color/colorSearch"
-                    app:cardCornerRadius="16dp"
-                    app:cardPreventCornerOverlap="true"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/user_profile_pic">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/product_search_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:id="@+id/img_search"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginEnd="16dp"
-                            android:alpha="0.5"
-                            android:contentDescription="@string/app_name"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/ic_search"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:tint="@color/colorIconDark" />
-
-                        <TextView
-                            android:id="@+id/text_search_product"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="16dp"
-                            android:fontFamily="@font/montserrat"
-                            android:hint="Search products"
-                            android:includeFontPadding="false"
-                            android:textAlignment="textStart"
-                            android:textAllCaps="false"
-                            android:textColor="@color/colorTextDark"
-                            android:textColorHint="@color/colorInactive"
-                            android:textSize="14sp"
-                            android:textStyle="normal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/img_search"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                </androidx.cardview.widget.CardView>
-
-                <com.smarteist.autoimageslider.SliderView
-                    android:id="@+id/banner_slider"
-                    android:layout_width="0dp"
-                    android:layout_height="210dp"
-                    android:layout_marginTop="24dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/product_search_btn_container"
-                    app:sliderAnimationDuration="1000"
-                    app:sliderAutoCycleDirection="back_and_forth"
-                    app:sliderAutoCycleEnabled="true"
-                    app:sliderIndicatorEnabled="false"
-                    app:sliderScrollTimeInSec="3"
-                    app:sliderStartAutoCycle="true" />
+                android:layout_height="match_parent"
+                android:background="@color/colorBackground"
+                android:fillViewport="true"
+                android:scrollbars="none"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/explore_by_category_layout"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:clipToPadding="false"
-                    android:paddingBottom="16dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/banner_slider">
+                    android:paddingBottom="144dp">
+
+                    <ImageView
+                        android:id="@+id/img_location"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="24dp"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_location"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/colorPrimary" />
 
                     <TextView
-                        android:id="@+id/text1"
-                        android:layout_width="0dp"
+                        android:id="@+id/user_location"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="16dp"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:ellipsize="end"
                         android:fontFamily="@font/montserrat"
                         android:includeFontPadding="false"
-                        android:text="Shop by Category"
-                        android:textAlignment="center"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:text="@string/locality_city"
+                        android:textAlignment="textStart"
                         android:textAllCaps="false"
                         android:textColor="@color/colorTextDark"
-                        android:textSize="18sp"
+                        android:textSize="14sp"
+                        android:textStyle="normal"
+                        app:layout_constraintStart_toEndOf="@id/img_location"
+                        app:layout_constraintTop_toTopOf="@id/img_location" />
+
+                    <View
+                        android:id="@+id/dashed_line"
+                        android:layout_width="0dp"
+                        android:layout_height="4dp"
+                        android:layout_marginTop="2dp"
+                        android:background="@drawable/dashed_line"
+                        app:layout_constraintEnd_toEndOf="@id/user_location"
+                        app:layout_constraintStart_toStartOf="@id/user_location"
+                        app:layout_constraintTop_toBottomOf="@id/user_location" />
+
+                    <ImageView
+                        android:id="@+id/edit_location_btn"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:contentDescription="@string/app_name"
+                        android:focusable="true"
+                        android:padding="4dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_edit"
+                        app:layout_constraintBottom_toBottomOf="@+id/user_location"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/user_location"
+                        app:tint="@color/colorIconDark" />
+
+                    <TextView
+                        android:id="@+id/greetings"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="26dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="@string/hey_user"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="20sp"
                         android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/user_profile_pic"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toBottomOf="@+id/edit_location_btn" />
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/category_fruits"
+                    <TextView
+                        android:id="@+id/greetings_secondary"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:layout_constraintEnd_toStartOf="@+id/category_vegetables"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="12dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="@string/how_can_we_help_you"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorInactive"
+                        android:textSize="14sp"
+                        android:textStyle="normal"
+                        app:layout_constraintEnd_toStartOf="@+id/user_profile_pic"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/text1">
+                        app:layout_constraintTop_toBottomOf="@+id/greetings" />
 
-                        <ImageView
-                            android:id="@+id/category_fruits_img"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:layout_marginTop="8dp"
-                            android:contentDescription="@string/app_name"
-                            android:scaleType="centerCrop"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/category_fruits_title"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="8dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="8dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/montserrat"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:text="Fruits"
-                            android:textAlignment="center"
-                            android:textAllCaps="false"
-                            android:textColor="@color/colorTextDark"
-                            android:textSize="12sp"
-                            android:textStyle="normal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/category_fruits_img" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/category_vegetables"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:layout_constraintEnd_toStartOf="@+id/category_foodgrains"
-                        app:layout_constraintStart_toEndOf="@+id/category_fruits"
-                        app:layout_constraintTop_toBottomOf="@+id/text1">
-
-                        <ImageView
-                            android:id="@+id/category_vegetables_img"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:layout_marginTop="8dp"
-                            android:contentDescription="@string/app_name"
-                            android:scaleType="centerCrop"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/category_vegetables_title"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="8dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="8dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/montserrat"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:text="Vegetables"
-                            android:textAlignment="center"
-                            android:textAllCaps="false"
-                            android:textColor="@color/colorTextDark"
-                            android:textSize="12sp"
-                            android:textStyle="normal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/category_vegetables_img" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/category_foodgrains"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="16dp"
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/user_profile_pic"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
                         android:layout_marginEnd="16dp"
-                        android:background="?attr/selectableItemBackground"
+                        android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
                         android:focusable="true"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/illustration_user_avatar"
+                        app:layout_constraintBottom_toBottomOf="@+id/greetings_secondary"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/category_vegetables"
-                        app:layout_constraintTop_toBottomOf="@+id/text1">
-
-                        <ImageView
-                            android:id="@+id/category_foodgrains_img"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:layout_marginTop="8dp"
-                            android:contentDescription="@string/app_name"
-                            android:scaleType="centerCrop"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/category_foodgrains_title"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="8dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="8dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/montserrat"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:text="Food Grains"
-                            android:textAlignment="center"
-                            android:textAllCaps="false"
-                            android:textColor="@color/colorTextDark"
-                            android:textSize="12sp"
-                            android:textStyle="normal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/category_foodgrains_img" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/category_dairy"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:layout_constraintEnd_toStartOf="@+id/category_bakery"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/category_fruits">
-
-                        <ImageView
-                            android:id="@+id/category_dairy_img"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:layout_marginTop="8dp"
-                            android:contentDescription="@string/app_name"
-                            android:scaleType="centerCrop"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/category_dairy_title"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="8dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="8dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/montserrat"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:text="Dairy Items"
-                            android:textAlignment="center"
-                            android:textAllCaps="false"
-                            android:textColor="@color/colorTextDark"
-                            android:textSize="12sp"
-                            android:textStyle="normal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/category_dairy_img" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/category_bakery"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:layout_constraintEnd_toStartOf="@+id/category_beverages"
-                        app:layout_constraintStart_toEndOf="@+id/category_dairy"
-                        app:layout_constraintTop_toBottomOf="@+id/category_vegetables">
-
-                        <ImageView
-                            android:id="@+id/category_bakery_img"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:layout_marginTop="8dp"
-                            android:contentDescription="@string/app_name"
-                            android:scaleType="centerCrop"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/category_bakery_title"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="8dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="8dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/montserrat"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:text="Bakery Items"
-                            android:textAlignment="center"
-                            android:textAllCaps="false"
-                            android:textColor="@color/colorTextDark"
-                            android:textSize="12sp"
-                            android:textStyle="normal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/category_bakery_img" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/category_beverages"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/category_bakery"
-                        app:layout_constraintTop_toBottomOf="@+id/category_foodgrains">
-
-                        <ImageView
-                            android:id="@+id/category_beverages_img"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:layout_marginTop="8dp"
-                            android:contentDescription="@string/app_name"
-                            android:scaleType="centerCrop"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/category_beverages_title"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="8dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="8dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/montserrat"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:text="Beverages"
-                            android:textAlignment="center"
-                            android:textAllCaps="false"
-                            android:textColor="@color/colorTextDark"
-                            android:textSize="12sp"
-                            android:textStyle="normal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/category_beverages_img" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                        app:layout_constraintTop_toTopOf="@+id/greetings" />
 
                     <androidx.cardview.widget.CardView
-                        android:id="@+id/view_all_categories_btn_container"
-                        android:layout_width="wrap_content"
-                        android:layout_height="32dp"
+                        android:id="@+id/product_search_btn_container"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
                         android:layout_marginHorizontal="16dp"
                         android:layout_marginTop="24dp"
-                        app:cardBackgroundColor="@color/colorPrimary"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="8dp"
+                        app:cardBackgroundColor="@color/colorSearch"
+                        app:cardCornerRadius="8dp"
                         app:cardPreventCornerOverlap="true"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/category_bakery">
+                        app:layout_constraintTop_toBottomOf="@+id/user_profile_pic">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/view_all_categories_btn"
-                            android:layout_width="wrap_content"
+                            android:id="@+id/product_search_btn"
+                            android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="?attr/selectableItemBackground"
                             android:clickable="true"
                             android:focusable="true">
 
+                            <ImageView
+                                android:id="@+id/img_search"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginEnd="16dp"
+                                android:contentDescription="@string/app_name"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/ic_search"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:tint="@color/colorInactive" />
+
                             <TextView
-                                android:layout_width="wrap_content"
+                                android:id="@+id/text_search_product"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="32dp"
+                                android:layout_marginHorizontal="16dp"
+                                android:fontFamily="@font/montserrat"
+                                android:hint="@string/search_grocery_and_more"
+                                android:includeFontPadding="false"
+                                android:textAlignment="textStart"
+                                android:textAllCaps="false"
+                                android:textColor="@color/colorTextDark"
+                                android:textColorHint="@color/colorInactive"
+                                android:textSize="14sp"
+                                android:textStyle="normal"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@id/img_search"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <com.smarteist.autoimageslider.SliderView
+                        android:id="@+id/banner_slider"
+                        android:layout_width="0dp"
+                        android:layout_height="240dp"
+                        android:layout_marginTop="32dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/product_search_btn_container"
+                        app:sliderAnimationDuration="2000"
+                        app:sliderAutoCycleDirection="back_and_forth"
+                        app:sliderAutoCycleEnabled="true"
+                        app:sliderIndicatorEnabled="false"
+                        app:sliderScrollTimeInSec="2"
+                        app:sliderStartAutoCycle="true" />
+
+                    <View
+                        android:id="@+id/view1"
+                        android:layout_width="0dp"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="32dp"
+                        android:background="@color/colorViews"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/banner_slider" />
+
+                    <ImageView
+                        android:id="@+id/img_express_delivery"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginTop="40dp"
+                        android:src="@drawable/img_express_delivery"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="centerInside"
+                        app:layout_constraintEnd_toStartOf="@id/img_pocket_friendly"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/view1" />
+
+                    <ImageView
+                        android:id="@+id/img_pocket_friendly"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginHorizontal="12dp"
+                        android:layout_marginTop="40dp"
+                        android:src="@drawable/img_pocket_friendly"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="centerInside"
+                        app:layout_constraintEnd_toStartOf="@id/img_top_rated"
+                        app:layout_constraintStart_toEndOf="@id/img_express_delivery"
+                        app:layout_constraintTop_toBottomOf="@id/view1" />
+
+                    <ImageView
+                        android:id="@+id/img_top_rated"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginHorizontal="12dp"
+                        android:layout_marginTop="40dp"
+                        android:src="@drawable/img_top_rated"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="centerInside"
+                        app:layout_constraintEnd_toStartOf="@id/img_safety_secured"
+                        app:layout_constraintStart_toEndOf="@id/img_pocket_friendly"
+                        app:layout_constraintTop_toBottomOf="@id/view1" />
+
+                    <ImageView
+                        android:id="@+id/img_safety_secured"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="40dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/img_safety_secured"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="centerInside"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/img_top_rated"
+                        app:layout_constraintTop_toBottomOf="@id/view1" />
+
+                    <TextView
+                        android:id="@+id/text_express_delivery"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="16dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="@string/express_delivery"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="12sp"
+                        android:textStyle="normal"
+                        app:layout_constraintEnd_toEndOf="@id/img_express_delivery"
+                        app:layout_constraintStart_toStartOf="@id/img_express_delivery"
+                        app:layout_constraintTop_toBottomOf="@id/img_express_delivery"/>
+
+                    <TextView
+                        android:id="@+id/text_pocket_friendly"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="16dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="@string/pocket_friendly"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="12sp"
+                        android:textStyle="normal"
+                        app:layout_constraintEnd_toEndOf="@id/img_pocket_friendly"
+                        app:layout_constraintStart_toStartOf="@id/img_pocket_friendly"
+                        app:layout_constraintTop_toBottomOf="@id/img_pocket_friendly"/>
+
+                    <TextView
+                        android:id="@+id/text_top_rated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="16dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="@string/top_rated"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="12sp"
+                        android:textStyle="normal"
+                        app:layout_constraintEnd_toEndOf="@id/img_top_rated"
+                        app:layout_constraintStart_toStartOf="@id/img_top_rated"
+                        app:layout_constraintTop_toBottomOf="@id/img_top_rated"/>
+
+                    <TextView
+                        android:id="@+id/text_safety_secured"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="16dp"
+                        android:fontFamily="@font/montserrat"
+                        android:includeFontPadding="false"
+                        android:text="@string/safety_secured"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextDark"
+                        android:textSize="12sp"
+                        android:textStyle="normal"
+                        app:layout_constraintEnd_toEndOf="@id/img_safety_secured"
+                        app:layout_constraintStart_toStartOf="@id/img_safety_secured"
+                        app:layout_constraintTop_toBottomOf="@id/img_safety_secured"/>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/shop_by_category_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:clipToPadding="false"
+                        android:paddingBottom="16dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/text_pocket_friendly">
+
+                        <TextView
+                            android:id="@+id/text1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="16dp"
+                            android:layout_marginTop="16dp"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:text="@string/shop_by_category"
+                            android:textAlignment="center"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorTextDark"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/category_fruits"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="24dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:layout_constraintEnd_toStartOf="@+id/category_vegetables"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/text1">
+
+                            <ImageView
+                                android:id="@+id/category_fruits_img"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:layout_marginTop="8dp"
+                                android:contentDescription="@string/app_name"
+                                android:scaleType="centerCrop"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/category_fruits_title"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="8dp"
+                                android:layout_marginTop="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:ellipsize="end"
                                 android:fontFamily="@font/montserrat"
                                 android:includeFontPadding="false"
-                                android:text="View All"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:text="@string/fruits"
                                 android:textAlignment="center"
                                 android:textAllCaps="false"
                                 android:textColor="@color/colorTextDark"
@@ -574,749 +434,996 @@
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                app:layout_constraintTop_toBottomOf="@+id/category_fruits_img" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    </androidx.cardview.widget.CardView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_first_order_offers"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:clipToPadding="false"
-                    android:paddingBottom="16dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/explore_by_category_layout">
-
-                    <TextView
-                        android:id="@+id/text2"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="16dp"
-                        android:layout_marginTop="16dp"
-                        android:fontFamily="@font/montserrat"
-                        android:includeFontPadding="false"
-                        android:text="Introductory Offers"
-                        android:textAlignment="textStart"
-                        android:textAllCaps="false"
-                        android:textColor="@color/colorTextDark"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/offer1_container"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="24dp"
-                        android:layout_marginEnd="8dp"
-                        app:cardBackgroundColor="@color/offer1Color"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="8dp"
-                        app:cardPreventCornerOverlap="true"
-                        app:layout_constraintEnd_toStartOf="@id/offer2_container"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/text2">
-
                         <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/offer1"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:id="@+id/category_vegetables"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="24dp"
+                            android:layout_marginEnd="8dp"
                             android:background="?attr/selectableItemBackground"
                             android:clickable="true"
-                            android:focusable="true">
+                            android:focusable="true"
+                            app:layout_constraintEnd_toStartOf="@+id/category_foodgrains"
+                            app:layout_constraintStart_toEndOf="@+id/category_fruits"
+                            app:layout_constraintTop_toBottomOf="@+id/text1">
 
                             <ImageView
-                                android:id="@+id/img_offer1"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_marginTop="16dp"
+                                android:id="@+id/category_vegetables_img"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:layout_marginTop="8dp"
                                 android:contentDescription="@string/app_name"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/free_delivery"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <TextView
-                                android:id="@+id/text_offer1"
+                                android:id="@+id/category_vegetables_title"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginHorizontal="8dp"
-                                android:layout_marginTop="12dp"
-                                android:layout_marginBottom="16dp"
+                                android:layout_marginTop="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:ellipsize="end"
                                 android:fontFamily="@font/montserrat"
                                 android:includeFontPadding="false"
-                                android:text="Free Home\nDelivery"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:text="@string/vegetables"
                                 android:textAlignment="center"
                                 android:textAllCaps="false"
                                 android:textColor="@color/colorTextDark"
-                                android:textSize="11sp"
+                                android:textSize="12sp"
                                 android:textStyle="normal"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/img_offer1" />
+                                app:layout_constraintTop_toBottomOf="@+id/category_vegetables_img" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/offer2_container"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="8dp"
-                        android:layout_marginTop="24dp"
-                        app:cardBackgroundColor="@color/offer2Color"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="8dp"
-                        app:cardPreventCornerOverlap="true"
-                        app:layout_constraintEnd_toStartOf="@id/offer3_container"
-                        app:layout_constraintStart_toEndOf="@id/offer1_container"
-                        app:layout_constraintTop_toBottomOf="@id/text2">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/offer2"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="?attr/selectableItemBackground"
-                            android:clickable="true"
-                            android:focusable="true">
-
-                            <ImageView
-                                android:id="@+id/img_offer2"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_marginTop="16dp"
-                                android:contentDescription="@string/app_name"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/no_convenience_fee"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <TextView
-                                android:id="@+id/text_offer2"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="8dp"
-                                android:layout_marginTop="12dp"
-                                android:layout_marginBottom="16dp"
-                                android:fontFamily="@font/montserrat"
-                                android:includeFontPadding="false"
-                                android:text="No Convenience\nCharges"
-                                android:textAlignment="center"
-                                android:textAllCaps="false"
-                                android:textColor="@color/colorTextDark"
-                                android:textSize="11sp"
-                                android:textStyle="normal"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/img_offer2" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/offer3_container"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="24dp"
-                        android:layout_marginEnd="16dp"
-                        app:cardBackgroundColor="@color/offer3Color"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="8dp"
-                        app:cardPreventCornerOverlap="true"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/offer2_container"
-                        app:layout_constraintTop_toBottomOf="@id/text2">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/offer3"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="?attr/selectableItemBackground"
-                            android:clickable="true"
-                            android:focusable="true">
-
-                            <ImageView
-                                android:id="@+id/img_offer3"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_marginTop="16dp"
-                                android:contentDescription="@string/app_name"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/offer_tag"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <TextView
-                                android:id="@+id/text_offer3"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="8dp"
-                                android:layout_marginTop="12dp"
-                                android:layout_marginBottom="16dp"
-                                android:fontFamily="@font/montserrat"
-                                android:includeFontPadding="false"
-                                android:text="Extra 10%\nDiscount"
-                                android:textAlignment="center"
-                                android:textAllCaps="false"
-                                android:textColor="@color/colorTextDark"
-                                android:textSize="11sp"
-                                android:textStyle="normal"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/img_offer3" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/layout_safe_delivery"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="32dp"
-                    app:cardBackgroundColor="@color/safeDeliveryColor"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="8dp"
-                    app:cardPreventCornerOverlap="true"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_first_order_offers">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <ImageView
-                            android:id="@+id/img_safe_delivery"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
+                            android:id="@+id/category_foodgrains"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="24dp"
                             android:layout_marginEnd="16dp"
-                            android:contentDescription="@string/app_name"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/safe_delivery"
-                            app:layout_constraintBottom_toBottomOf="parent"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintStart_toEndOf="@+id/category_vegetables"
+                            app:layout_constraintTop_toBottomOf="@+id/text1">
 
-                        <TextView
-                            android:id="@+id/text_safe_delivery1"
+                            <ImageView
+                                android:id="@+id/category_foodgrains_img"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:layout_marginTop="8dp"
+                                android:contentDescription="@string/app_name"
+                                android:scaleType="centerCrop"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/category_foodgrains_title"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="8dp"
+                                android:layout_marginTop="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/montserrat"
+                                android:includeFontPadding="false"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:text="@string/food_grains"
+                                android:textAlignment="center"
+                                android:textAllCaps="false"
+                                android:textColor="@color/colorTextDark"
+                                android:textSize="12sp"
+                                android:textStyle="normal"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/category_foodgrains_img" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/category_dairy"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:layout_constraintEnd_toStartOf="@+id/category_bakery"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/category_fruits">
+
+                            <ImageView
+                                android:id="@+id/category_dairy_img"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:layout_marginTop="8dp"
+                                android:contentDescription="@string/app_name"
+                                android:scaleType="centerCrop"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/category_dairy_title"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="8dp"
+                                android:layout_marginTop="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/montserrat"
+                                android:includeFontPadding="false"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:text="@string/dairy_items"
+                                android:textAlignment="center"
+                                android:textAllCaps="false"
+                                android:textColor="@color/colorTextDark"
+                                android:textSize="12sp"
+                                android:textStyle="normal"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/category_dairy_img" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/category_bakery"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:layout_constraintEnd_toStartOf="@+id/category_beverages"
+                            app:layout_constraintStart_toEndOf="@+id/category_dairy"
+                            app:layout_constraintTop_toBottomOf="@+id/category_vegetables">
+
+                            <ImageView
+                                android:id="@+id/category_bakery_img"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:layout_marginTop="8dp"
+                                android:contentDescription="@string/app_name"
+                                android:scaleType="centerCrop"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/category_bakery_title"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="8dp"
+                                android:layout_marginTop="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/montserrat"
+                                android:includeFontPadding="false"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:text="@string/bakery_items"
+                                android:textAlignment="center"
+                                android:textAllCaps="false"
+                                android:textColor="@color/colorTextDark"
+                                android:textSize="12sp"
+                                android:textStyle="normal"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/category_bakery_img" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/category_beverages"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/category_bakery"
+                            app:layout_constraintTop_toBottomOf="@+id/category_foodgrains">
+
+                            <ImageView
+                                android:id="@+id/category_beverages_img"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:layout_marginTop="8dp"
+                                android:contentDescription="@string/app_name"
+                                android:scaleType="centerCrop"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/category_beverages_title"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="8dp"
+                                android:layout_marginTop="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/montserrat"
+                                android:includeFontPadding="false"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:text="@string/beverages"
+                                android:textAlignment="center"
+                                android:textAllCaps="false"
+                                android:textColor="@color/colorTextDark"
+                                android:textSize="12sp"
+                                android:textStyle="normal"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/category_beverages_img" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/view_all_categories_btn_container"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_marginHorizontal="16dp"
                             android:layout_marginTop="24dp"
-                            android:layout_marginEnd="24dp"
+                            app:cardBackgroundColor="@color/colorPrimary"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="8dp"
+                            app:cardPreventCornerOverlap="true"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/category_bakery">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:id="@+id/view_all_categories_btn"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:background="?attr/selectableItemBackground"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginHorizontal="24dp"
+                                    android:fontFamily="@font/montserrat"
+                                    android:includeFontPadding="false"
+                                    android:text="@string/view_all"
+                                    android:textAlignment="center"
+                                    android:textAllCaps="false"
+                                    android:textColor="@color/colorTextDark"
+                                    android:textSize="12sp"
+                                    android:textStyle="normal"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:id="@+id/view2"
+                        android:layout_width="0dp"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="16dp"
+                        android:background="@color/colorViews"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/shop_by_category_layout" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_first_order_offers"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:clipToPadding="false"
+                        android:paddingBottom="16dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/view2">
+
+                        <TextView
+                            android:id="@+id/text2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="16dp"
+                            android:layout_marginTop="16dp"
                             android:fontFamily="@font/montserrat"
                             android:includeFontPadding="false"
-                            android:text="Safe No-Contact Delivery"
-                            android:textAlignment="textStart"
+                            android:text="@string/introductory_offers"
+                            android:textAlignment="center"
                             android:textAllCaps="false"
                             android:textColor="@color/colorTextDark"
-                            android:textSize="14sp"
+                            android:textSize="16sp"
                             android:textStyle="bold"
-                            app:layout_constraintEnd_toStartOf="@id/img_safe_delivery"
+                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
+                        <ImageView
+                            android:id="@+id/img_delivery_guy"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="32dp"
+                            android:layout_marginHorizontal="16dp"
+                            android:src="@drawable/img_delivery_guy"
+                            android:scaleType="centerInside"
+                            android:contentDescription="@string/app_name"
+                            app:layout_constraintEnd_toStartOf="@id/img_no_convenience_fee"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/text2"/>
+
                         <TextView
-                            android:id="@+id/text_safe_delivery2"
-                            android:layout_width="0dp"
+                            android:id="@+id/text_offer1"                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginEnd="24dp"
-                            android:alpha="0.75"
+                            android:layout_marginTop="12dp"
                             android:fontFamily="@font/montserrat"
                             android:includeFontPadding="false"
-                            android:text="Keep yourself saviour safe with our safe delivery program equiped with social distancing"
-                            android:textAlignment="textStart"
+                            android:text="@string/free_home_delivery"
+                            android:textAlignment="center"
                             android:textAllCaps="false"
                             android:textColor="@color/colorTextDark"
                             android:textSize="12sp"
                             android:textStyle="normal"
-                            app:layout_constraintEnd_toStartOf="@id/img_safe_delivery"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/text_safe_delivery1" />
+                            app:layout_constraintEnd_toEndOf="@id/img_delivery_guy"
+                            app:layout_constraintStart_toStartOf="@id/img_delivery_guy"
+                            app:layout_constraintTop_toBottomOf="@id/img_delivery_guy"/>
+
+                        <ImageView
+                            android:id="@+id/img_no_convenience_fee"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="32dp"
+                            android:layout_marginHorizontal="16dp"
+                            android:src="@drawable/img_no_convenience_fee"
+                            android:scaleType="centerInside"
+                            android:contentDescription="@string/app_name"
+                            app:layout_constraintEnd_toStartOf="@id/img_offer_tag"
+                            app:layout_constraintStart_toEndOf="@id/img_delivery_guy"
+                            app:layout_constraintTop_toBottomOf="@id/text2"/>
 
                         <TextView
-                            android:id="@+id/learn_more_btn"
+                            android:id="@+id/text_offer2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
                             android:layout_marginTop="12dp"
-                            android:layout_marginBottom="20dp"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:text="@string/no_convenience_charges"
+                            android:textAlignment="center"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorTextDark"
+                            android:textSize="12sp"
+                            android:textStyle="normal"
+                            app:layout_constraintEnd_toEndOf="@id/img_no_convenience_fee"
+                            app:layout_constraintStart_toStartOf="@id/img_no_convenience_fee"
+                            app:layout_constraintTop_toBottomOf="@id/img_no_convenience_fee"/>
+
+                        <ImageView
+                            android:id="@+id/img_offer_tag"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="32dp"
+                            android:layout_marginHorizontal="16dp"
+                            android:src="@drawable/img_offer_tag"
+                            android:scaleType="centerInside"
+                            android:contentDescription="@string/app_name"
+                            app:layout_constraintStart_toEndOf="@id/img_no_convenience_fee"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/text2"/>
+
+                        <TextView
+                            android:id="@+id/text_offer3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:text="@string/extra_10_off"
+                            android:textAlignment="center"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorTextDark"
+                            android:textSize="12sp"
+                            android:textStyle="normal"
+                            app:layout_constraintEnd_toEndOf="@id/img_offer_tag"
+                            app:layout_constraintStart_toStartOf="@id/img_offer_tag"
+                            app:layout_constraintTop_toBottomOf="@id/img_offer_tag"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/layout_safe_delivery"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="32dp"
+                        app:cardBackgroundColor="@color/safeDeliveryColor"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="8dp"
+                        app:cardPreventCornerOverlap="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/layout_first_order_offers">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ImageView
+                                android:id="@+id/img_safe_delivery"
+                                android:layout_width="96dp"
+                                android:layout_height="96dp"
+                                android:layout_marginEnd="16dp"
+                                android:contentDescription="@string/app_name"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/img_safe_delivery"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/text_safe_delivery1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginTop="32dp"
+                                android:layout_marginEnd="24dp"
+                                android:fontFamily="@font/montserrat"
+                                android:includeFontPadding="false"
+                                android:text="@string/safe_no_contact_delivery"
+                                android:textAlignment="textStart"
+                                android:textAllCaps="false"
+                                android:textColor="@color/colorTextDark"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toStartOf="@id/img_safe_delivery"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/text_safe_delivery2"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginEnd="24dp"
+                                android:alpha="0.75"
+                                android:fontFamily="@font/montserrat"
+                                android:includeFontPadding="false"
+                                android:text="@string/keep_yourself_saviour_safe_with_our_safe_delivery_program_equiped_with_social_distancing"
+                                android:textAlignment="textStart"
+                                android:textAllCaps="false"
+                                android:textColor="@color/colorTextDark"
+                                android:textSize="11sp"
+                                android:textStyle="normal"
+                                app:layout_constraintEnd_toStartOf="@id/img_safe_delivery"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/text_safe_delivery1"
+                                tools:ignore="SmallSp" />
+
+                            <TextView
+                                android:id="@+id/learn_more_btn"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginTop="16dp"
+                                android:layout_marginBottom="32dp"
+                                android:fontFamily="@font/montserrat"
+                                android:includeFontPadding="false"
+                                android:text="@string/learn_more"
+                                android:textAlignment="textStart"
+                                android:textAllCaps="false"
+                                android:textColor="@color/errorColor"
+                                android:textSize="12sp"
+                                android:textStyle="normal"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/text_safe_delivery2" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <View
+                        android:id="@+id/view3"
+                        android:layout_width="0dp"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="32dp"
+                        android:background="@color/colorViews"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/layout_safe_delivery" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_stores"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/view3">
+
+                        <TextView
+                            android:id="@+id/text3"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="16dp"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:text="@string/top_rated_stores"
+                            android:textAlignment="textStart"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorTextDark"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="@id/view_all_stores_btn"
+                            app:layout_constraintEnd_toStartOf="@id/view_all_stores_btn"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/view_all_stores_btn" />
+
+                        <TextView
+                            android:id="@+id/view_all_stores_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="10dp"
                             android:background="?attr/selectableItemBackground"
                             android:clickable="true"
                             android:focusable="true"
                             android:fontFamily="@font/montserrat"
                             android:includeFontPadding="false"
-                            android:padding="4dp"
-                            android:text="Learn More"
-                            android:textAlignment="textStart"
+                            android:padding="6dp"
+                            android:text="@string/view_all"
+                            android:textAlignment="center"
                             android:textAllCaps="false"
-                            android:textColor="@color/errorColor"
-                            android:textSize="13sp"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="14sp"
                             android:textStyle="bold"
-                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recycler_stores"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:clipToPadding="false"
+                            android:nestedScrollingEnabled="false"
+                            android:orientation="vertical"
+                            android:paddingBottom="16dp"
+                            android:scrollbars="none"
+                            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/text_safe_delivery2" />
+                            app:layout_constraintTop_toBottomOf="@id/view_all_stores_btn" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                </androidx.cardview.widget.CardView>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_stores"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_safe_delivery">
-
-                    <TextView
-                        android:id="@+id/text3"
+                    <View
+                        android:id="@+id/view4"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="16dp"
-                        android:fontFamily="@font/montserrat"
-                        android:includeFontPadding="false"
-                        android:text="Top Stores"
-                        android:textAlignment="textStart"
-                        android:textAllCaps="false"
-                        android:textColor="@color/colorTextDark"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@id/view_all_stores_btn"
-                        app:layout_constraintEnd_toStartOf="@id/view_all_stores_btn"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/view_all_stores_btn" />
-
-                    <TextView
-                        android:id="@+id/view_all_stores_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:fontFamily="@font/montserrat"
-                        android:includeFontPadding="false"
-                        android:padding="6dp"
-                        android:text="View All"
-                        android:textAlignment="center"
-                        android:textAllCaps="false"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="16dp"
+                        android:background="@color/colorViews"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/layout_stores" />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recycler_stores"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_fruits"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/view4">
+
+                        <TextView
+                            android:id="@+id/text4"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="16dp"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:text="@string/best_offers_in_fruits"
+                            android:textAlignment="textStart"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorTextDark"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="@id/view_all_fruits_btn"
+                            app:layout_constraintEnd_toStartOf="@id/view_all_fruits_btn"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/view_all_fruits_btn" />
+
+                        <TextView
+                            android:id="@+id/view_all_fruits_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:padding="6dp"
+                            android:text="@string/view_all"
+                            android:textAlignment="center"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recycler_fruits"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="18dp"
+                            android:clipToPadding="false"
+                            android:nestedScrollingEnabled="false"
+                            android:orientation="horizontal"
+                            android:paddingEnd="16dp"
+                            android:paddingHorizontal="8dp"
+                            android:scrollbars="none"
+                            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/view_all_fruits_btn"
+                            tools:ignore="RtlSymmetry" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/explore_all_products_btn"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:clipToPadding="false"
-                        android:nestedScrollingEnabled="false"
-                        android:orientation="vertical"
-                        android:paddingBottom="16dp"
-                        android:scrollbars="none"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                        android:layout_height="240dp"
+                        android:layout_marginTop="40dp"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/banner3"
+                        app:riv_corner_radius="8dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/view_all_stores_btn" />
+                        app:layout_constraintTop_toBottomOf="@id/layout_fruits" />
 
-                    <ProgressBar
-                        android:id="@+id/stores_progress_bar"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:progressTint="@color/colorAccent"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="@id/recycler_stores"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_vegetables"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/recycler_stores" />
+                        app:layout_constraintTop_toBottomOf="@id/explore_all_products_btn">
+
+                        <TextView
+                            android:id="@+id/text5"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="16dp"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:text="@string/best_offers_in_vegetables"
+                            android:textAlignment="textStart"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorTextDark"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="@id/view_all_veg_btn"
+                            app:layout_constraintEnd_toStartOf="@id/view_all_veg_btn"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/view_all_veg_btn" />
+
+                        <TextView
+                            android:id="@+id/view_all_veg_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:padding="6dp"
+                            android:text="@string/view_all"
+                            android:textAlignment="center"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recycler_vegetables"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="18dp"
+                            android:clipToPadding="false"
+                            android:nestedScrollingEnabled="false"
+                            android:orientation="horizontal"
+                            android:paddingEnd="16dp"
+                            android:paddingHorizontal="8dp"
+                            android:scrollbars="none"
+                            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/view_all_veg_btn"
+                            tools:ignore="RtlSymmetry" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/banner_image1"
+                        android:layout_width="0dp"
+                        android:layout_height="240dp"
+                        android:layout_marginTop="40dp"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/banner4"
+                        app:riv_corner_radius="8dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/layout_vegetables"
+                        tools:ignore="TooManyViews" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_foodgrains"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/banner_image1">
+
+                        <TextView
+                            android:id="@+id/text6"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="16dp"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:text="@string/best_offers_in_food_grains"
+                            android:textAlignment="textStart"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorTextDark"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="@id/view_all_foodgrains_btn"
+                            app:layout_constraintEnd_toStartOf="@id/view_all_foodgrains_btn"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/view_all_foodgrains_btn" />
+
+                        <TextView
+                            android:id="@+id/view_all_foodgrains_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:padding="6dp"
+                            android:text="@string/view_all"
+                            android:textAlignment="center"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recycler_foodgrains"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="18dp"
+                            android:clipToPadding="false"
+                            android:nestedScrollingEnabled="false"
+                            android:orientation="horizontal"
+                            android:paddingEnd="16dp"
+                            android:paddingHorizontal="8dp"
+                            android:scrollbars="none"
+                            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/view_all_foodgrains_btn"
+                            tools:ignore="RtlSymmetry,TooManyViews" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:id="@+id/view5"
+                        android:layout_width="0dp"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="16dp"
+                        android:background="@color/colorViews"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/layout_foodgrains" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layout_pcare"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/view5">
+
+                        <TextView
+                            android:id="@+id/text7"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="16dp"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:text="@string/best_offers_in_personal_care"
+                            android:textAlignment="textStart"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorTextDark"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="@id/view_all_pcare_btn"
+                            app:layout_constraintEnd_toStartOf="@id/view_all_pcare_btn"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/view_all_pcare_btn" />
+
+                        <TextView
+                            android:id="@+id/view_all_pcare_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:fontFamily="@font/montserrat"
+                            android:includeFontPadding="false"
+                            android:padding="6dp"
+                            android:text="@string/view_all"
+                            android:textAlignment="center"
+                            android:textAllCaps="false"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recycler_pcare"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="18dp"
+                            android:clipToPadding="false"
+                            android:nestedScrollingEnabled="false"
+                            android:orientation="horizontal"
+                            android:paddingEnd="16dp"
+                            android:paddingHorizontal="8dp"
+                            android:scrollbars="none"
+                            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/view_all_pcare_btn"
+                            tools:ignore="RtlSymmetry" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/banner_image2"
+                        android:layout_width="0dp"
+                        android:layout_height="240dp"
+                        android:layout_marginTop="40dp"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/banner5"
+                        app:riv_corner_radius="8dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/layout_pcare" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_fruits"
+            </androidx.core.widget.NestedScrollView>
+
+        </com.baoyz.widget.PullRefreshLayout>
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.bottomappbar.BottomAppBar
+                android:id="@+id/bottom_app_bar"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                app:backgroundTint="@color/colorPrimary"
+                android:layout_gravity="bottom"
+                style="@style/Theme.MaterialComponents.Light"
+                app:contentInsetStart="0dp"
+                app:contentInsetStartWithNavigation="0dp"
+                app:fabAlignmentMode="center"
+                app:fabCradleMargin="8dp"
+                app:fabCradleRoundedCornerRadius="8dp">
+
+                <com.google.android.material.bottomnavigation.BottomNavigationView
+                    android:id="@+id/bottom_bar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_stores">
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginEnd="0dp"
+                    android:background="@drawable/background_bottom_bar"
+                    app:itemIconTint="@drawable/bottom_nav_item_color"
+                    app:labelVisibilityMode="unlabeled"
+                    app:menu="@menu/menu_bottom"
+                    app:itemRippleColor="@color/colorPrimary"/>
 
-                    <TextView
-                        android:id="@+id/text4"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="16dp"
-                        android:fontFamily="@font/montserrat"
-                        android:includeFontPadding="false"
-                        android:text="Fruits"
-                        android:textAlignment="textStart"
-                        android:textAllCaps="false"
-                        android:textColor="@color/colorTextDark"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@id/view_all_fruits_btn"
-                        app:layout_constraintEnd_toStartOf="@id/view_all_fruits_btn"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/view_all_fruits_btn" />
+            </com.google.android.material.bottomappbar.BottomAppBar>
 
-                    <TextView
-                        android:id="@+id/view_all_fruits_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:fontFamily="@font/montserrat"
-                        android:includeFontPadding="false"
-                        android:padding="6dp"
-                        android:text="View All"
-                        android:textAlignment="center"
-                        android:textAllCaps="false"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/cart_btn"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_cart"
+                app:maxImageSize="24sp"
+                app:backgroundTint="@color/colorAccent"
+                app:layout_anchor="@+id/bottom_app_bar"
+                app:tint="@color/colorIconLight" />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recycler_fruits"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:clipToPadding="false"
-                        android:nestedScrollingEnabled="false"
-                        android:orientation="horizontal"
-                        android:paddingEnd="16dp"
-                        android:scrollbars="none"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/view_all_fruits_btn"
-                        tools:ignore="RtlSymmetry" />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-                    <ProgressBar
-                        android:id="@+id/fruits_progress_bar"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:progressTint="@color/colorAccent"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="@id/recycler_fruits"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/recycler_fruits" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <ImageView
-                    android:id="@+id/explore_all_products_btn"
-                    android:layout_width="0dp"
-                    android:layout_height="210dp"
-                    android:layout_marginTop="32dp"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/app_name"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/banner3"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_fruits" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_vegetables"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/explore_all_products_btn">
-
-                    <TextView
-                        android:id="@+id/text5"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="16dp"
-                        android:fontFamily="@font/montserrat"
-                        android:includeFontPadding="false"
-                        android:text="Vegetables"
-                        android:textAlignment="textStart"
-                        android:textAllCaps="false"
-                        android:textColor="@color/colorTextDark"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@id/view_all_veg_btn"
-                        app:layout_constraintEnd_toStartOf="@id/view_all_veg_btn"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/view_all_veg_btn" />
-
-                    <TextView
-                        android:id="@+id/view_all_veg_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:fontFamily="@font/montserrat"
-                        android:includeFontPadding="false"
-                        android:padding="6dp"
-                        android:text="View All"
-                        android:textAlignment="center"
-                        android:textAllCaps="false"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recycler_vegetables"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:clipToPadding="false"
-                        android:nestedScrollingEnabled="false"
-                        android:orientation="horizontal"
-                        android:paddingEnd="16dp"
-                        android:scrollbars="none"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/view_all_veg_btn"
-                        tools:ignore="RtlSymmetry" />
-
-                    <ProgressBar
-                        android:id="@+id/veg_progress_bar"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:progressTint="@color/colorAccent"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="@id/recycler_vegetables"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/recycler_vegetables" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <ImageView
-                    android:id="@+id/banner_image1"
-                    android:layout_width="0dp"
-                    android:layout_height="210dp"
-                    android:layout_marginTop="32dp"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/app_name"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/banner4"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_vegetables" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_foodgrains"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/banner_image1">
-
-                    <TextView
-                        android:id="@+id/text6"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="16dp"
-                        android:fontFamily="@font/montserrat"
-                        android:includeFontPadding="false"
-                        android:text="Food Grains &amp; Cereals"
-                        android:textAlignment="textStart"
-                        android:textAllCaps="false"
-                        android:textColor="@color/colorTextDark"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@id/view_all_foodgrains_btn"
-                        app:layout_constraintEnd_toStartOf="@id/view_all_foodgrains_btn"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/view_all_foodgrains_btn" />
-
-                    <TextView
-                        android:id="@+id/view_all_foodgrains_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:fontFamily="@font/montserrat"
-                        android:includeFontPadding="false"
-                        android:padding="6dp"
-                        android:text="View All"
-                        android:textAlignment="center"
-                        android:textAllCaps="false"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recycler_foodgrains"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:clipToPadding="false"
-                        android:nestedScrollingEnabled="false"
-                        android:orientation="horizontal"
-                        android:paddingEnd="16dp"
-                        android:scrollbars="none"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/view_all_foodgrains_btn"
-                        tools:ignore="RtlSymmetry" />
-
-                    <ProgressBar
-                        android:id="@+id/foodgrains_progress_bar"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:progressTint="@color/colorAccent"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="@id/recycler_foodgrains"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/recycler_foodgrains" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layout_pcare"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_foodgrains">
-
-                    <TextView
-                        android:id="@+id/text7"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="16dp"
-                        android:fontFamily="@font/montserrat"
-                        android:includeFontPadding="false"
-                        android:text="Personal Care"
-                        android:textAlignment="textStart"
-                        android:textAllCaps="false"
-                        android:textColor="@color/colorTextDark"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@id/view_all_pcare_btn"
-                        app:layout_constraintEnd_toStartOf="@id/view_all_pcare_btn"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/view_all_pcare_btn" />
-
-                    <TextView
-                        android:id="@+id/view_all_pcare_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:fontFamily="@font/montserrat"
-                        android:includeFontPadding="false"
-                        android:padding="6dp"
-                        android:text="View All"
-                        android:textAlignment="center"
-                        android:textAllCaps="false"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recycler_pcare"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:clipToPadding="false"
-                        android:nestedScrollingEnabled="false"
-                        android:orientation="horizontal"
-                        android:paddingEnd="16dp"
-                        android:scrollbars="none"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/view_all_pcare_btn"
-                        tools:ignore="RtlSymmetry" />
-
-                    <ProgressBar
-                        android:id="@+id/pcare_progress_bar"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:progressTint="@color/colorAccent"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="@id/recycler_pcare"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/recycler_pcare" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <ImageView
-                    android:id="@+id/banner_image2"
-                    android:layout_width="0dp"
-                    android:layout_height="210dp"
-                    android:layout_marginTop="32dp"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/app_name"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/banner5"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/layout_pcare" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </androidx.core.widget.NestedScrollView>
-
-    </com.baoyz.widget.PullRefreshLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_empty"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@color/colorBackground"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -1324,13 +1431,12 @@
 
         <ImageView
             android:id="@+id/illustration_empty"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
-            android:layout_marginTop="40dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginBottom="96dp"
             android:contentDescription="@string/app_name"
             android:scaleType="centerInside"
             android:src="@drawable/illustration_empty3"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -1342,15 +1448,15 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="16dp"
+            android:alpha="0.75"
             android:fontFamily="@font/montserrat"
             android:includeFontPadding="false"
-            android:text="Whoa! We aren't servicing this location yet.\nTry changing location."
+            android:text="@string/whoa_we_aren_t_servicing_this_location_yet_ntry_changing_location"
             android:textAlignment="center"
             android:textAllCaps="false"
-            android:textColor="@color/colorInactive"
-            android:textSize="14sp"
+            android:textColor="@color/colorTextDark"
+            android:textSize="12sp"
             android:textStyle="normal"
-            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/illustration_empty" />
@@ -1361,7 +1467,6 @@
             android:layout_height="40dp"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="24dp"
-            android:visibility="gone"
             app:cardBackgroundColor="@color/colorPrimary"
             app:cardCornerRadius="20dp"
             app:cardElevation="8dp"
@@ -1384,7 +1489,7 @@
                     android:layout_marginHorizontal="32dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    android:text="Change Location"
+                    android:text="@string/change_location"
                     android:textAlignment="center"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
@@ -1401,141 +1506,110 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/cart_btn"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_marginBottom="48dp"
-        android:contentDescription="@string/app_name"
-        android:elevation="16dp"
-        android:src="@drawable/ic_cart"
-        app:backgroundTint="@color/colorIconDark"
-        app:layout_constraintBottom_toBottomOf="@+id/bottom_bar_container"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/bottom_bar_container"
-        app:maxImageSize="24dp"
-        app:tint="@color/colorIconLight" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cart_indicator"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:visibility="gone"
-        app:cardBackgroundColor="@color/colorIconLight"
-        app:cardCornerRadius="6dp"
-        app:cardElevation="8dp"
-        app:cardPreventCornerOverlap="true"
-        app:layout_constraintBottom_toBottomOf="@id/cart_btn"
-        app:layout_constraintEnd_toEndOf="@id/cart_btn"
-        app:layout_constraintStart_toStartOf="@id/cart_btn"
-        app:layout_constraintTop_toBottomOf="@id/cart_btn" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottom_bar_container"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:id="@+id/layout_no_internet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBackground"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/bottom_bar"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
+            android:id="@+id/img_no_internet"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:layout_marginBottom="120dp"
             android:contentDescription="@string/app_name"
-            android:rotation="180"
-            android:scaleType="fitXY"
-            android:src="@drawable/pattern3"
+            android:scaleType="centerInside"
+            android:src="@drawable/illustration_no_internet"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <ImageView
-            android:id="@+id/bottom_bar_secondary"
-            android:layout_width="0dp"
-            android:layout_height="72dp"
-            android:alpha="0.5"
-            android:contentDescription="@string/app_name"
-            android:rotation="180"
-            android:scaleType="fitXY"
-            android:src="@drawable/pattern3"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <ImageView
-            android:id="@+id/menu_home"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="@string/app_name"
-            android:focusable="true"
-            android:padding="4dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_menu_home"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
-            app:tint="@color/colorIconDark" />
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/menu_category"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="40dp"
-            android:alpha="0.5"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="@string/app_name"
-            android:focusable="true"
-            android:padding="8dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_menu_category"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/menu_store"
-            app:layout_constraintStart_toEndOf="@+id/menu_home"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
-            app:tint="@color/colorIconDark" />
-
-        <ImageView
-            android:id="@+id/menu_store"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="40dp"
-            android:alpha="0.5"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="@string/app_name"
-            android:focusable="true"
-            android:padding="8dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_menu_store"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/menu_profile"
-            app:layout_constraintStart_toEndOf="@+id/menu_category"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
-            app:tint="@color/colorIconDark" />
-
-        <ImageView
-            android:id="@+id/menu_profile"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="24dp"
-            android:alpha="0.5"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="@string/app_name"
-            android:focusable="true"
-            android:padding="8dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_menu_profile"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <TextView
+            android:id="@+id/text_no_internet"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="24dp"
+            android:fontFamily="@font/montserrat_bold"
+            android:includeFontPadding="false"
+            android:text="@string/connection_error"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/colorTextDark"
+            android:textSize="20sp"
+            android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
-            app:tint="@color/colorIconDark" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/img_no_internet" />
+
+        <TextView
+            android:id="@+id/text_no_internet_desc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            android:alpha="0.75"
+            android:fontFamily="@font/montserrat"
+            android:includeFontPadding="false"
+            android:text="@string/something_s_not_right_please_check_nyour_internet_connection_and_try_again"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/colorTextDark"
+            android:textSize="12sp"
+            android:textStyle="normal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_no_internet" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/retry_btn_container"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp"
+            app:cardPreventCornerOverlap="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_no_internet_desc">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/retry_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:id="@+id/text_retry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="32dp"
+                    android:fontFamily="@font/montserrat"
+                    android:includeFontPadding="false"
+                    android:text="@string/retry"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorTextDark"
+                    android:textSize="12sp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

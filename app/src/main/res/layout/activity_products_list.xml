@@ -7,245 +7,420 @@
     android:background="@color/colorBackground"
     tools:context=".ProductsListActivity">
 
-    <ImageView
-        android:id="@+id/back_btn"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="24dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:contentDescription="@string/app_name"
-        android:focusable="true"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_back"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/colorIconDark" />
-
-    <ImageView
-        android:id="@+id/cart_btn"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:contentDescription="@string/app_name"
-        android:focusable="true"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_cart"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/colorIconDark" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cart_indicator"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:visibility="gone"
-        app:cardBackgroundColor="@color/colorPrimary"
-        app:cardCornerRadius="6dp"
-        app:cardElevation="8dp"
-        app:cardPreventCornerOverlap="true"
-        app:layout_constraintEnd_toEndOf="@id/cart_btn"
-        app:layout_constraintTop_toTopOf="@id/cart_btn" />
-
-    <TextView
-        android:id="@+id/products_list_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:ellipsize="end"
-        android:fontFamily="@font/montserrat_bold"
-        android:includeFontPadding="false"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:text="All products"
-        android:textAlignment="textStart"
-        android:textAllCaps="false"
-        android:textColor="@color/colorTextDark"
-        android:textSize="20sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="@id/back_btn"
-        app:layout_constraintEnd_toStartOf="@id/cart_btn"
-        app:layout_constraintStart_toEndOf="@id/back_btn"
-        app:layout_constraintTop_toTopOf="@id/back_btn" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/input_product_search"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        app:cardBackgroundColor="@color/colorSearch"
-        app:cardCornerRadius="16dp"
-        app:cardPreventCornerOverlap="true"
-        app:layout_constraintEnd_toStartOf="@id/sort_btn_container"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/back_btn">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <EditText
-                android:id="@+id/input_product_search_field"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
-                android:background="@android:color/transparent"
-                android:fontFamily="@font/montserrat"
-                android:hint="Search product"
-                android:imeOptions="actionSearch"
-                android:importantForAutofill="no"
-                android:includeFontPadding="false"
-                android:inputType="text"
-                android:maxLines="1"
-                android:paddingHorizontal="16dp"
-                android:singleLine="true"
-                android:textAlignment="textStart"
-                android:textAllCaps="false"
-                android:textColor="@color/colorTextDark"
-                android:textColorHint="@color/colorInactive"
-                android:textSize="14sp"
-                android:textStyle="normal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/speech_to_text"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/speech_to_text"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginEnd="16dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:contentDescription="@string/app_name"
-                android:focusable="true"
-                android:padding="6dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_mic"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/colorIconDark" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/sort_btn_container"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="16dp"
-        app:cardBackgroundColor="@color/colorPrimary"
-        app:cardCornerRadius="16dp"
-        app:cardPreventCornerOverlap="true"
-        app:layout_constraintBottom_toBottomOf="@id/input_product_search"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/input_product_search">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/sort_btn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:contentDescription="@string/app_name"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_sort"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/colorIconDark" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.cardview.widget.CardView>
-
-    <com.baoyz.widget.PullRefreshLayout
-        android:id="@+id/pull_refresh_layout"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_product_search"
-        app:refreshType="smartisan">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_products"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:orientation="vertical"
-            android:paddingBottom="48dp"
-            android:scrollbars="none" />
-
-    </com.baoyz.widget.PullRefreshLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@id/pull_refresh_layout"
-        app:layout_constraintEnd_toEndOf="@id/pull_refresh_layout"
-        app:layout_constraintStart_toStartOf="@id/pull_refresh_layout"
-        app:layout_constraintTop_toTopOf="@id/pull_refresh_layout">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/illustration_empty"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
-            android:layout_marginBottom="64dp"
+            android:id="@+id/back_btn"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="@string/app_name"
+            android:focusable="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/colorIconDark" />
+
+        <TextView
+            android:id="@+id/products_list_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/montserrat"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="@string/all_products"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/colorTextDark"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/back_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/back_btn"
+            app:layout_constraintTop_toTopOf="@id/back_btn" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/input_product_search"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/colorSearch"
+            app:cardCornerRadius="8dp"
+            app:cardPreventCornerOverlap="true"
+            app:layout_constraintEnd_toStartOf="@id/sort_btn_container"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/back_btn">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <EditText
+                    android:id="@+id/input_product_search_field"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="@android:color/transparent"
+                    android:fontFamily="@font/montserrat"
+                    android:hint="@string/search_product"
+                    android:imeOptions="actionSearch"
+                    android:importantForAutofill="no"
+                    android:includeFontPadding="false"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textAlignment="textStart"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorTextDark"
+                    android:textColorHint="@color/colorInactive"
+                    android:textSize="14sp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/speech_to_text"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/speech_to_text"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:contentDescription="@string/app_name"
+                    android:focusable="true"
+                    android:padding="6dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_mic"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/colorIconDark" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/sort_btn_container"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="16dp"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="8dp"
+            app:cardPreventCornerOverlap="true"
+            app:layout_constraintBottom_toBottomOf="@id/input_product_search"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/input_product_search">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/sort_btn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_sort"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/colorIconDark" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <com.baoyz.widget.PullRefreshLayout
+            android:id="@+id/pull_refresh_layout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/input_product_search"
+            app:refreshType="smartisan">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_products"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:orientation="vertical"
+                android:paddingBottom="104dp"
+                android:scrollbars="none" />
+
+        </com.baoyz.widget.PullRefreshLayout>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_layout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/pull_refresh_layout"
+            app:layout_constraintEnd_toEndOf="@id/pull_refresh_layout"
+            app:layout_constraintStart_toStartOf="@id/pull_refresh_layout"
+            app:layout_constraintTop_toTopOf="@id/pull_refresh_layout">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <include layout="@layout/layout_product_placeholder" />
+                <include layout="@layout/layout_product_placeholder" />
+                <include layout="@layout/layout_product_placeholder" />
+
+            </LinearLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_empty"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/pull_refresh_layout"
+            app:layout_constraintEnd_toEndOf="@id/pull_refresh_layout"
+            app:layout_constraintStart_toStartOf="@id/pull_refresh_layout"
+            app:layout_constraintTop_toTopOf="@id/pull_refresh_layout">
+
+            <ImageView
+                android:id="@+id/illustration_empty"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:layout_marginBottom="64dp"
+                android:contentDescription="@string/app_name"
+                android:scaleType="centerInside"
+                android:src="@drawable/illustration_empty1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/text_empty"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:alpha="0.75"
+                android:fontFamily="@font/montserrat"
+                android:includeFontPadding="false"
+                android:text="@string/no_products_in_here"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textColor="@color/colorTextDark"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/illustration_empty" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_cart_info"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:visibility="gone"
+            android:background="@color/successColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/cart_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/montserrat"
+                android:includeFontPadding="false"
+                android:text="@string/x_items_xxx"
+                android:textAlignment="textStart"
+                android:textAllCaps="false"
+                android:textColor="@color/colorTextLight"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cart_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/img_cart"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginVertical="8dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_cart"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/colorIconLight" />
+
+                <TextView
+                    android:id="@+id/text_cart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:fontFamily="@font/montserrat"
+                    android:includeFontPadding="false"
+                    android:text="@string/view_cart"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorTextLight"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/img_cart"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/img_cart"
+                    app:layout_constraintTop_toTopOf="@id/img_cart" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_no_internet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBackground"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/img_no_internet"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:layout_marginBottom="120dp"
             android:contentDescription="@string/app_name"
             android:scaleType="centerInside"
-            android:src="@drawable/illustration_empty1"
-            android:visibility="gone"
+            android:src="@drawable/illustration_no_internet"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/text_empty"
+            android:id="@+id/text_no_internet"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="16dp"
-            android:fontFamily="@font/montserrat"
+            android:layout_marginTop="24dp"
+            android:fontFamily="@font/montserrat_bold"
             android:includeFontPadding="false"
-            android:text="No products here yet"
+            android:text="@string/connection_error"
             android:textAlignment="center"
             android:textAllCaps="false"
-            android:textColor="@color/colorInactive"
-            android:textSize="14sp"
+            android:textColor="@color/colorTextDark"
+            android:textSize="20sp"
             android:textStyle="normal"
-            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/illustration_empty" />
+            app:layout_constraintTop_toBottomOf="@id/img_no_internet" />
 
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:progressTint="@color/colorAccent"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <TextView
+            android:id="@+id/text_no_internet_desc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            android:alpha="0.75"
+            android:fontFamily="@font/montserrat"
+            android:includeFontPadding="false"
+            android:text="@string/something_s_not_right_please_check_nyour_internet_connection_and_try_again"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/colorTextDark"
+            android:textSize="12sp"
+            android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/text_no_internet" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/retry_btn_container"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp"
+            app:cardPreventCornerOverlap="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_no_internet_desc">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/retry_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:id="@+id/text_retry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="32dp"
+                    android:fontFamily="@font/montserrat"
+                    android:includeFontPadding="false"
+                    android:text="@string/retry"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorTextDark"
+                    android:textSize="12sp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,9 +1,12 @@
 package com.application.grocertaxi;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
@@ -56,6 +59,7 @@ public class ChooseCityActivity extends AppCompatActivity {
     private EditText inputCitySearchField;
     private RecyclerView recyclerCity;
     private ProgressBar progressBar;
+    private ConstraintLayout layoutContent, layoutNoInternet, retryBtn;
 
     private CollectionReference citiesRef, userRef;
     private FirestoreRecyclerAdapter<City, CityViewHolder> cityAdapter;
@@ -82,12 +86,12 @@ public class ChooseCityActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        initViews();
-        initFirebase();
-        setActionOnViews();
-    }
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void initViews() {
+        layoutContent = findViewById(R.id.layout_content);
+        layoutNoInternet = findViewById(R.id.layout_no_internet);
+        retryBtn = findViewById(R.id.retry_btn);
+
         closeBtn = findViewById(R.id.close_btn);
         chooseCityTitle = findViewById(R.id.choose_city_title);
         chooseCityGif = findViewById(R.id.choose_city_gif);
@@ -97,21 +101,43 @@ public class ChooseCityActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progress_bar);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkNetworkConnection();
+    }
+
+    private void checkNetworkConnection() {
+        if (!isConnectedToInternet(ChooseCityActivity.this)) {
+            layoutContent.setVisibility(View.GONE);
+            layoutNoInternet.setVisibility(View.VISIBLE);
+            retryBtn.setOnClickListener(v -> checkNetworkConnection());
+        } else {
+            initFirebase();
+            setActionOnViews();
+        }
+    }
+
     private void initFirebase() {
         citiesRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_CITIES);
         userRef = FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS);
     }
 
     private void setActionOnViews() {
-        closeBtn.setOnClickListener(v -> {
-            onBackPressed();
-            finish();
-        });
+        layoutNoInternet.setVisibility(View.GONE);
+        layoutContent.setVisibility(View.VISIBLE);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        closeBtn.setOnClickListener(v -> onBackPressed());
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         String name = preferenceManager.getString(Constants.KEY_USER_NAME);
         String[] splitName = name.split(" ", 2);
-
         chooseCityTitle.setText(String.format("Hi, %s", splitName[0]));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         KeyboardVisibilityEvent.setEventListener(ChooseCityActivity.this, isOpen -> {
             if (!isOpen) {
@@ -119,7 +145,12 @@ public class ChooseCityActivity extends AppCompatActivity {
             }
         });
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        loadCities();
         progressBar.setVisibility(View.VISIBLE);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         speechToText.setOnClickListener(view -> {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -145,6 +176,8 @@ public class ChooseCityActivity extends AppCompatActivity {
                         .show();
             }
         });
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         inputCitySearchField.setOnFocusChangeListener((view, hasFocus) -> {
             if (hasFocus) {
@@ -220,6 +253,8 @@ public class ChooseCityActivity extends AppCompatActivity {
         }
     }
 
+    /////////////////////////////////////////// LoadCities /////////////////////////////////////////
+
     private void loadCities() {
         Query query = citiesRef.orderBy("name", Query.Direction.ASCENDING);
 
@@ -233,7 +268,7 @@ public class ChooseCityActivity extends AppCompatActivity {
             @NonNull
             @Override
             public CityViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_city_item, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_city, parent, false);
                 return new CityViewHolder(view);
             }
 
@@ -295,14 +330,14 @@ public class ChooseCityActivity extends AppCompatActivity {
                 if (getItemCount() == 1) {
                     Snacky.builder()
                             .setActivity(ChooseCityActivity.this)
-                            .setText("We're currently servicing in 1 city.")
+                            .setText(String.format("We're currently servicing %d city.", getItemCount()))
                             .setDuration(Snacky.LENGTH_INDEFINITE)
                             .info()
                             .show();
                 } else {
                     Snacky.builder()
                             .setActivity(ChooseCityActivity.this)
-                            .setText(String.format("We're currently servicing in %d cities.", getItemCount()))
+                            .setText(String.format("We're currently servicing %d cities.", getItemCount()))
                             .setDuration(Snacky.LENGTH_INDEFINITE)
                             .info()
                             .show();
@@ -312,6 +347,7 @@ public class ChooseCityActivity extends AppCompatActivity {
             @Override
             public void onError(@NonNull FirebaseFirestoreException e) {
                 super.onError(e);
+                progressBar.setVisibility(View.GONE);
                 Alerter.create(ChooseCityActivity.this)
                         .setText("Whoa! Something Broke. Try again!")
                         .setTextAppearance(R.style.AlertText)
@@ -334,6 +370,8 @@ public class ChooseCityActivity extends AppCompatActivity {
         recyclerCity.setAdapter(cityAdapter);
     }
 
+    /////////////////////////////////////// CityViewHolder /////////////////////////////////////////
+
     public static class CityViewHolder extends RecyclerView.ViewHolder {
 
         ConstraintLayout clickListener;
@@ -343,15 +381,24 @@ public class ChooseCityActivity extends AppCompatActivity {
             super(itemView);
 
             clickListener = itemView.findViewById(R.id.click_listener);
-            cityName = itemView.findViewById(R.id.item_city_name);
+            cityName = itemView.findViewById(R.id.city_name);
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
-        loadCities();
+    private boolean isConnectedToInternet(ChooseCityActivity chooseCityActivity) {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) chooseCityActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -362,6 +409,12 @@ public class ChooseCityActivity extends AppCompatActivity {
                 UIUtil.hideKeyboard(ChooseCityActivity.this);
             }
         });
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
         CustomIntent.customType(ChooseCityActivity.this, "fadein-to-fadeout");
     }
 }

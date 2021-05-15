@@ -26,32 +26,16 @@
             android:clipToPadding="false"
             android:paddingBottom="144dp">
 
-            <ImageView
-                android:id="@+id/back_btn"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:contentDescription="@string/app_name"
-                android:focusable="true"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_back"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/colorIconDark" />
-
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/user_profile_pic"
                 android:layout_width="144dp"
                 android:layout_height="144dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="48dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/illustration_user_avatar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/back_btn" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/choose_photo"
@@ -75,18 +59,18 @@
                 android:includeFontPadding="false"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:text="Apoorva Ranjan"
+                android:text="@string/user_name"
                 android:textAlignment="center"
                 android:textAllCaps="false"
                 android:textColor="@color/colorTextDark"
-                android:textSize="22sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/user_profile_pic" />
 
             <TextView
-                android:id="@+id/user_id"
+                android:id="@+id/user_email"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="24dp"
@@ -96,36 +80,16 @@
                 android:includeFontPadding="false"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:text="USER-00000-00000"
+                android:text="@string/xxxxxxxxxxxxxx_xxxxx_xxx"
                 android:textAlignment="center"
                 android:textAllCaps="false"
-                android:textColor="@color/colorInactive"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/user_name" />
-
-            <TextView
-                android:id="@+id/user_email"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginTop="8dp"
-                android:ellipsize="end"
-                android:fontFamily="@font/montserrat"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:text="apoorvaranjan025@gmail.com"
-                android:textAlignment="center"
-                android:textAllCaps="false"
-                android:textColor="@color/colorInactive"
+                android:textColor="@color/colorTextDark"
+                android:alpha="0.75"
                 android:textSize="14sp"
                 android:textStyle="normal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/user_id" />
+                app:layout_constraintTop_toBottomOf="@+id/user_name" />
 
             <TextView
                 android:id="@+id/user_mobile"
@@ -138,10 +102,11 @@
                 android:includeFontPadding="false"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:text="+919915462971"
+                android:text="@string/_91xxxxxxxxxx"
                 android:textAlignment="center"
                 android:textAllCaps="false"
-                android:textColor="@color/colorInactive"
+                android:textColor="@color/colorTextDark"
+                android:alpha="0.75"
                 android:textSize="14sp"
                 android:textStyle="normal"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -167,11 +132,11 @@
                     android:layout_marginHorizontal="16dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    android:text="Delivery Address"
+                    android:text="@string/delivery_address"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="@+id/img_address"
                     app:layout_constraintEnd_toStartOf="@+id/img_address"
@@ -180,33 +145,33 @@
 
                 <ImageView
                     android:id="@+id/img_address"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginVertical="16dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginTop="12dp"
                     android:layout_marginEnd="16dp"
-                    android:alpha="0.5"
                     android:contentDescription="@string/app_name"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_address"
-                    app:layout_constraintBottom_toTopOf="@+id/delivery_address"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/colorIconDark" />
+                    app:tint="@color/colorInactive" />
 
                 <TextView
                     android:id="@+id/delivery_address"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="12dp"
                     android:ellipsize="end"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
                     android:maxLines="2"
-                    android:text="Parvati Sadan, Chitrakoot Colony (Palnagar), B-Polytechnic, Dhanbad - 828130"
+                    android:text="@string/sample_address"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorInactive"
+                    android:textColor="@color/colorTextDark"
+                    android:alpha="0.75"
                     android:textSize="12sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -234,11 +199,11 @@
                     android:layout_marginHorizontal="16dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    android:text="Cart"
+                    android:text="@string/cart"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="@+id/img_cart"
                     app:layout_constraintEnd_toStartOf="@+id/img_cart"
@@ -247,21 +212,20 @@
 
                 <ImageView
                     android:id="@+id/img_cart"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginVertical="16dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginVertical="12dp"
                     android:layout_marginEnd="16dp"
-                    android:alpha="0.5"
                     android:contentDescription="@string/app_name"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_cart"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/colorIconDark" />
+                    app:tint="@color/colorInactive" />
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cart_indicator2"
+                    android:id="@+id/cart_indicator"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:visibility="gone"
@@ -292,11 +256,11 @@
                     android:layout_marginHorizontal="16dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    android:text="Orders"
+                    android:text="@string/orders"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="@+id/img_orders"
                     app:layout_constraintEnd_toStartOf="@+id/img_orders"
@@ -305,18 +269,17 @@
 
                 <ImageView
                     android:id="@+id/img_orders"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginVertical="16dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginVertical="12dp"
                     android:layout_marginEnd="16dp"
-                    android:alpha="0.5"
                     android:contentDescription="@string/app_name"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_orders"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/colorIconDark" />
+                    app:tint="@color/colorInactive" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -324,18 +287,17 @@
                 android:id="@+id/divider1"
                 android:layout_width="0dp"
                 android:layout_height="0.5dp"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:background="@color/colorInactive"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/orders" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/coupons"
+                android:id="@+id/write_us"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
@@ -344,167 +306,17 @@
                 app:layout_constraintTop_toBottomOf="@id/divider1">
 
                 <TextView
-                    android:id="@+id/text_coupons"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Coupons"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
-                    android:textStyle="normal"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_coupons"
-                    app:layout_constraintEnd_toStartOf="@+id/img_coupons"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_coupons" />
-
-                <ImageView
-                    android:id="@+id/img_coupons"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginVertical="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:alpha="0.5"
-                    android:contentDescription="@string/app_name"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_coupons"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/colorIconDark" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/notifications"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/coupons">
-
-                <TextView
-                    android:id="@+id/text_notifications"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Notifications"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
-                    android:textStyle="normal"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_notifications"
-                    app:layout_constraintEnd_toStartOf="@+id/img_notifications"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_notifications" />
-
-                <ImageView
-                    android:id="@+id/img_notifications"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginVertical="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:alpha="0.5"
-                    android:contentDescription="@string/app_name"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_notifications"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/colorIconDark" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <View
-                android:id="@+id/divider2"
-                android:layout_width="0dp"
-                android:layout_height="0.5dp"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="24dp"
-                android:background="@color/colorInactive"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/notifications" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/chat_with_us"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider2">
-
-                <TextView
-                    android:id="@+id/text_chat_with_us"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:fontFamily="@font/montserrat"
-                    android:includeFontPadding="false"
-                    android:text="Chat with us"
-                    android:textAlignment="textStart"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
-                    android:textStyle="normal"
-                    app:layout_constraintBottom_toBottomOf="@+id/img_chat_with_us"
-                    app:layout_constraintEnd_toStartOf="@+id/img_chat_with_us"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/img_chat_with_us" />
-
-                <ImageView
-                    android:id="@+id/img_chat_with_us"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginVertical="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:alpha="0.5"
-                    android:contentDescription="@string/app_name"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_chat"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/colorIconDark" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/write_us"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/chat_with_us">
-
-                <TextView
                     android:id="@+id/text_write_us"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    android:text="Write to us"
+                    android:text="@string/write_to_us"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="@+id/img_write_us"
                     app:layout_constraintEnd_toStartOf="@+id/img_write_us"
@@ -513,18 +325,17 @@
 
                 <ImageView
                     android:id="@+id/img_write_us"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginVertical="16dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginVertical="12dp"
                     android:layout_marginEnd="16dp"
-                    android:alpha="0.5"
                     android:contentDescription="@string/app_name"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_write"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/colorIconDark" />
+                    app:tint="@color/colorInactive" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -546,11 +357,11 @@
                     android:layout_marginHorizontal="16dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    android:text="Rate us on Google Play"
+                    android:text="@string/rate_us_on_google_play"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="@+id/img_rate_us"
                     app:layout_constraintEnd_toStartOf="@+id/img_rate_us"
@@ -559,18 +370,17 @@
 
                 <ImageView
                     android:id="@+id/img_rate_us"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginVertical="16dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginVertical="12dp"
                     android:layout_marginEnd="16dp"
-                    android:alpha="0.5"
                     android:contentDescription="@string/app_name"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_rate"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/colorIconDark" />
+                    app:tint="@color/colorInactive" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -592,11 +402,11 @@
                     android:layout_marginHorizontal="16dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    android:text="Invite a friend"
+                    android:text="@string/invite_a_friend"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="@+id/img_invite_friend"
                     app:layout_constraintEnd_toStartOf="@+id/img_invite_friend"
@@ -605,27 +415,25 @@
 
                 <ImageView
                     android:id="@+id/img_invite_friend"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginVertical="16dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginVertical="12dp"
                     android:layout_marginEnd="16dp"
-                    android:alpha="0.5"
                     android:contentDescription="@string/app_name"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_invite"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/colorIconDark" />
+                    app:tint="@color/colorInactive" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <View
-                android:id="@+id/divider3"
+                android:id="@+id/divider2"
                 android:layout_width="0dp"
                 android:layout_height="0.5dp"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:background="@color/colorInactive"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -635,13 +443,13 @@
                 android:id="@+id/privacy_policy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider3">
+                app:layout_constraintTop_toBottomOf="@id/divider2">
 
                 <TextView
                     android:id="@+id/text_privacy_policy"
@@ -650,11 +458,11 @@
                     android:layout_marginHorizontal="16dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    android:text="Privacy Policy"
+                    android:text="@string/privacy_policy"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="@+id/img_privacy_policy"
                     app:layout_constraintEnd_toStartOf="@+id/img_privacy_policy"
@@ -663,18 +471,17 @@
 
                 <ImageView
                     android:id="@+id/img_privacy_policy"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginVertical="16dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginVertical="12dp"
                     android:layout_marginEnd="16dp"
-                    android:alpha="0.5"
                     android:contentDescription="@string/app_name"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_privacy_policy"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/colorIconDark" />
+                    app:tint="@color/colorInactive" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -696,11 +503,11 @@
                     android:layout_marginHorizontal="16dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    android:text="Terms of Service"
+                    android:text="@string/terms_of_service"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="@+id/img_terms"
                     app:layout_constraintEnd_toStartOf="@+id/img_terms"
@@ -709,43 +516,86 @@
 
                 <ImageView
                     android:id="@+id/img_terms"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginVertical="16dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginVertical="12dp"
                     android:layout_marginEnd="16dp"
-                    android:alpha="0.5"
                     android:contentDescription="@string/app_name"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_terms"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/colorIconDark" />
+                    app:tint="@color/colorInactive" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <View
-                android:id="@+id/divider4"
-                android:layout_width="0dp"
-                android:layout_height="0.5dp"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="24dp"
-                android:background="@color/colorInactive"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/terms_of_service" />
-
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/app_settings"
+                android:id="@+id/refund_policy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider4">
+                app:layout_constraintTop_toBottomOf="@id/terms_of_service">
+
+                <TextView
+                    android:id="@+id/text_refund"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:fontFamily="@font/montserrat"
+                    android:includeFontPadding="false"
+                    android:text="@string/refund_policy"
+                    android:textAlignment="textStart"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorTextDark"
+                    android:textSize="14sp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_refund"
+                    app:layout_constraintEnd_toStartOf="@+id/img_refund"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_refund" />
+
+                <ImageView
+                    android:id="@+id/img_refund"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginVertical="12dp"
+                    android:layout_marginEnd="16dp"
+                    android:contentDescription="@string/app_name"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_terms"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/colorInactive" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:id="@+id/divider3"
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:layout_marginTop="20dp"
+                android:background="@color/colorInactive"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/refund_policy" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/app_settings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider3">
 
                 <TextView
                     android:id="@+id/text_settings"
@@ -754,11 +604,11 @@
                     android:layout_marginHorizontal="16dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    android:text="App Settings"
+                    android:text="@string/app_settings"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextDark"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="@+id/img_settings"
                     app:layout_constraintEnd_toStartOf="@+id/img_settings"
@@ -767,18 +617,17 @@
 
                 <ImageView
                     android:id="@+id/img_settings"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginVertical="16dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginVertical="12dp"
                     android:layout_marginEnd="16dp"
-                    android:alpha="0.5"
                     android:contentDescription="@string/app_name"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_settings"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/colorIconDark" />
+                    app:tint="@color/colorInactive" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -800,11 +649,11 @@
                     android:layout_marginHorizontal="16dp"
                     android:fontFamily="@font/montserrat"
                     android:includeFontPadding="false"
-                    android:text="Log Out"
+                    android:text="@string/log_out"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/errorColor"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@+id/img_logout"
                     app:layout_constraintEnd_toStartOf="@+id/img_logout"
@@ -813,8 +662,8 @@
 
                 <ImageView
                     android:id="@+id/img_logout"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
                     android:layout_marginVertical="16dp"
                     android:layout_marginEnd="16dp"
                     android:contentDescription="@string/app_name"
@@ -831,142 +680,52 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/cart_btn"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_marginBottom="48dp"
-        android:contentDescription="@string/app_name"
-        android:elevation="16dp"
-        android:src="@drawable/ic_cart"
-        app:backgroundTint="@color/colorIconDark"
-        app:layout_constraintBottom_toBottomOf="@+id/bottom_bar_container"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/bottom_bar_container"
-        app:maxImageSize="24dp"
-        app:tint="@color/colorIconLight" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cart_indicator"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:visibility="gone"
-        app:cardBackgroundColor="@color/colorIconLight"
-        app:cardCornerRadius="6dp"
-        app:cardElevation="8dp"
-        app:cardPreventCornerOverlap="true"
-        app:layout_constraintBottom_toBottomOf="@id/cart_btn"
-        app:layout_constraintEnd_toEndOf="@id/cart_btn"
-        app:layout_constraintStart_toStartOf="@id/cart_btn"
-        app:layout_constraintTop_toBottomOf="@id/cart_btn" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottom_bar_container"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/bottom_bar"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/bottom_app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            app:backgroundTint="@color/colorPrimary"
+            android:layout_gravity="bottom"
+            style="@style/Theme.MaterialComponents.Light"
+            app:contentInsetStart="0dp"
+            app:contentInsetStartWithNavigation="0dp"
+            app:fabAlignmentMode="center"
+            app:fabCradleMargin="8dp"
+            app:fabCradleRoundedCornerRadius="8dp">
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottom_bar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="0dp"
+                android:background="@drawable/background_bottom_bar"
+                app:itemIconTint="@drawable/bottom_nav_item_color"
+                app:labelVisibilityMode="unlabeled"
+                app:menu="@menu/menu_bottom"
+                app:itemRippleColor="@color/colorPrimary"/>
+
+        </com.google.android.material.bottomappbar.BottomAppBar>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/cart_btn"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:contentDescription="@string/app_name"
-            android:rotation="180"
-            android:scaleType="fitXY"
-            android:src="@drawable/pattern3"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:src="@drawable/ic_cart"
+            app:maxImageSize="24sp"
+            app:backgroundTint="@color/colorAccent"
+            app:layout_anchor="@+id/bottom_app_bar"
+            app:tint="@color/colorIconLight" />
 
-        <ImageView
-            android:id="@+id/bottom_bar_secondary"
-            android:layout_width="0dp"
-            android:layout_height="72dp"
-            android:alpha="0.5"
-            android:contentDescription="@string/app_name"
-            android:rotation="180"
-            android:scaleType="fitXY"
-            android:src="@drawable/pattern3"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <ImageView
-            android:id="@+id/menu_home"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="24dp"
-            android:alpha="0.5"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="@string/app_name"
-            android:focusable="true"
-            android:padding="8dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_menu_home"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
-            app:tint="@color/colorIconDark" />
-
-        <ImageView
-            android:id="@+id/menu_category"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="40dp"
-            android:alpha="0.5"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="@string/app_name"
-            android:focusable="true"
-            android:padding="8dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_menu_category"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/menu_store"
-            app:layout_constraintStart_toEndOf="@+id/menu_home"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
-            app:tint="@color/colorIconDark" />
-
-        <ImageView
-            android:id="@+id/menu_store"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="40dp"
-            android:alpha="0.5"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="@string/app_name"
-            android:focusable="true"
-            android:padding="8dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_menu_store"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/menu_profile"
-            app:layout_constraintStart_toEndOf="@+id/menu_category"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
-            app:tint="@color/colorIconDark" />
-
-        <ImageView
-            android:id="@+id/menu_profile"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="@string/app_name"
-            android:focusable="true"
-            android:padding="4dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_menu_profile"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/bottom_bar"
-            app:tint="@color/colorIconDark" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

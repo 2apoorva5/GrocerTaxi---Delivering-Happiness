@@ -75,7 +75,7 @@ public class SignUpActivity extends AppCompatActivity {
         }
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        getWindow().setStatusBarColor(getColor(R.color.colorPrimary));
+        getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         initViews();
@@ -140,6 +140,10 @@ public class SignUpActivity extends AppCompatActivity {
             progressBar.setVisibility(View.GONE);
             sendOtpBtnContainer.setVisibility(View.VISIBLE);
             sendOtpBtn.setEnabled(true);
+
+            String privacyPolicyUrl = "https://grocertaxi.wixsite.com/privacy-policy";
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl));
+            startActivity(browserIntent);
         });
 
         sendOtpBtn.setOnClickListener(view -> {
@@ -155,7 +159,7 @@ public class SignUpActivity extends AppCompatActivity {
                     YoYo.with(Techniques.Shake).duration(700).repeat(0).playOn(privacyPolicyCheckBox);
                     YoYo.with(Techniques.Shake).duration(700).repeat(0).playOn(privacyPolicy);
                     Alerter.create(SignUpActivity.this)
-                            .setText("Review and accept that privacy policy first!")
+                            .setText("Review and accept the privacy policy first!")
                             .setTextAppearance(R.style.AlertText)
                             .setBackgroundColorRes(R.color.infoColor)
                             .setIcon(R.drawable.ic_info)
@@ -477,13 +481,16 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     private boolean isConnectedToInternet(SignUpActivity signUpActivity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) signUpActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) signUpActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if ((wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected())) {
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
             return true;
         } else {
             return false;

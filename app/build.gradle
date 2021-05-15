@@ -40,7 +40,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
@@ -109,8 +109,9 @@ dependencies {
     //PullRefreshLayout Library
     implementation 'com.baoyz.pullrefreshlayout:library:1.2.0'
 
-    //ShimmerTextView Library
+    //Shimmer Library
     implementation 'com.romainpiel.shimmer:library:1.4.0@aar'
+    implementation 'com.facebook.shimmer:shimmer:0.5.0'
 
     //RecyclerViewSwipeDecorator Library
     implementation 'it.xabaras.android:recyclerview-swipedecorator:1.2.3'
@@ -121,29 +122,43 @@ dependencies {
     //Dexter Permissions Library
     implementation 'com.karumi:dexter:6.2.2'
 
+    //RippleBackground Library
+    implementation 'com.skyfishjy.ripplebackground:library:1.0.1'
+
     //Tooltip Library
     implementation 'com.tomergoldst.android:tooltips:1.1.0'
 
+    //Custom RatingBar Library
+    implementation 'com.github.giswangsj:AndRatingBar:1.0.5'
+
+    //Razorpay Payment Gateway
+    implementation 'com.razorpay:checkout:1.6.6'
+
     //Firebase Analytics
-    implementation 'com.google.firebase:firebase-analytics:18.0.2'
+    implementation 'com.google.firebase:firebase-analytics:19.0.0'
 
     //Firebase Authentication
-    implementation 'com.google.firebase:firebase-auth:20.0.2'
+    implementation 'com.google.firebase:firebase-auth:21.0.1'
     implementation "androidx.browser:browser:1.3.0"
 
     //Firebase Cloud Messaging
-    implementation 'com.google.firebase:firebase-messaging:21.0.1'
+    implementation 'com.google.firebase:firebase-messaging:22.0.0'
 
     //Firebase Cloud Firestore Database
-    implementation 'com.google.firebase:firebase-firestore:22.1.0'
+    implementation 'com.google.firebase:firebase-firestore:23.0.0'
     implementation 'com.firebaseui:firebase-ui-firestore:7.1.1'
     implementation 'android.arch.paging:runtime:2.1.1'
 
     //Firebase Storage
-    implementation 'com.google.firebase:firebase-storage:19.2.1'
+    implementation 'com.google.firebase:firebase-storage:20.0.0'
+
+    //Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     //Google Maps
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.1'
 
     //Google Location
     implementation 'com.google.android.gms:play-services-location:18.0.0'

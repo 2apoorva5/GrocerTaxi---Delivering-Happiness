@@ -5,9 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -23,7 +26,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -57,20 +59,18 @@ import maes.tech.intentanim.CustomIntent;
 
 public class CartActivity extends AppCompatActivity {
 
-    private NestedScrollView nestedScrollView;
-    private ImageView closeBtn, knowMoreBtn1, knowMoreBtn2, illustrationEmpty;
+    private ImageView closeBtn, knowMoreBtn1, knowMoreBtn2;
     private TextView noOfItems, coupon, itemsCount, totalMRP, discountAmount, couponDiscount,
-            deliveryCharges, subTotal, totalAmount, totalDiscount, textEmpty;
+            deliveryCharges, subTotal, totalAmount, totalDiscount, readPolicyBtn;
     private RecyclerView recyclerCart;
-    private CardView shopBtnContainer, proceedBtnContainer;
-    private ConstraintLayout layoutNoConvenienceFee, removeAllBtn, applyCouponBtn, proceedBtn, shopBtn;
+    private ConstraintLayout layoutContent, layoutEmpty, layoutNoInternet, retryBtn,
+            layoutNoConvenienceFee, removeAllBtn, applyCouponBtn, proceedBtn, shopBtn;
     private ProgressBar progressBar;
 
     private CollectionReference cartRef, userRef, storeRef;
     private CartAdapter cartAdapter;
 
     private String cart_location;
-    private Shimmer shimmer;
     private PreferenceManager preferenceManager;
     private AlertDialog progressDialog;
 
@@ -112,17 +112,19 @@ public class CartActivity extends AppCompatActivity {
                 .setTheme(R.style.SpotsDialog)
                 .build();
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
 
-        initViews();
-        initFirebase();
-        setActionOnViews();
-    }
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void initViews() {
+        layoutContent = findViewById(R.id.layout_content);
+        layoutEmpty = findViewById(R.id.layout_empty);
+        layoutNoInternet = findViewById(R.id.layout_no_internet);
+        retryBtn = findViewById(R.id.retry_btn);
+
         closeBtn = findViewById(R.id.close_btn);
         noOfItems = findViewById(R.id.cart_no_of_items);
-        nestedScrollView = findViewById(R.id.nested_scroll_view);
         layoutNoConvenienceFee = findViewById(R.id.layout_no_convenience_fee);
         removeAllBtn = findViewById(R.id.remove_all_btn);
         recyclerCart = findViewById(R.id.recycler_cart);
@@ -137,16 +139,33 @@ public class CartActivity extends AppCompatActivity {
         deliveryCharges = findViewById(R.id.delivery_charges);
         subTotal = findViewById(R.id.sub_total);
 
-        proceedBtnContainer = findViewById(R.id.proceed_btn_container);
         proceedBtn = findViewById(R.id.proceed_btn);
         totalAmount = findViewById(R.id.total_amount);
         totalDiscount = findViewById(R.id.total_discount);
 
-        progressBar = findViewById(R.id.progress_bar);
-        illustrationEmpty = findViewById(R.id.illustration_empty);
-        textEmpty = findViewById(R.id.text_empty);
-        shopBtnContainer = findViewById(R.id.shop_btn_container);
+        readPolicyBtn = findViewById(R.id.read_policy_btn);
+
         shopBtn = findViewById(R.id.shop_btn);
+
+        progressBar = findViewById(R.id.progress_bar);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkNetworkConnection();
+    }
+
+    private void checkNetworkConnection() {
+        if (!isConnectedToInternet(CartActivity.this)) {
+            layoutContent.setVisibility(View.GONE);
+            layoutEmpty.setVisibility(View.GONE);
+            layoutNoInternet.setVisibility(View.VISIBLE);
+            retryBtn.setOnClickListener(v -> checkNetworkConnection());
+        } else {
+            initFirebase();
+            setActionOnViews();
+        }
     }
 
     private void initFirebase() {
@@ -165,18 +184,25 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void setActionOnViews() {
-        closeBtn.setOnClickListener(v -> {
-            onBackPressed();
-            finish();
-        });
+        layoutNoInternet.setVisibility(View.GONE);
+        layoutContent.setVisibility(View.GONE);
+        layoutEmpty.setVisibility(View.GONE);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        closeBtn.setOnClickListener(v -> onBackPressed());
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         progressBar.setVisibility(View.VISIBLE);
+        loadCartItems();
     }
+
+    ///////////////////////////////////// LoadCartItems ////////////////////////////////////////////
 
     private void loadCartItems() {
         Query query = cartRef.whereEqualTo(Constants.KEY_CART_ITEM_LOCATION, cart_location)
                 .orderBy(Constants.KEY_CART_ITEM_TIMESTAMP, Query.Direction.ASCENDING);
-
         FirestoreRecyclerOptions<CartItem> options = new FirestoreRecyclerOptions.Builder<CartItem>()
                 .setLifecycleOwner(CartActivity.this)
                 .setQuery(query, CartItem.class)
@@ -208,6 +234,7 @@ public class CartActivity extends AppCompatActivity {
                     } else {
                         progressDialog.show();
                         cartAdapter.deleteItem(viewHolder.getAdapterPosition());
+                        recyclerCart.getAdapter().notifyDataSetChanged();
                     }
                 }
             }
@@ -227,6 +254,8 @@ public class CartActivity extends AppCompatActivity {
         }).attachToRecyclerView(recyclerCart);
     }
 
+    //////////////////////////////////////// CartAdapter ///////////////////////////////////////////
+
     public class CartAdapter extends FirestoreRecyclerAdapter<CartItem, CartAdapter.CartViewHolder> {
 
         public CartAdapter(@NonNull FirestoreRecyclerOptions<CartItem> options) {
@@ -245,27 +274,201 @@ public class CartActivity extends AppCompatActivity {
         protected void onBindViewHolder(@NonNull CartViewHolder holder, int position, @NonNull CartItem model) {
             Glide.with(holder.cartProductImage.getContext()).load(model.getCartItemProductImage())
                     .placeholder(R.drawable.thumbnail).centerCrop().into(holder.cartProductImage);
-            holder.cartItemID.setText(model.getCartItemID());
+
+            ////////////////////////////////////////////////////////////////////////////////////////
+
             holder.cartProductName.setText(model.getCartItemProductName());
             holder.cartProductUnit.setText(model.getCartItemProductUnit());
             holder.cartProductCategory.setText(model.getCartItemProductCategory());
             holder.cartProductStoreName.setText(model.getCartItemProductStoreName());
-            holder.cartProductPrice.setText(String.format("₹ %s", model.getCartItemProductRetailPrice()));
 
-            if (model.getCartItemProductRetailPrice() == model.getCartItemProductMRP()) {
-                holder.cartProductMRP.setVisibility(View.GONE);
+            ////////////////////////////////////////////////////////////////////////////////////////
+
+            if (model.getCartItemProductOffer() == 0) {
                 holder.cartProductOffer.setVisibility(View.GONE);
             } else {
-                holder.cartProductMRP.setVisibility(View.VISIBLE);
+                Shimmer shimmer = new Shimmer();
                 holder.cartProductOffer.setVisibility(View.VISIBLE);
-                shimmer = new Shimmer();
-                holder.cartProductMRP.setText(String.format("₹ %s", model.getCartItemProductMRP()));
-                holder.cartProductMRP.setPaintFlags(holder.cartProductMRP.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                float offer = (float) (((model.getCartItemProductMRP() - model.getCartItemProductRetailPrice()) / model.getCartItemProductMRP()) * 100);
-                String offer_value = ((int) offer) + "% off";
-                holder.cartProductOffer.setText(offer_value);
+                holder.cartProductOffer.setText(String.format("%d%% OFF", model.getCartItemProductOffer()));
                 shimmer.start(holder.cartProductOffer);
             }
+
+            ////////////////////////////////////////////////////////////////////////////////////
+
+            storeRef.document(model.getCartItemProductStoreID()).collection(Constants.KEY_COLLECTION_PRODUCTS)
+                    .document(model.getCartItemProductID())
+                    .addSnapshotListener((documentSnapshot, error) -> {
+                        if (error != null) {
+                            Alerter.create(CartActivity.this)
+                                    .setText("Whoa! Something Broke. Try again!")
+                                    .setTextAppearance(R.style.AlertText)
+                                    .setBackgroundColorRes(R.color.errorColor)
+                                    .setIcon(R.drawable.ic_error)
+                                    .setDuration(3000)
+                                    .enableIconPulse(true)
+                                    .enableVibration(true)
+                                    .disableOutsideTouch()
+                                    .enableProgress(true)
+                                    .setProgressColorInt(getColor(android.R.color.white))
+                                    .show();
+                        } else {
+                            if (documentSnapshot.exists()) {
+                                boolean status = documentSnapshot.getBoolean(Constants.KEY_PRODUCT_IN_STOCK);
+                                long count = documentSnapshot.getLong(Constants.KEY_PRODUCT_UNITS_IN_STOCK);
+
+                                if (status) {
+                                    holder.cartProductImage.clearColorFilter();
+                                    holder.cartProductOffer.setVisibility(View.VISIBLE);
+
+                                    holder.cartProductStatus.setText("In Stock");
+                                    holder.cartProductStatus.setTextColor(getColor(R.color.successColor));
+
+                                    holder.cartProductUnitsInStock.setVisibility(View.VISIBLE);
+                                    if (count >= 1 && count <= 5) {
+                                        holder.cartProductUnitsInStock.setText(String.format("(Hurry! Only %d left)", count));
+                                    } else if (count > 5) {
+                                        holder.cartProductUnitsInStock.setText(String.format("(%d units left)", count));
+                                    }
+
+                                    //Decrement Quantity
+                                    holder.decrementBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
+                                    holder.decrementBtn.setEnabled(true);
+                                    holder.decrementBtn.setOnClickListener(v -> {
+                                        if (!isConnectedToInternet(CartActivity.this)) {
+                                            showConnectToInternetDialog();
+                                            return;
+                                        } else {
+                                            progressDialog.show();
+                                            cartRef.document(model.getCartItemID())
+                                                    .update(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, model.getCartItemProductQuantity() - 1)
+                                                    .addOnSuccessListener(aVoid -> {
+                                                        if (model.getCartItemProductQuantity() == 0) {
+                                                            deleteItem(holder.getAdapterPosition());
+                                                        } else {
+                                                            progressDialog.dismiss();
+                                                            holder.cartProductQuantity.setText(String.valueOf(model.getCartItemProductQuantity()));
+                                                        }
+                                                    }).addOnFailureListener(e -> {
+                                                progressDialog.dismiss();
+                                                Alerter.create(CartActivity.this)
+                                                        .setText("Whoa! Something Broke. Try again!")
+                                                        .setTextAppearance(R.style.AlertText)
+                                                        .setBackgroundColorRes(R.color.errorColor)
+                                                        .setIcon(R.drawable.ic_error)
+                                                        .setDuration(3000)
+                                                        .enableIconPulse(true)
+                                                        .enableVibration(true)
+                                                        .disableOutsideTouch()
+                                                        .enableProgress(true)
+                                                        .setProgressColorInt(getColor(android.R.color.white))
+                                                        .show();
+                                            });
+                                        }
+                                    });
+
+                                    //Increment Quantity
+                                    holder.incrementBtnContainer.setCardBackgroundColor(getColor(R.color.colorAccent));
+                                    holder.incrementBtn.setEnabled(true);
+                                    holder.incrementBtn.setOnClickListener(v -> {
+                                        if (!isConnectedToInternet(CartActivity.this)) {
+                                            showConnectToInternetDialog();
+                                            return;
+                                        } else {
+                                            progressDialog.show();
+                                            if (model.getCartItemProductQuantity() <= count) {
+                                                cartRef.document(model.getCartItemID())
+                                                        .update(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, model.getCartItemProductQuantity() + 1)
+                                                        .addOnSuccessListener(aVoid -> {
+                                                            progressDialog.dismiss();
+                                                            holder.cartProductQuantity.setText(String.valueOf(model.getCartItemProductQuantity()));
+                                                        }).addOnFailureListener(e -> {
+                                                    progressDialog.dismiss();
+                                                    Alerter.create(CartActivity.this)
+                                                            .setText("Whoa! Something Broke. Try again!")
+                                                            .setTextAppearance(R.style.AlertText)
+                                                            .setBackgroundColorRes(R.color.errorColor)
+                                                            .setIcon(R.drawable.ic_error)
+                                                            .setDuration(3000)
+                                                            .enableIconPulse(true)
+                                                            .enableVibration(true)
+                                                            .disableOutsideTouch()
+                                                            .enableProgress(true)
+                                                            .setProgressColorInt(getColor(android.R.color.white))
+                                                            .show();
+                                                });
+                                            } else {
+                                                progressDialog.dismiss();
+                                                MaterialDialog materialDialog = new MaterialDialog.Builder(CartActivity.this)
+                                                        .setTitle("Item can't be further added to your cart!")
+                                                        .setMessage("The store doesn't have more of this product than the quantity you already have in your cart.")
+                                                        .setCancelable(false)
+                                                        .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface, which) -> dialogInterface.dismiss())
+                                                        .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                                                materialDialog.show();
+                                            }
+                                        }
+                                    });
+
+                                    //Checking if item quantity is more than what is there in stock
+                                    if (model.getCartItemProductQuantity() > count) {
+                                        proceedBtn.setOnClickListener(v -> {
+                                            MaterialDialog materialDialog = new MaterialDialog.Builder(CartActivity.this)
+                                                    .setTitle("Can't proceed!")
+                                                    .setMessage("You can't proceed with item quantity more than what the store has right now in its stock.")
+                                                    .setCancelable(false)
+                                                    .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface, which) -> dialogInterface.dismiss())
+                                                    .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                                            materialDialog.show();
+                                            return;
+                                        });
+                                    }
+                                } else {
+                                    ColorMatrix matrix = new ColorMatrix();
+                                    matrix.setSaturation(0);
+
+                                    ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+                                    holder.cartProductImage.setColorFilter(filter);
+
+                                    holder.cartProductOffer.setVisibility(View.GONE);
+
+                                    holder.cartProductStatus.setText("Out of Stock");
+                                    holder.cartProductStatus.setTextColor(getColor(R.color.errorColor));
+                                    holder.cartProductUnitsInStock.setVisibility(View.GONE);
+
+                                    holder.decrementBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
+                                    holder.decrementBtn.setEnabled(false);
+                                    holder.incrementBtnContainer.setCardBackgroundColor(getColor(R.color.colorInactive));
+                                    holder.incrementBtn.setEnabled(false);
+
+                                    proceedBtn.setOnClickListener(v -> {
+                                        MaterialDialog materialDialog = new MaterialDialog.Builder(CartActivity.this)
+                                                .setTitle("Can't proceed!")
+                                                .setMessage("There are items in your cart that are out of stock right now. Remove them first to proceed.")
+                                                .setCancelable(false)
+                                                .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface, which) -> dialogInterface.dismiss())
+                                                .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                                        materialDialog.show();
+                                        return;
+                                    });
+                                }
+                            } else {
+                                Alerter.create(CartActivity.this)
+                                        .setText("Whoa! Something Broke. Try again!")
+                                        .setTextAppearance(R.style.AlertText)
+                                        .setBackgroundColorRes(R.color.errorColor)
+                                        .setIcon(R.drawable.ic_error)
+                                        .setDuration(3000)
+                                        .enableIconPulse(true)
+                                        .enableVibration(true)
+                                        .disableOutsideTouch()
+                                        .enableProgress(true)
+                                        .setProgressColorInt(getColor(android.R.color.white))
+                                        .show();
+                            }
+                        }
+                    });
+
+            ////////////////////////////////////////////////////////////////////////////////////////
 
             if (model.getCartItemProductQuantity() == 0) {
                 deleteItem(holder.getAdapterPosition());
@@ -285,86 +488,7 @@ public class CartActivity extends AppCompatActivity {
                 }
             }
 
-            holder.removeBtn.setOnClickListener(v -> {
-                if (!isConnectedToInternet(CartActivity.this)) {
-                    showConnectToInternetDialog();
-                    return;
-                } else {
-                    MaterialDialog materialDialog = new MaterialDialog.Builder(CartActivity.this)
-                            .setTitle("Remove item from cart?")
-                            .setMessage("Are you sure of removing this item from your cart?")
-                            .setCancelable(false)
-                            .setPositiveButton("Remove", R.drawable.ic_dialog_remove, (dialogInterface, which) -> {
-                                dialogInterface.dismiss();
-                                progressDialog.show();
-                                deleteItem(holder.getAdapterPosition());
-                            })
-                            .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
-                    materialDialog.show();
-                }
-            });
-
-            holder.decrementBtn.setOnClickListener(v -> {
-                if (!isConnectedToInternet(CartActivity.this)) {
-                    showConnectToInternetDialog();
-                    return;
-                } else {
-                    progressDialog.show();
-                    cartRef.document(model.getCartItemID())
-                            .update(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, model.getCartItemProductQuantity() - 1)
-                            .addOnSuccessListener(aVoid -> {
-                                if (model.getCartItemProductQuantity() == 0) {
-                                    deleteItem(holder.getAdapterPosition());
-                                } else {
-                                    progressDialog.dismiss();
-                                    holder.cartProductQuantity.setText(String.valueOf(model.getCartItemProductQuantity()));
-                                }
-                            }).addOnFailureListener(e -> {
-                        progressDialog.dismiss();
-                        Alerter.create(CartActivity.this)
-                                .setText("Whoa! Something Broke. Try again!")
-                                .setTextAppearance(R.style.AlertText)
-                                .setBackgroundColorRes(R.color.errorColor)
-                                .setIcon(R.drawable.ic_error)
-                                .setDuration(3000)
-                                .enableIconPulse(true)
-                                .enableVibration(true)
-                                .disableOutsideTouch()
-                                .enableProgress(true)
-                                .setProgressColorInt(getColor(android.R.color.white))
-                                .show();
-                    });
-                }
-            });
-
-            holder.incrementBtn.setOnClickListener(v -> {
-                if (!isConnectedToInternet(CartActivity.this)) {
-                    showConnectToInternetDialog();
-                    return;
-                } else {
-                    progressDialog.show();
-                    cartRef.document(model.getCartItemID())
-                            .update(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, model.getCartItemProductQuantity() + 1)
-                            .addOnSuccessListener(aVoid -> {
-                                progressDialog.dismiss();
-                                holder.cartProductQuantity.setText(String.valueOf(model.getCartItemProductQuantity()));
-                            }).addOnFailureListener(e -> {
-                        progressDialog.dismiss();
-                        Alerter.create(CartActivity.this)
-                                .setText("Whoa! Something Broke. Try again!")
-                                .setTextAppearance(R.style.AlertText)
-                                .setBackgroundColorRes(R.color.errorColor)
-                                .setIcon(R.drawable.ic_error)
-                                .setDuration(3000)
-                                .enableIconPulse(true)
-                                .enableVibration(true)
-                                .disableOutsideTouch()
-                                .enableProgress(true)
-                                .setProgressColorInt(getColor(android.R.color.white))
-                                .show();
-                    });
-                }
-            });
+            ////////////////////////////////////////////////////////////////////////////////////////
 
             holder.clickListener.setOnClickListener(v -> {
                 preferenceManager.putString(Constants.KEY_PRODUCT, model.getCartItemProductID());
@@ -380,21 +504,16 @@ public class CartActivity extends AppCompatActivity {
             progressBar.setVisibility(View.GONE);
 
             if (getItemCount() == 0) {
-                noOfItems.setVisibility(View.GONE);
-                illustrationEmpty.setVisibility(View.VISIBLE);
-                textEmpty.setVisibility(View.VISIBLE);
-                shopBtnContainer.setVisibility(View.VISIBLE);
-                shopBtn.setEnabled(true);
+                layoutContent.setVisibility(View.GONE);
+                layoutEmpty.setVisibility(View.VISIBLE);
                 shopBtn.setOnClickListener(v -> {
                     startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     CustomIntent.customType(CartActivity.this, "up-to-bottom");
                     finish();
                 });
-                proceedBtn.setEnabled(false);
-                proceedBtnContainer.setVisibility(View.GONE);
-                recyclerCart.setAdapter(null);
-                cartAdapter.notifyDataSetChanged();
-                nestedScrollView.setVisibility(View.GONE);
+
+                preferenceManager.putString(Constants.KEY_COUPON, "");
+                preferenceManager.putString(Constants.KEY_COUPON_DISCOUNT_PERCENT, String.valueOf(0));
 
                 preferenceManager.putString(Constants.KEY_ORDER_ID, "");
                 preferenceManager.putString(Constants.KEY_ORDER_BY_USERID, "");
@@ -403,11 +522,16 @@ public class CartActivity extends AppCompatActivity {
                 preferenceManager.putString(Constants.KEY_ORDER_FROM_STORENAME, "");
                 preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_NAME, "");
                 preferenceManager.putString(Constants.KEY_ORDER_CUSTOMER_MOBILE, "");
+                preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LOCATION, "");
                 preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_ADDRESS, "");
+                preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LATITUDE, String.valueOf(0));
+                preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_LONGITUDE, String.valueOf(0));
+                preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_DISTANCE, String.valueOf(0));
                 preferenceManager.putString(Constants.KEY_ORDER_NO_OF_ITEMS, String.valueOf(0));
                 preferenceManager.putString(Constants.KEY_ORDER_TOTAL_MRP, String.valueOf(0));
                 preferenceManager.putString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE, String.valueOf(0));
-                preferenceManager.putString(Constants.KEY_ORDER_TOTAL_DISCOUNT, String.valueOf(0));
+                preferenceManager.putString(Constants.KEY_ORDER_COUPON_APPLIED, "");
+                preferenceManager.putString(Constants.KEY_ORDER_COUPON_DISCOUNT, String.valueOf(0));
                 preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
                 preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
                 preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(0));
@@ -421,24 +545,23 @@ public class CartActivity extends AppCompatActivity {
                 preferenceManager.putString(Constants.KEY_ORDER_CANCELLATION_TIME, "");
                 preferenceManager.putString(Constants.KEY_ORDER_TIMESTAMP, "");
             } else {
+                layoutContent.setVisibility(View.VISIBLE);
+                layoutEmpty.setVisibility(View.GONE);
+
+                cartAdapter.notifyDataSetChanged();
+                recyclerCart.setAdapter(cartAdapter);
+                recyclerCart.getAdapter().notifyDataSetChanged();
+
                 noOfItems.setVisibility(View.VISIBLE);
-                if(getItemCount() == 1) {
+                if (getItemCount() == 1) {
                     noOfItems.setText(String.format("%d Item", getItemCount()));
                     itemsCount.setText(String.format("(%d Item)", getItemCount()));
                 } else {
                     noOfItems.setText(String.format("%d Items", getItemCount()));
                     itemsCount.setText(String.format("(%d Items)", getItemCount()));
                 }
-                illustrationEmpty.setVisibility(View.GONE);
-                textEmpty.setVisibility(View.GONE);
-                shopBtnContainer.setVisibility(View.GONE);
-                shopBtn.setEnabled(false);
-                proceedBtnContainer.setVisibility(View.VISIBLE);
-                proceedBtn.setEnabled(true);
-                cartAdapter.notifyDataSetChanged();
-                recyclerCart.setAdapter(cartAdapter);
-                recyclerCart.getAdapter().notifyDataSetChanged();
-                nestedScrollView.setVisibility(View.VISIBLE);
+
+                //////////////////////////////////// Remove All ////////////////////////////////////
 
                 removeAllBtn.setOnClickListener(v -> {
                     if (!isConnectedToInternet(CartActivity.this)) {
@@ -478,6 +601,8 @@ public class CartActivity extends AppCompatActivity {
                     }
                 });
 
+                ////////////////////////////////////////////////////////////////////////////////////
+
                 double total_mrp = 0;
                 double total_price = 0;
 
@@ -494,7 +619,40 @@ public class CartActivity extends AppCompatActivity {
 
                 totalMRP.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_MRP))));
                 discountAmount.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_DISCOUNT))));
-                totalDiscount.setText(String.format("Saved ₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_DISCOUNT))));
+
+                /////////////////////////////////// Apply Coupon ///////////////////////////////////
+
+                applyCouponBtn.setOnClickListener(v -> {
+                    startActivity(new Intent(CartActivity.this, CouponsListActivity.class));
+                    CustomIntent.customType(CartActivity.this, "bottom-to-up");
+                });
+
+                if (preferenceManager.getString(Constants.KEY_COUPON).isEmpty() ||
+                        preferenceManager.getString(Constants.KEY_COUPON).equals("")) {
+                    coupon.setText("Apply Coupon");
+                    couponDiscount.setText("No coupon applied");
+                    couponDiscount.setTextColor(getColor(R.color.colorTextDark));
+
+                    preferenceManager.putString(Constants.KEY_ORDER_COUPON_APPLIED, "");
+                    preferenceManager.putString(Constants.KEY_ORDER_COUPON_DISCOUNT, String.valueOf(0));
+
+                    totalDiscount.setText(String.format("Saved ₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_DISCOUNT))
+                            + Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_COUPON_DISCOUNT))));
+                } else {
+                    coupon.setText(preferenceManager.getString(Constants.KEY_COUPON));
+                    double coupon_discount = Long.parseLong(preferenceManager.getString(Constants.KEY_COUPON_DISCOUNT_PERCENT)) * 0.01
+                            * Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE));
+                    couponDiscount.setText("₹ " + coupon_discount);
+                    couponDiscount.setTextColor(getColor(R.color.successColor));
+
+                    preferenceManager.putString(Constants.KEY_ORDER_COUPON_APPLIED, preferenceManager.getString(Constants.KEY_COUPON));
+                    preferenceManager.putString(Constants.KEY_ORDER_COUPON_DISCOUNT, String.valueOf(coupon_discount));
+
+                    totalDiscount.setText(String.format("Saved ₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_DISCOUNT))
+                            + Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_COUPON_DISCOUNT))));
+                }
+
+                ////////////////////////////////////////////////////////////////////////////////////
 
                 userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
                         .get().addOnCompleteListener(task -> {
@@ -521,7 +679,8 @@ public class CartActivity extends AppCompatActivity {
                                 deliveryCharges.setText("FREE");
                                 deliveryCharges.setTextColor(getColor(R.color.successColor));
 
-                                double sub_total = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) +
+                                double sub_total = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) -
+                                        Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_COUPON_DISCOUNT)) +
                                         Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_CHARGES));
                                 preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(sub_total));
 
@@ -532,58 +691,24 @@ public class CartActivity extends AppCompatActivity {
 
                                 if (Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) > 0 &&
                                         Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) <= 500) {
-                                    preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(89));
+                                    preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(40));
                                     deliveryCharges.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_CHARGES))));
                                     deliveryCharges.setTextColor(getColor(R.color.errorColor));
 
-                                    double sub_total = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) +
+                                    double sub_total = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) -
+                                            Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_COUPON_DISCOUNT)) +
                                             Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_CHARGES));
                                     preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(sub_total));
 
                                     subTotal.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))));
                                     totalAmount.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))));
-                                } else if (Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) > 500 &&
-                                        Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) <= 1000) {
-                                    preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(69));
-                                    deliveryCharges.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_CHARGES))));
-                                    deliveryCharges.setTextColor(getColor(R.color.errorColor));
-
-                                    double sub_total = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) +
-                                            Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_CHARGES));
-                                    preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(sub_total));
-
-                                    subTotal.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))));
-                                    totalAmount.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))));
-                                } else if (Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) > 1000 &&
-                                        Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) <= 1500) {
-                                    preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(49));
-                                    deliveryCharges.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_CHARGES))));
-                                    deliveryCharges.setTextColor(getColor(R.color.errorColor));
-
-                                    double sub_total = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) +
-                                            Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_CHARGES));
-                                    preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(sub_total));
-
-                                    subTotal.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))));
-                                    totalAmount.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))));
-                                } else if (Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) > 1500 &&
-                                        Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) <= 2000) {
-                                    preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(29));
-                                    deliveryCharges.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_CHARGES))));
-                                    deliveryCharges.setTextColor(getColor(R.color.errorColor));
-
-                                    double sub_total = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) +
-                                            Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_CHARGES));
-                                    preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(sub_total));
-
-                                    subTotal.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))));
-                                    totalAmount.setText(String.format("₹ %s", Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_SUB_TOTAL))));
-                                } else if (Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) > 2000) {
+                                } else if (Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) > 500) {
                                     preferenceManager.putString(Constants.KEY_ORDER_DELIVERY_CHARGES, String.valueOf(0));
                                     deliveryCharges.setText("FREE");
                                     deliveryCharges.setTextColor(getColor(R.color.successColor));
 
-                                    double sub_total = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) +
+                                    double sub_total = Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE)) -
+                                            Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_COUPON_DISCOUNT)) +
                                             Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_DELIVERY_CHARGES));
                                     preferenceManager.putString(Constants.KEY_ORDER_SUB_TOTAL, String.valueOf(sub_total));
 
@@ -621,6 +746,8 @@ public class CartActivity extends AppCompatActivity {
                     }
                 });
 
+                ////////////////////////////////////////////////////////////////////////////////////
+
                 knowMoreBtn2.setOnClickListener(v -> {
                     BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(CartActivity.this);
                     bottomSheetDialog.setContentView(R.layout.bottom_sheet_info2);
@@ -632,12 +759,23 @@ public class CartActivity extends AppCompatActivity {
                     bottomSheetDialog.show();
                 });
 
+                ////////////////////////////////////////////////////////////////////////////////////
+
+                readPolicyBtn.setOnClickListener(v -> {
+                    String privacyPolicyUrl = "https://grocertaxi.wixsite.com/refund-policy";
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl));
+                    startActivity(browserIntent);
+                });
+
+                ////////////////////////////////////////////////////////////////////////////////////
+
                 proceedBtn.setOnClickListener(v -> {
                     if (!isConnectedToInternet(CartActivity.this)) {
                         showConnectToInternetDialog();
                         return;
                     } else {
                         progressDialog.show();
+
                         storeRef.document(getItem(0).getCartItemProductStoreID()).get()
                                 .addOnCompleteListener(task -> {
                                     if (task.isSuccessful()) {
@@ -669,12 +807,12 @@ public class CartActivity extends AppCompatActivity {
                                                 });
 
                                                 checkoutBtn.setOnClickListener(v1 -> {
-                                                    if (tipChipGroup.getCheckedChipId() == R.id.tip25_chip) {
-                                                        preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(25));
-                                                    } else if (tipChipGroup.getCheckedChipId() == R.id.tip50_chip) {
-                                                        preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(50));
-                                                    } else if (tipChipGroup.getCheckedChipId() == R.id.tip100_chip) {
-                                                        preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(100));
+                                                    if (tipChipGroup.getCheckedChipId() == R.id.tip10_chip) {
+                                                        preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(10));
+                                                    } else if (tipChipGroup.getCheckedChipId() == R.id.tip20_chip) {
+                                                        preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(20));
+                                                    } else if (tipChipGroup.getCheckedChipId() == R.id.tip30_chip) {
+                                                        preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(30));
                                                     } else if (!tipChipGroup.isSelected()) {
                                                         preferenceManager.putString(Constants.KEY_ORDER_TIP_AMOUNT, String.valueOf(0));
                                                     }
@@ -792,42 +930,46 @@ public class CartActivity extends AppCompatActivity {
 
         public class CartViewHolder extends RecyclerView.ViewHolder {
 
-            TextView cartItemID, cartProductName, cartProductUnit, cartProductCategory, cartProductStoreName,
-                    cartProductPrice, cartProductMRP, cartItemTotalPrice, cartItemTotalMRP, cartProductQuantity;
+            TextView cartProductName, cartProductUnit, cartProductCategory, cartProductStoreName,
+                    cartProductStatus, cartProductUnitsInStock, cartItemTotalPrice, cartItemTotalMRP, cartProductQuantity;
             ShimmerTextView cartProductOffer;
-            ImageView cartProductImage, removeBtn;
+            ImageView cartProductImage;
+            CardView decrementBtnContainer, incrementBtnContainer;
             ConstraintLayout clickListener, decrementBtn, incrementBtn;
 
             public CartViewHolder(@NonNull View itemView) {
                 super(itemView);
 
                 clickListener = itemView.findViewById(R.id.click_listener);
-                cartItemID = itemView.findViewById(R.id.cart_item_id);
                 cartProductImage = itemView.findViewById(R.id.cart_product_image);
                 cartProductName = itemView.findViewById(R.id.cart_product_name);
                 cartProductUnit = itemView.findViewById(R.id.cart_product_unit);
                 cartProductCategory = itemView.findViewById(R.id.cart_product_category);
                 cartProductStoreName = itemView.findViewById(R.id.cart_product_store_name);
-                cartProductPrice = itemView.findViewById(R.id.cart_product_price);
-                cartProductMRP = itemView.findViewById(R.id.cart_product_mrp);
+                cartProductStatus = itemView.findViewById(R.id.cart_product_status);
+                cartProductUnitsInStock = itemView.findViewById(R.id.cart_product_unit_in_stock);
                 cartItemTotalPrice = itemView.findViewById(R.id.cart_item_total_price);
                 cartItemTotalMRP = itemView.findViewById(R.id.cart_item_total_mrp);
                 cartProductOffer = itemView.findViewById(R.id.cart_product_offer);
                 cartProductQuantity = itemView.findViewById(R.id.cart_product_quantity);
-                removeBtn = itemView.findViewById(R.id.remove_btn);
                 decrementBtn = itemView.findViewById(R.id.decrement_btn);
+                decrementBtnContainer = itemView.findViewById(R.id.decrement_btn_container);
                 incrementBtn = itemView.findViewById(R.id.increment_btn);
+                incrementBtnContainer = itemView.findViewById(R.id.increment_btn_container);
             }
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     private boolean isConnectedToInternet(CartActivity cartActivity) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) cartActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) cartActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if ((wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected())) {
+        if (null != networkInfo &&
+                (networkInfo.getType() == ConnectivityManager.TYPE_WIFI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)) {
             return true;
         } else {
             return false;
@@ -849,25 +991,14 @@ public class CartActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        if (!isConnectedToInternet(CartActivity.this)) {
-            showConnectToInternetDialog();
-            return;
-        } else {
-            loadCartItems();
-        }
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        KeyboardVisibilityEvent.setEventListener(CartActivity.this, isOpen -> {
-            if (isOpen) {
-                UIUtil.hideKeyboard(CartActivity.this);
-            }
-        });
+    public void finish() {
+        super.finish();
         CustomIntent.customType(CartActivity.this, "up-to-bottom");
     }
 }

@@ -5,7 +5,7 @@ import com.google.firebase.Timestamp;
 public class CartItem {
     private String cartItemID, cartItemProductID, cartItemProductStoreID, cartItemProductStoreName,
             cartItemProductCategory, cartItemProductImage, cartItemProductName, cartItemProductUnit;
-    private long cartItemProductQuantity;
+    private long cartItemProductOffer, cartItemProductQuantity;
     private double cartItemProductMRP, cartItemProductRetailPrice;
     private Timestamp cartItemTimestamp;
 
@@ -13,9 +13,10 @@ public class CartItem {
     }
 
     public CartItem(String cartItemID, String cartItemProductID, String cartItemProductStoreID,
-                    String cartItemProductStoreName, String cartItemProductCategory, String cartItemProductImage,
-                    String cartItemProductName, String cartItemProductUnit, long cartItemProductQuantity,
-                    double cartItemProductMRP, double cartItemProductRetailPrice, Timestamp cartItemTimestamp) {
+                    String cartItemProductStoreName, String cartItemProductCategory,
+                    String cartItemProductImage, String cartItemProductName, String cartItemProductUnit,
+                    long cartItemProductOffer, long cartItemProductQuantity, double cartItemProductMRP,
+                    double cartItemProductRetailPrice, Timestamp cartItemTimestamp) {
         this.cartItemID = cartItemID;
         this.cartItemProductID = cartItemProductID;
         this.cartItemProductStoreID = cartItemProductStoreID;
@@ -24,6 +25,7 @@ public class CartItem {
         this.cartItemProductImage = cartItemProductImage;
         this.cartItemProductName = cartItemProductName;
         this.cartItemProductUnit = cartItemProductUnit;
+        this.cartItemProductOffer = cartItemProductOffer;
         this.cartItemProductQuantity = cartItemProductQuantity;
         this.cartItemProductMRP = cartItemProductMRP;
         this.cartItemProductRetailPrice = cartItemProductRetailPrice;
@@ -92,6 +94,14 @@ public class CartItem {
 
     public void setCartItemProductUnit(String cartItemProductUnit) {
         this.cartItemProductUnit = cartItemProductUnit;
+    }
+
+    public long getCartItemProductOffer() {
+        return cartItemProductOffer;
+    }
+
+    public void setCartItemProductOffer(long cartItemProductOffer) {
+        this.cartItemProductOffer = cartItemProductOffer;
     }
 
     public long getCartItemProductQuantity() {

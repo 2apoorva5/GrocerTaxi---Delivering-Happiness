@@ -3,32 +3,35 @@ package com.application.grocertaxi.Model;
 import com.google.firebase.Timestamp;
 
 public class Order {
-    private String orderID, orderByUserID, orderByUserName, orderFromStoreID, orderFromStoreName,
-            orderCustomerName, orderCustomerMobile, orderDeliveryAddress, orderPaymentMode, orderInstructions,
+    private String orderID, orderByUserID, orderCouponApplied, orderByUserName, orderFromStoreID, orderFromStoreName,
+            orderCustomerName, orderCustomerMobile, orderDeliveryLocation, orderDeliveryAddress, orderPaymentMode, orderInstructions,
             orderStatus, orderPlacedTime, orderCompletionTime, orderCancellationTime;
     private long orderNoOfItems;
-    private double orderTotalMRP, orderTotalRetailPrice, orderTotalDiscount, orderDeliveryCharges, orderTipAmount,
-            orderSubTotal, orderConvenienceFee, orderTotalPayable;
+    private double orderDeliveryLatitude, orderDeliveryLongitude, orderTotalMRP, orderTotalRetailPrice, orderCouponDiscount,
+            orderTotalDiscount, orderDeliveryCharges, orderTipAmount, orderSubTotal, orderConvenienceFee, orderTotalPayable;
     private Timestamp orderTimestamp;
 
     public Order() {
     }
 
-    public Order(String orderID, String orderByUserID, String orderByUserName, String orderFromStoreID,
-                 String orderFromStoreName, String orderCustomerName, String orderCustomerMobile,
-                 String orderDeliveryAddress, String orderPaymentMode, String orderInstructions,
-                 String orderStatus, String orderPlacedTime, String orderCompletionTime,
-                 String orderCancellationTime, long orderNoOfItems, double orderTotalMRP,
-                 double orderTotalRetailPrice, double orderTotalDiscount, double orderDeliveryCharges,
-                 double orderTipAmount, double orderSubTotal, double orderConvenienceFee,
+    public Order(String orderID, String orderByUserID, String orderCouponApplied, String orderByUserName,
+                 String orderFromStoreID, String orderFromStoreName, String orderCustomerName,
+                 String orderCustomerMobile, String orderDeliveryLocation, String orderDeliveryAddress,
+                 String orderPaymentMode, String orderInstructions, String orderStatus, String orderPlacedTime,
+                 String orderCompletionTime, String orderCancellationTime, long orderNoOfItems,
+                 double orderDeliveryLatitude, double orderDeliveryLongitude, double orderTotalMRP,
+                 double orderTotalRetailPrice, double orderCouponDiscount, double orderTotalDiscount,
+                 double orderDeliveryCharges, double orderTipAmount, double orderSubTotal, double orderConvenienceFee,
                  double orderTotalPayable, Timestamp orderTimestamp) {
         this.orderID = orderID;
         this.orderByUserID = orderByUserID;
+        this.orderCouponApplied = orderCouponApplied;
         this.orderByUserName = orderByUserName;
         this.orderFromStoreID = orderFromStoreID;
         this.orderFromStoreName = orderFromStoreName;
         this.orderCustomerName = orderCustomerName;
         this.orderCustomerMobile = orderCustomerMobile;
+        this.orderDeliveryLocation = orderDeliveryLocation;
         this.orderDeliveryAddress = orderDeliveryAddress;
         this.orderPaymentMode = orderPaymentMode;
         this.orderInstructions = orderInstructions;
@@ -37,8 +40,11 @@ public class Order {
         this.orderCompletionTime = orderCompletionTime;
         this.orderCancellationTime = orderCancellationTime;
         this.orderNoOfItems = orderNoOfItems;
+        this.orderDeliveryLatitude = orderDeliveryLatitude;
+        this.orderDeliveryLongitude = orderDeliveryLongitude;
         this.orderTotalMRP = orderTotalMRP;
         this.orderTotalRetailPrice = orderTotalRetailPrice;
+        this.orderCouponDiscount = orderCouponDiscount;
         this.orderTotalDiscount = orderTotalDiscount;
         this.orderDeliveryCharges = orderDeliveryCharges;
         this.orderTipAmount = orderTipAmount;
@@ -62,6 +68,14 @@ public class Order {
 
     public void setOrderByUserID(String orderByUserID) {
         this.orderByUserID = orderByUserID;
+    }
+
+    public String getOrderCouponApplied() {
+        return orderCouponApplied;
+    }
+
+    public void setOrderCouponApplied(String orderCouponApplied) {
+        this.orderCouponApplied = orderCouponApplied;
     }
 
     public String getOrderByUserName() {
@@ -102,6 +116,14 @@ public class Order {
 
     public void setOrderCustomerMobile(String orderCustomerMobile) {
         this.orderCustomerMobile = orderCustomerMobile;
+    }
+
+    public String getOrderDeliveryLocation() {
+        return orderDeliveryLocation;
+    }
+
+    public void setOrderDeliveryLocation(String orderDeliveryLocation) {
+        this.orderDeliveryLocation = orderDeliveryLocation;
     }
 
     public String getOrderDeliveryAddress() {
@@ -168,6 +190,22 @@ public class Order {
         this.orderNoOfItems = orderNoOfItems;
     }
 
+    public double getOrderDeliveryLatitude() {
+        return orderDeliveryLatitude;
+    }
+
+    public void setOrderDeliveryLatitude(double orderDeliveryLatitude) {
+        this.orderDeliveryLatitude = orderDeliveryLatitude;
+    }
+
+    public double getOrderDeliveryLongitude() {
+        return orderDeliveryLongitude;
+    }
+
+    public void setOrderDeliveryLongitude(double orderDeliveryLongitude) {
+        this.orderDeliveryLongitude = orderDeliveryLongitude;
+    }
+
     public double getOrderTotalMRP() {
         return orderTotalMRP;
     }
@@ -182,6 +220,14 @@ public class Order {
 
     public void setOrderTotalRetailPrice(double orderTotalRetailPrice) {
         this.orderTotalRetailPrice = orderTotalRetailPrice;
+    }
+
+    public double getOrderCouponDiscount() {
+        return orderCouponDiscount;
+    }
+
+    public void setOrderCouponDiscount(double orderCouponDiscount) {
+        this.orderCouponDiscount = orderCouponDiscount;
     }
 
     public double getOrderTotalDiscount() {

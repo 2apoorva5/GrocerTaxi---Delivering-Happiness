@@ -24,11 +24,10 @@
     <color name="colorInactive">#9A9A9A</color>
     <color name="colorViews">#E9E9F3</color>
     <color name="colorSearch">#E9E9F3</color>
-    <color name="offer1Color">#60EDAC</color>
-    <color name="offer2Color">#F88989</color>
-    <color name="offer3Color">#6CDAE6</color>
     <color name="safeDeliveryColor">#FDF5A8</color>
     <color name="bottomSheetColor">#FBEDC9</color>
+    <color name="bottomBarInactiveIconColor">#80000000</color>
+    <color name="bottomBarActiveIconColor">#000000</color>
 
     <!-- Categories Colors -->
     <color name="category1">#FFE400</color>
