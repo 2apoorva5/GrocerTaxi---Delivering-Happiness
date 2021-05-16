@@ -42,6 +42,18 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/colorIconDark" />
 
+            <ImageView
+                android:id="@+id/illustration_verify_otp"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginTop="24dp"
+                android:contentDescription="@string/app_name"
+                android:scaleType="centerInside"
+                android:src="@drawable/illustration_verify_otp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/close_btn" />
+
             <TextView
                 android:id="@+id/verify_otp_title"
                 android:layout_width="0dp"
@@ -54,11 +66,11 @@
                 android:textAlignment="center"
                 android:textAllCaps="false"
                 android:textColor="@color/colorTextDark"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/close_btn" />
+                app:layout_constraintTop_toBottomOf="@id/illustration_verify_otp" />
 
             <TextView
                 android:id="@+id/verify_otp_subtitle"
@@ -77,18 +89,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/verify_otp_title" />
-
-            <ImageView
-                android:id="@+id/illustration_verify_otp"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:layout_marginTop="24dp"
-                android:contentDescription="@string/app_name"
-                android:scaleType="centerInside"
-                android:src="@drawable/illustration_verify_otp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/verify_otp_subtitle" />
 
             <com.chaos.view.PinView
                 android:id="@+id/verify_otp_pinview"
@@ -113,14 +113,14 @@
                 app:itemWidth="44dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/illustration_verify_otp"
+                app:layout_constraintTop_toBottomOf="@id/verify_otp_subtitle"
                 app:lineColor="@color/colorViews" />
 
             <TextView
                 android:id="@+id/resend_otp_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="26dp"
+                android:layout_marginTop="18dp"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:enabled="false"

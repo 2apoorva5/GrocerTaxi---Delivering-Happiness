@@ -40,7 +40,7 @@
         android:textAlignment="textStart"
         android:textAllCaps="false"
         android:textColor="@color/colorTextDark"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,7 +78,7 @@
         android:textAlignment="textStart"
         android:textAllCaps="false"
         android:textColor="@color/successColor"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/store_address" />
