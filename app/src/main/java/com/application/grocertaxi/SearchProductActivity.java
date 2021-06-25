@@ -189,6 +189,7 @@ public class SearchProductActivity extends AppCompatActivity {
                 actionBtn.setOnClickListener(v -> {
                     UIUtil.hideKeyboard(SearchProductActivity.this);
                     onBackPressed();
+                    finish();
                 });
             }
         });
@@ -229,17 +230,17 @@ public class SearchProductActivity extends AppCompatActivity {
             }
         }).addOnFailureListener(e ->
                 Alerter.create(SearchProductActivity.this)
-                .setText("Whoa! Something broke. Try again!")
-                .setTextAppearance(R.style.AlertText)
-                .setBackgroundColorRes(R.color.errorColor)
-                .setIcon(R.drawable.ic_error)
-                .setDuration(3000)
-                .enableIconPulse(true)
-                .enableVibration(true)
-                .disableOutsideTouch()
-                .enableProgress(true)
-                .setProgressColorInt(getColor(android.R.color.white))
-                .show());
+                        .setText("Whoa! Something broke. Try again!")
+                        .setTextAppearance(R.style.AlertText)
+                        .setBackgroundColorRes(R.color.errorColor)
+                        .setIcon(R.drawable.ic_error)
+                        .setDuration(3000)
+                        .enableIconPulse(true)
+                        .enableVibration(true)
+                        .disableOutsideTouch()
+                        .enableProgress(true)
+                        .setProgressColorInt(getColor(android.R.color.white))
+                        .show());
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(SearchProductActivity.this, R.layout.layout_search_text, productsList);
         inputProductSearch.setAdapter(adapter);
@@ -808,12 +809,6 @@ public class SearchProductActivity extends AppCompatActivity {
                 UIUtil.hideKeyboard(SearchProductActivity.this);
             }
         });
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
         CustomIntent.customType(SearchProductActivity.this, "up-to-bottom");
     }
 }

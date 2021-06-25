@@ -50,9 +50,6 @@ import com.tapadoo.alerter.Alerter;
 import com.tomergoldst.tooltips.ToolTip;
 import com.tomergoldst.tooltips.ToolTipsManager;
 
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
-
 import dmax.dialog.SpotsDialog;
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 import maes.tech.intentanim.CustomIntent;
@@ -190,7 +187,10 @@ public class CartActivity extends AppCompatActivity {
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        closeBtn.setOnClickListener(v -> onBackPressed());
+        closeBtn.setOnClickListener(v -> {
+            onBackPressed();
+            finish();
+        });
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -579,6 +579,18 @@ public class CartActivity extends AppCompatActivity {
                                         getSnapshots().getSnapshot(i).getReference().delete()
                                                 .addOnSuccessListener(aVoid -> {
                                                     progressDialog.dismiss();
+                                                    Alerter.create(CartActivity.this)
+                                                            .setText("Your cart has been cleared!")
+                                                            .setTextAppearance(R.style.AlertText)
+                                                            .setBackgroundColorRes(R.color.infoColor)
+                                                            .setIcon(R.drawable.ic_info)
+                                                            .setDuration(3000)
+                                                            .enableIconPulse(true)
+                                                            .enableVibration(true)
+                                                            .disableOutsideTouch()
+                                                            .enableProgress(true)
+                                                            .setProgressColorInt(getColor(android.R.color.white))
+                                                            .show();
                                                 }).addOnFailureListener(e -> {
                                             progressDialog.dismiss();
                                             Alerter.create(CartActivity.this)
@@ -900,7 +912,7 @@ public class CartActivity extends AppCompatActivity {
                     .addOnSuccessListener(aVoid -> {
                         progressDialog.dismiss();
                         Alerter.create(CartActivity.this)
-                                .setText("Ahan! One item has been removed from cart.")
+                                .setText("Ahan! An item has been removed from your cart.")
                                 .setTextAppearance(R.style.AlertText)
                                 .setBackgroundColorRes(R.color.infoColor)
                                 .setIcon(R.drawable.ic_dialog_okay)
@@ -993,12 +1005,6 @@ public class CartActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
         CustomIntent.customType(CartActivity.this, "up-to-bottom");
     }
 }

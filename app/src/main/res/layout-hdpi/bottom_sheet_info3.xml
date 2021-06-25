@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_sheet_info3"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/title_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/bottomSheetColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/text_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="12dp"
+            android:fontFamily="@font/montserrat"
+            android:includeFontPadding="false"
+            android:text="@string/convenience_fee"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/colorTextDark"
+            android:textSize="11sp"
+            android:textStyle="normal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/close_bottom_sheet_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="SmallSp" />
+
+        <ImageView
+            android:id="@+id/close_bottom_sheet_btn"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="@string/app_name"
+            android:focusable="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_close"
+            app:layout_constraintBottom_toBottomOf="@id/text_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/text_title"
+            app:tint="@color/colorIconDark" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/text_message1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        android:text="@string/there_won_t_be_any_convenience_fee_for_your_first_order"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/infoColor"
+        android:textSize="9sp"
+        tools:ignore="SmallSp"
+        android:textStyle="normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_container" />
+
+    <TextView
+        android:id="@+id/text_message2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"
+        android:alpha="0.75"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        android:text="@string/after_the_first_order_we_will_be_adding_some_convenience_fee_in_form_of_platform_handling_charges_on_each_of_your_order_made_using_online_payment"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/colorTextDark"
+        android:textSize="9sp"
+        tools:ignore="SmallSp"
+        android:textStyle="normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_message1" />
+
+    <TextView
+        android:id="@+id/text_message3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginHorizontal="16dp"
+        android:alpha="0.75"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
+        android:text="@string/this_convenience_fee_or_platform_handling_charge_will_be_2_of_the_total_order_amount_and_will_be_reflected_in_your_order_summary_during_checkout"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/colorTextDark"
+        android:textSize="9sp"
+        tools:ignore="SmallSp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_message2" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -269,7 +269,10 @@ public class DeliveryAddressActivity extends AppCompatActivity implements OnMapR
     }
 
     private void setActionOnViews() {
-        backBtn.setOnClickListener(v -> onBackPressed());
+        backBtn.setOnClickListener(v -> {
+            onBackPressed();
+            finish();
+        });
 
         userCurrentLocationBtn.setOnClickListener(v -> getCurrentLocation());
 
@@ -521,12 +524,6 @@ public class DeliveryAddressActivity extends AppCompatActivity implements OnMapR
                 UIUtil.hideKeyboard(DeliveryAddressActivity.this);
             }
         });
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
         CustomIntent.customType(DeliveryAddressActivity.this, "up-to-bottom");
     }
 }

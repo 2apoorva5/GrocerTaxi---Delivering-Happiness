@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
@@ -26,9 +27,6 @@ import com.tapadoo.alerter.Alerter;
 import com.tomergoldst.tooltips.ToolTip;
 import com.tomergoldst.tooltips.ToolTipsManager;
 
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,7 +36,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements PaymentRe
 
     private ImageView backBtn, knowMoreBtn1, knowMoreBtn2, knowMoreBtn3, knowMoreBtn4;
     private TextView name, address, mobile, orderID, storeName, itemsCount, totalMRP, discountAmount, couponDiscount,
-            deliveryCharges, textTipAdded, tipAmount, convenienceFee, totalPayable;
+            deliveryCharges, textTipAdded, tipAmount, convenienceFee, totalPayable, readPolicyBtn;
     private ConstraintLayout layoutContent, layoutNoInternet, retryBtn, priceDetailsContainer, placeOrderBtn;
 
     private PreferenceManager preferenceManager;
@@ -101,6 +99,9 @@ public class OrderSummaryActivity extends AppCompatActivity implements PaymentRe
         convenienceFee = findViewById(R.id.convenience_fee);
         totalPayable = findViewById(R.id.total_payable);
         priceDetailsContainer = findViewById(R.id.price_details_container);
+
+        readPolicyBtn = findViewById(R.id.read_policy_btn);
+
         placeOrderBtn = findViewById(R.id.place_order_btn);
     }
 
@@ -126,7 +127,10 @@ public class OrderSummaryActivity extends AppCompatActivity implements PaymentRe
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        backBtn.setOnClickListener(v -> onBackPressed());
+        backBtn.setOnClickListener(v -> {
+            onBackPressed();
+            finish();
+        });
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -249,20 +253,28 @@ public class OrderSummaryActivity extends AppCompatActivity implements PaymentRe
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
+        readPolicyBtn.setOnClickListener(v -> {
+                    String privacyPolicyUrl = "https://grocertaxi.wixsite.com/refund-policy";
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl));
+                    startActivity(browserIntent);
+                });
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         placeOrderBtn.setOnClickListener(v -> {
             if (!isConnectedToInternet(OrderSummaryActivity.this)) {
                 showConnectToInternetDialog();
                 return;
             } else {
-                if(preferenceManager.getString(Constants.KEY_ORDER_PAYMENT_MODE).equals("Pay on Delivery")) {
+                if (preferenceManager.getString(Constants.KEY_ORDER_PAYMENT_MODE).equals("Pay on Delivery")) {
                     startActivity(new Intent(OrderSummaryActivity.this, OrderConfirmationActivity.class));
                     CustomIntent.customType(OrderSummaryActivity.this, "left-to-right");
                     finish();
-                } else if(preferenceManager.getString(Constants.KEY_ORDER_PAYMENT_MODE).equals("Online Payment")) {
+                } else if (preferenceManager.getString(Constants.KEY_ORDER_PAYMENT_MODE).equals("Online Payment")) {
                     int payable = Math.round(Float.parseFloat(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_PAYABLE)) * 100);
 
                     Checkout checkout = new Checkout();
-                    checkout.setKeyID("rzp_test_MxUHR0ZJnKFmDx");
+                    checkout.setKeyID("rzp_live_TKJ8qCyCDVnT6Z");
                     checkout.setImage(R.mipmap.app_logo);
                     JSONObject jsonObject = new JSONObject();
 
@@ -325,13 +337,13 @@ public class OrderSummaryActivity extends AppCompatActivity implements PaymentRe
 
     @Override
     public void onPaymentError(int i, String s) {
-        if(i == Checkout.NETWORK_ERROR) {
+        if (i == Checkout.NETWORK_ERROR) {
             Toast.makeText(OrderSummaryActivity.this, "NETWORK ERROR!", Toast.LENGTH_SHORT).show();
-        } else if(i == Checkout.INVALID_OPTIONS) {
+        } else if (i == Checkout.INVALID_OPTIONS) {
             Toast.makeText(OrderSummaryActivity.this, "Invalid details in checkout form!", Toast.LENGTH_SHORT).show();
-        } else if(i == Checkout.PAYMENT_CANCELED) {
+        } else if (i == Checkout.PAYMENT_CANCELED) {
             Toast.makeText(OrderSummaryActivity.this, "Payment Cancelled!", Toast.LENGTH_SHORT).show();
-        } else if(i == Checkout.TLS_ERROR) {
+        } else if (i == Checkout.TLS_ERROR) {
             Toast.makeText(OrderSummaryActivity.this, "The device does not support TLS v1.1 or TLS v1.2!", Toast.LENGTH_SHORT).show();
         }
     }
@@ -369,12 +381,6 @@ public class OrderSummaryActivity extends AppCompatActivity implements PaymentRe
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
         CustomIntent.customType(OrderSummaryActivity.this, "right-to-left");
     }
 }

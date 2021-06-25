@@ -27,9 +27,6 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 import com.shreyaspatil.MaterialDialog.MaterialDialog;
 
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
-
 import de.mateware.snacky.Snacky;
 import maes.tech.intentanim.CustomIntent;
 
@@ -90,7 +87,10 @@ public class LocationPermissionActivity extends AppCompatActivity {
     }
 
     private void setActionOnViews() {
-        backBtn.setOnClickListener(v -> onBackPressed());
+        backBtn.setOnClickListener(v -> {
+            onBackPressed();
+            finish();
+        });
 
         grantBtn.setOnClickListener(v -> {
             if (!isConnectedToInternet(LocationPermissionActivity.this)) {
@@ -175,12 +175,6 @@ public class LocationPermissionActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
         CustomIntent.customType(LocationPermissionActivity.this, "up-to-bottom");
     }
 }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
@@ -41,7 +42,7 @@ public class OrderAddressActivity extends AppCompatActivity {
 
     private ImageView backBtn, knowMoreBtn;
     private TextInputLayout nameInput, mobileInput, deliveryAddress, instructions;
-    private TextView changeAddressBtn;
+    private TextView changeAddressBtn, readPolicyBtn;
     private ChipGroup paymentMethodChipGroup;
     private ConstraintLayout layoutContent, layoutNoInternet, retryBtn, proceedBtn;
 
@@ -102,6 +103,7 @@ public class OrderAddressActivity extends AppCompatActivity {
         knowMoreBtn = findViewById(R.id.know_more_btn);
         instructions = findViewById(R.id.instructions);
         paymentMethodChipGroup = findViewById(R.id.payment_method_chip_group);
+        readPolicyBtn = findViewById(R.id.read_policy_btn);
         proceedBtn = findViewById(R.id.proceed_btn);
     }
 
@@ -162,7 +164,10 @@ public class OrderAddressActivity extends AppCompatActivity {
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        backBtn.setOnClickListener(v -> onBackPressed());
+        backBtn.setOnClickListener(v -> {
+            onBackPressed();
+            finish();
+        });
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -202,6 +207,14 @@ public class OrderAddressActivity extends AppCompatActivity {
 
             bottomSheetDialog.show();
         });
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        readPolicyBtn.setOnClickListener(v -> {
+                    String privacyPolicyUrl = "https://grocertaxi.wixsite.com/refund-policy";
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl));
+                    startActivity(browserIntent);
+                });
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -656,12 +669,6 @@ public class OrderAddressActivity extends AppCompatActivity {
                 UIUtil.hideKeyboard(OrderAddressActivity.this);
             }
         });
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
         CustomIntent.customType(OrderAddressActivity.this, "right-to-left");
     }
 }

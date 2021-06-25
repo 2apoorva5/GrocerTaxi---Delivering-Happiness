@@ -48,9 +48,6 @@ import com.romainpiel.shimmer.ShimmerTextView;
 import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
-
 import java.util.HashMap;
 
 import dmax.dialog.SpotsDialog;
@@ -219,7 +216,10 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        closeBtn.setOnClickListener(v -> onBackPressed());
+        closeBtn.setOnClickListener(v -> {
+            onBackPressed();
+            finish();
+        });
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1285,6 +1285,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                     recyclerSimilarItems.setLayoutManager(new LinearLayoutManager(ProductDetailsActivity.this, LinearLayoutManager.HORIZONTAL, false));
                     recyclerSimilarItems.setAdapter(similarItemAdapter);
                 } else {
+                    progressBar.setVisibility(View.GONE);
                     Alerter.create(ProductDetailsActivity.this)
                             .setText("Whoa! Something broke. Try again!")
                             .setTextAppearance(R.style.AlertText)
@@ -1391,12 +1392,6 @@ public class ProductDetailsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
         CustomIntent.customType(ProductDetailsActivity.this, "up-to-bottom");
     }
 }

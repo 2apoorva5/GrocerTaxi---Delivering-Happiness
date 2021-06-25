@@ -1,11 +1,5 @@
 package com.application.grocertaxi;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +13,12 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.grocertaxi.Model.Coupon;
 import com.application.grocertaxi.Utilities.Constants;
@@ -34,9 +34,6 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
-
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import dmax.dialog.SpotsDialog;
 import maes.tech.intentanim.CustomIntent;
@@ -142,7 +139,10 @@ public class CouponsListActivity extends AppCompatActivity {
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        closeBtn.setOnClickListener(v -> onBackPressed());
+        closeBtn.setOnClickListener(v -> {
+            onBackPressed();
+            finish();
+        });
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -175,71 +175,71 @@ public class CouponsListActivity extends AppCompatActivity {
                 holder.description.setText(model.getDescription());
 
                 holder.clickListener.setOnClickListener(v -> {
-                    if(!isConnectedToInternet(CouponsListActivity.this)) {
+                    if (!isConnectedToInternet(CouponsListActivity.this)) {
                         showConnectToInternetDialog();
                         return;
                     } else {
-                        if(model.getCode().equals("GTNEW10")) {
+                        if (model.getCode().equals("GTNEW10")) {
                             progressDialog.show();
 
                             FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS)
                                     .document(preferenceManager.getString(Constants.KEY_USER_ID))
                                     .get().addOnCompleteListener(task -> {
-                                        if (task.isSuccessful()) {
-                                            DocumentSnapshot documentSnapshot = task.getResult();
-                                            if (documentSnapshot.exists()) {
-                                                boolean first_order = documentSnapshot.getBoolean(Constants.KEY_USER_FIRST_ORDER);
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot documentSnapshot = task.getResult();
+                                    if (documentSnapshot.exists()) {
+                                        boolean first_order = documentSnapshot.getBoolean(Constants.KEY_USER_FIRST_ORDER);
 
-                                                if (first_order) {
-                                                    progressDialog.dismiss();
-
-                                                    preferenceManager.putString(Constants.KEY_COUPON, model.getCode());
-                                                    preferenceManager.putString(Constants.KEY_COUPON_DISCOUNT_PERCENT, String.valueOf(model.getDiscountPercent()));
-
-                                                    onBackPressed();
-                                                } else {
-                                                    progressDialog.dismiss();
-                                                    MaterialDialog materialDialog = new MaterialDialog.Builder(CouponsListActivity.this)
-                                                            .setTitle("You can't use this coupon!")
-                                                            .setMessage("This coupon is only valid for your first order. Since this is not your first order, we're sorry you can't use this.")
-                                                            .setCancelable(false)
-                                                            .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface, which) -> dialogInterface.dismiss())
-                                                            .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
-                                                    materialDialog.show();
-                                                }
-                                            } else {
-                                                progressDialog.dismiss();
-
-                                                Alerter.create(CouponsListActivity.this)
-                                                        .setText("Whoa! Something broke. Try again!")
-                                                        .setTextAppearance(R.style.AlertText)
-                                                        .setBackgroundColorRes(R.color.errorColor)
-                                                        .setIcon(R.drawable.ic_error)
-                                                        .setDuration(3000)
-                                                        .enableIconPulse(true)
-                                                        .enableVibration(true)
-                                                        .disableOutsideTouch()
-                                                        .enableProgress(true)
-                                                        .setProgressColorInt(getColor(android.R.color.white))
-                                                        .show();
-                                            }
-                                        } else {
+                                        if (first_order) {
                                             progressDialog.dismiss();
 
-                                            Alerter.create(CouponsListActivity.this)
-                                                    .setText("Whoa! Something broke. Try again!")
-                                                    .setTextAppearance(R.style.AlertText)
-                                                    .setBackgroundColorRes(R.color.errorColor)
-                                                    .setIcon(R.drawable.ic_error)
-                                                    .setDuration(3000)
-                                                    .enableIconPulse(true)
-                                                    .enableVibration(true)
-                                                    .disableOutsideTouch()
-                                                    .enableProgress(true)
-                                                    .setProgressColorInt(getColor(android.R.color.white))
-                                                    .show();
+                                            preferenceManager.putString(Constants.KEY_COUPON, model.getCode());
+                                            preferenceManager.putString(Constants.KEY_COUPON_DISCOUNT_PERCENT, String.valueOf(model.getDiscountPercent()));
+
+                                            onBackPressed();
+                                        } else {
+                                            progressDialog.dismiss();
+                                            MaterialDialog materialDialog = new MaterialDialog.Builder(CouponsListActivity.this)
+                                                    .setTitle("You can't use this coupon!")
+                                                    .setMessage("This coupon is only valid for your first order. Since this is not your first order, we're sorry you can't use this.")
+                                                    .setCancelable(false)
+                                                    .setPositiveButton("Okay", R.drawable.ic_dialog_okay, (dialogInterface, which) -> dialogInterface.dismiss())
+                                                    .setNegativeButton("Cancel", R.drawable.ic_dialog_cancel, (dialogInterface, which) -> dialogInterface.dismiss()).build();
+                                            materialDialog.show();
                                         }
-                                    });
+                                    } else {
+                                        progressDialog.dismiss();
+
+                                        Alerter.create(CouponsListActivity.this)
+                                                .setText("Whoa! Something broke. Try again!")
+                                                .setTextAppearance(R.style.AlertText)
+                                                .setBackgroundColorRes(R.color.errorColor)
+                                                .setIcon(R.drawable.ic_error)
+                                                .setDuration(3000)
+                                                .enableIconPulse(true)
+                                                .enableVibration(true)
+                                                .disableOutsideTouch()
+                                                .enableProgress(true)
+                                                .setProgressColorInt(getColor(android.R.color.white))
+                                                .show();
+                                    }
+                                } else {
+                                    progressDialog.dismiss();
+
+                                    Alerter.create(CouponsListActivity.this)
+                                            .setText("Whoa! Something broke. Try again!")
+                                            .setTextAppearance(R.style.AlertText)
+                                            .setBackgroundColorRes(R.color.errorColor)
+                                            .setIcon(R.drawable.ic_error)
+                                            .setDuration(3000)
+                                            .enableIconPulse(true)
+                                            .enableVibration(true)
+                                            .disableOutsideTouch()
+                                            .enableProgress(true)
+                                            .setProgressColorInt(getColor(android.R.color.white))
+                                            .show();
+                                }
+                            });
                         } else {
                             preferenceManager.putString(Constants.KEY_COUPON, model.getCode());
                             preferenceManager.putString(Constants.KEY_COUPON_DISCOUNT_PERCENT, String.valueOf(model.getDiscountPercent()));
@@ -343,12 +343,6 @@ public class CouponsListActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
         CustomIntent.customType(CouponsListActivity.this, "up-to-bottom");
     }
 }

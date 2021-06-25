@@ -3,6 +3,7 @@ package com.application.grocertaxi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.net.ConnectivityManager;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -34,6 +36,16 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.InstallState;
+import com.google.android.play.core.install.InstallStateUpdatedListener;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.InstallStatus;
+import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.android.play.core.tasks.OnSuccessListener;
+import com.google.android.play.core.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
@@ -88,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
     private PreferenceManager preferenceManager;
     private AlertDialog progressDialog;
 
+    private AppUpdateManager appUpdateManager;
+    private static final int RC_APP_UPDATE = 123;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,6 +140,20 @@ public class MainActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setTheme(R.style.SpotsDialog)
                 .build();
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        appUpdateManager = AppUpdateManagerFactory.create(this);
+        appUpdateManager.getAppUpdateInfo().addOnSuccessListener(result -> {
+            if (result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                try {
+                    appUpdateManager.startUpdateFlowForResult(result, AppUpdateType.IMMEDIATE, MainActivity.this, RC_APP_UPDATE);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -190,6 +219,17 @@ public class MainActivity extends AppCompatActivity {
 
         layoutEmpty = findViewById(R.id.layout_empty);
         changeLocationBtn = findViewById(R.id.change_location_btn);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == RC_APP_UPDATE) {
+            if(resultCode != RESULT_OK) {
+                Toast.makeText(MainActivity.this, "App Update Cancelled!", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -2213,5 +2253,19 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finishAffinity();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        appUpdateManager.getAppUpdateInfo().addOnSuccessListener(result -> {
+            if (result.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                try {
+                    appUpdateManager.startUpdateFlowForResult(result, AppUpdateType.IMMEDIATE, MainActivity.this, RC_APP_UPDATE);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

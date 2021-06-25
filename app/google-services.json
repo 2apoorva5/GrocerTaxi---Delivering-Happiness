@@ -1,0 +1,85 @@
+{
+  "project_info": {
+    "project_number": "894351161163",
+    "firebase_url": "https://grocer-taxi.firebaseio.com",
+    "project_id": "grocer-taxi",
+    "storage_bucket": "grocer-taxi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:894351161163:android:fccfbf39effcfe46359ace",
+        "android_client_info": {
+          "package_name": "com.application.grocertaxi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "894351161163-h1o3crrdsgevu7bb24shudqu44lmda5m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.application.grocertaxi",
+            "certificate_hash": "5e148e12ca5d88bc23bf1a6d396eef11e7193a8b"
+          }
+        },
+        {
+          "client_id": "894351161163-rv9kj3ie44q83q3g0r8v94dppn7g394l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnKVALcu6dD302f0s9naD779wn1lQpOwg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "894351161163-rv9kj3ie44q83q3g0r8v94dppn7g394l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:894351161163:android:35dca1e5433e16f4359ace",
+        "android_client_info": {
+          "package_name": "com.application.grocertaxistore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "894351161163-alpjs3gvun1k0b3jlh2ctsaludloh8d9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.application.grocertaxistore",
+            "certificate_hash": "5e148e12ca5d88bc23bf1a6d396eef11e7193a8b"
+          }
+        },
+        {
+          "client_id": "894351161163-rv9kj3ie44q83q3g0r8v94dppn7g394l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnKVALcu6dD302f0s9naD779wn1lQpOwg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "894351161163-rv9kj3ie44q83q3g0r8v94dppn7g394l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

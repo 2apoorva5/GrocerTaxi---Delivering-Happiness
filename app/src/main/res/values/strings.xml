@@ -3,8 +3,8 @@
     <string name="app_slogan">Delivering Happiness!</string>
 
     <!-- Razorpay Key -->
-    <string name="razorpay_key_id">rzp_test_MxUHR0ZJnKFmDx</string>
-    <string name="razorpay_key_secret">zv3ya9O3KMXMDSe4mBM1g63d</string>
+    <string name="razorpay_key_id">rzp_live_TKJ8qCyCDVnT6Z</string>
+    <string name="razorpay_key_secret">ncTsL9ClmTVA69K8T8vASj89</string>
 
     <string name="onboarding_title1">Need groceries?</string>
     <string name="onboarding_title2">Multiple stores</string>

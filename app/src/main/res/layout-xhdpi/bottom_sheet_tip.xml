@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_sheet_tip"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container_tip_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/bottomSheetColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_delivery_guy"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:contentDescription="@string/app_name"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img_delivery_guy"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/text_tip_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:fontFamily="@font/montserrat"
+            android:includeFontPadding="false"
+            android:text="@string/add_tip_to_support_your_delivery_hero"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/colorTextDark"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/img_delivery_guy"
+            app:layout_constraintTop_toTopOf="@id/img_delivery_guy" />
+
+        <TextView
+            android:id="@+id/text_tip_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:alpha="0.75"
+            android:fontFamily="@font/montserrat"
+            android:includeFontPadding="false"
+            android:text="@string/your_delivery_hero_risks_his_life_to_deliver_your_grocery_safely_amp_timely_in_the_times_of_crisis"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/colorTextDark"
+            android:textSize="10sp"
+            android:textStyle="normal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/img_delivery_guy"
+            app:layout_constraintTop_toBottomOf="@id/text_tip_title"
+            tools:ignore="SmallSp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/tip_chip_group"
+        style="@style/Widget.MaterialComponents.Chip.Choice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="12dp"
+        android:layout_marginStart="16dp"
+        android:nestedScrollingEnabled="true"
+        app:chipSpacingHorizontal="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/container_tip_message"
+        app:singleLine="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/tip10_chip"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="@string/_10"
+            android:textAppearance="@style/ChipText"
+            android:textColor="@color/chip_text_color"
+            app:chipBackgroundColor="@color/chip_background_color"
+            app:chipCornerRadius="8dp"
+            app:chipEndPadding="8dp"
+            app:chipMinHeight="32dp"
+            app:chipStartPadding="8dp"
+            app:rippleColor="@color/colorAccent" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/tip20_chip"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="@string/_20"
+            android:textAppearance="@style/ChipText"
+            android:textColor="@color/chip_text_color"
+            app:chipBackgroundColor="@color/chip_background_color"
+            app:chipCornerRadius="8dp"
+            app:chipEndPadding="8dp"
+            app:chipMinHeight="32dp"
+            app:chipStartPadding="8dp"
+            app:rippleColor="@color/colorAccent" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/tip30_chip"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="@string/_30"
+            android:textAppearance="@style/ChipText"
+            android:textColor="@color/chip_text_color"
+            app:chipBackgroundColor="@color/chip_background_color"
+            app:chipCornerRadius="8dp"
+            app:chipEndPadding="8dp"
+            app:chipMinHeight="32dp"
+            app:chipStartPadding="8dp"
+            app:rippleColor="@color/colorAccent" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <ImageView
+        android:id="@+id/tip_info_btn"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="@string/app_name"
+        android:focusable="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_info"
+        app:layout_constraintBottom_toBottomOf="@id/tip_chip_group"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tip_chip_group"
+        app:tint="@color/infoColor" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/checkout_btn_container"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:elevation="8dp"
+        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardPreventCornerOverlap="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tip_chip_group">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/checkout_btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat"
+                android:includeFontPadding="false"
+                android:text="@string/checkout"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textColor="@color/colorTextDark"
+                android:textSize="16sp"
+                android:textStyle="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

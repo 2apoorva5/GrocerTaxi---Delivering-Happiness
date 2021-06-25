@@ -29,18 +29,13 @@ import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.makeramen.roundedimageview.RoundedImageView;
 import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
@@ -185,7 +180,10 @@ public class TrackOrderActivity extends AppCompatActivity {
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        closeBtn.setOnClickListener(v -> onBackPressed());
+        closeBtn.setOnClickListener(v -> {
+            onBackPressed();
+            finish();
+        });
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -345,11 +343,11 @@ public class TrackOrderActivity extends AppCompatActivity {
                         requestCancellationBtnContainer.setCardBackgroundColor(getColor(R.color.errorColor));
                         requestCancellationBtn.setEnabled(true);
                         requestCancellationBtn.setOnClickListener(v -> {
-                            if(!isConnectedToInternet(TrackOrderActivity.this)) {
+                            if (!isConnectedToInternet(TrackOrderActivity.this)) {
                                 showConnectToInternetDialog();
                                 return;
                             } else {
-                                if(order_status.equals("Out for Delivery")) {
+                                if (order_status.equals("Out for Delivery")) {
                                     progressDialog.dismiss();
                                     MaterialDialog materialDialog = new MaterialDialog.Builder(TrackOrderActivity.this)
                                             .setTitle("Can't proceed!")
@@ -391,8 +389,8 @@ public class TrackOrderActivity extends AppCompatActivity {
                                                         .document(documentSnapshot.getString(Constants.KEY_ORDER_FROM_STOREID))
                                                         .get()
                                                         .addOnCompleteListener(task -> {
-                                                            if(task.isSuccessful()) {
-                                                                if(task.getResult().exists()) {
+                                                            if (task.isSuccessful()) {
+                                                                if (task.getResult().exists()) {
                                                                     FirebaseFirestore.getInstance()
                                                                             .collection(Constants.KEY_COLLECTION_CITIES)
                                                                             .document(preferenceManager.getString(Constants.KEY_USER_CITY))
@@ -404,8 +402,8 @@ public class TrackOrderActivity extends AppCompatActivity {
                                                                             .whereEqualTo("orderID", preferenceManager.getString(Constants.KEY_ORDER))
                                                                             .get()
                                                                             .addOnCompleteListener(task1 -> {
-                                                                                if(task1.isSuccessful()) {
-                                                                                    if(!task1.getResult().getDocuments().isEmpty() || task1.getResult().getDocuments().size() != 0) {
+                                                                                if (task1.isSuccessful()) {
+                                                                                    if (!task1.getResult().getDocuments().isEmpty() || task1.getResult().getDocuments().size() != 0) {
                                                                                         progressDialog.dismiss();
                                                                                         MaterialDialog materialDialog = new MaterialDialog.Builder(TrackOrderActivity.this)
                                                                                                 .setTitle("Already requested!")
@@ -619,7 +617,7 @@ public class TrackOrderActivity extends AppCompatActivity {
 
     public static class OrderItemViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView orderItemProductImage;
+        RoundedImageView orderItemProductImage;
         TextView orderItemProductName, orderItemProductQuantity, orderItemProductPrice, orderItemProductMRP, orderItemProductTotalPrice;
 
         public OrderItemViewHolder(@NonNull View itemView) {
@@ -667,12 +665,6 @@ public class TrackOrderActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
         CustomIntent.customType(TrackOrderActivity.this, "up-to-bottom");
     }
 }

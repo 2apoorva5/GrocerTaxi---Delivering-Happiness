@@ -138,7 +138,10 @@ public class OrderConfirmationActivity extends AppCompatActivity {
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        backBtn.setOnClickListener(v -> onBackPressed());
+        backBtn.setOnClickListener(v -> {
+            onBackPressed();
+            finish();
+        });
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -468,13 +471,12 @@ public class OrderConfirmationActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
+        CustomIntent.customType(OrderConfirmationActivity.this, "right-to-left");
     }
 
     @Override
     public void finish() {
         super.finish();
-        CustomIntent.customType(OrderConfirmationActivity.this, "right-to-left");
 
         preferenceManager.putString(Constants.KEY_COUPON, "");
         preferenceManager.putString(Constants.KEY_COUPON_DISCOUNT_PERCENT, String.valueOf(0));

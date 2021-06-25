@@ -200,7 +200,10 @@ public class ProductsListActivity extends AppCompatActivity {
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        backBtn.setOnClickListener(v -> onBackPressed());
+        backBtn.setOnClickListener(v -> {
+            onBackPressed();
+            finish();
+        });
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1015,12 +1018,6 @@ public class ProductsListActivity extends AppCompatActivity {
                 UIUtil.hideKeyboard(ProductsListActivity.this);
             }
         });
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
         CustomIntent.customType(ProductsListActivity.this, "right-to-left");
     }
 }

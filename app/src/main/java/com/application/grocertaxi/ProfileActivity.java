@@ -36,9 +36,6 @@ import com.google.firebase.storage.StorageReference;
 import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
-
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
