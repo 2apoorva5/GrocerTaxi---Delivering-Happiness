@@ -136,5 +136,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/order_item_product_quantity"/>
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -310,5 +310,14 @@
     <string name="note_that_the_delivery_address_should_be_within_5_kilometres_from_the_store_in_order_to_make_your_delivery_possible_for_the_store_n_nyou_cannot_place_your_order_from_a_store_if_your_delivery_address_doesn_t_fall_within_5_kilometres_from_the_store">Note that the delivery address should be within 5 kilometres from the store in order to make your delivery possible for the store.\n\nYou cannot place your order from a store if your delivery address doesn\'t fall within 5 kilometres from the store.</string>
     <string name="x">X</string>
     <string name="search_text">Search Text</string>
+    <string name="about">Grocer Taxi is an all-in-one grocery delivery application. The application intends to provide grocery delivery services in the quickest and easiest way possible. The app partners with multiple grocery and daily need stores in the area to deliver the best quality products to the customers, swiftly and cheaply.</string>
+    <string name="co_founders">Co-Founders</string>
+    <string name="apoorva_ranjan">Apoorva Ranjan</string>
+    <string name="nitesh_kumar">Nitesh Kumar</string>
+    <string name="contact">Contact</string>
+    <string name="address_chitrakoot_colony_b_polytechnic_dhanbad_828130">Address : Chitrakoot Colony, B-Polytechnic, Dhanbad - 828130</string>
+    <string name="mobile_919915462971_919815225676">Mobile : +919915462971 / +919815225676</string>
+    <string name="whatsapp_918809940931_919815225676">WhatsApp : +918809940931 / +919815225676</string>
+    <string name="about_us">About us</string>
 
 </resources>

@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,11 +21,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.application.grocertaxi.Model.Product;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.bumptech.glide.Glide;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -46,8 +49,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     private CircleImageView userProfilePic, choosePhoto;
     private TextView userName, userEmail, userMobile, deliveryAddress;
-    private ConstraintLayout address, cart, orders, writeToUs, rateUs, inviteFriends, privacyPolicy,
-            termsOfService, refundPolicy, appSettings, logout;
+    private ConstraintLayout address, cart, orders, writeToUs, rateUs, inviteFriends,
+            aboutUs, privacyPolicy, termsOfService, refundPolicy, appSettings, logout;
     private BottomNavigationView bottomBar;
     private FloatingActionButton cartBtn;
     private CardView cartIndicator;
@@ -163,6 +166,7 @@ public class ProfileActivity extends AppCompatActivity {
         writeToUs = findViewById(R.id.write_us);
         rateUs = findViewById(R.id.rate_us);
         inviteFriends = findViewById(R.id.invite_friend);
+        aboutUs = findViewById(R.id.about_us);
         privacyPolicy = findViewById(R.id.privacy_policy);
         termsOfService = findViewById(R.id.terms_of_service);
         refundPolicy = findViewById(R.id.refund_policy);
@@ -347,6 +351,19 @@ public class ProfileActivity extends AppCompatActivity {
             String app_url = "https://play.google.com/store/apps/details?id=" + ProfileActivity.this.getPackageName();
             shareIntent.putExtra(Intent.EXTRA_TEXT, app_url);
             startActivity(Intent.createChooser(shareIntent, "Share via"));
+        });
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        aboutUs.setOnClickListener(v -> {
+            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(ProfileActivity.this);
+            bottomSheetDialog.setContentView(R.layout.bottom_sheet_about);
+            bottomSheetDialog.setCanceledOnTouchOutside(false);
+
+            ImageView closeSheetBtn = bottomSheetDialog.findViewById(R.id.close_bottom_sheet_btn);
+            closeSheetBtn.setOnClickListener(v12 -> bottomSheetDialog.dismiss());
+
+            bottomSheetDialog.show();
         });
 
         ////////////////////////////////////////////////////////////////////////////////////////////

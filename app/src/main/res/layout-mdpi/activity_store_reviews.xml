@@ -94,7 +94,6 @@
                 <include layout="@layout/layout_review_placeholder" />
                 <include layout="@layout/layout_review_placeholder" />
                 <include layout="@layout/layout_review_placeholder" />
-                <include layout="@layout/layout_review_placeholder" />
 
             </LinearLayout>
 
