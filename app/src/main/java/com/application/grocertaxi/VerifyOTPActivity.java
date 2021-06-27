@@ -168,12 +168,12 @@ public class VerifyOTPActivity extends AppCompatActivity {
                 showConnectToInternetDialog();
                 return;
             } else {
+                UIUtil.hideKeyboard(VerifyOTPActivity.this);
                 if (String.valueOf(otpPinView.getText()).isEmpty() || String.valueOf(otpPinView.getText()).length() != 6) {
                     progressBar.setVisibility(View.GONE);
                     verifyBtnContainer.setVisibility(View.VISIBLE);
                     verifyBtn.setEnabled(true);
 
-                    UIUtil.hideKeyboard(VerifyOTPActivity.this);
                     YoYo.with(Techniques.Shake).duration(700).repeat(0).playOn(otpPinView);
                     Alerter.create(VerifyOTPActivity.this)
                             .setText("Enter the valid OTP received on " + mobile + "!")
