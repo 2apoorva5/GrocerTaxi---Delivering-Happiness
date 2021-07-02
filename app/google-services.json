@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "894351161163-12cs8m027p3pl778o0khh5noeqmkuqvn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.application.grocertaxi",
+            "certificate_hash": "2c0b35243eeba01f27d27e16e33ba429c586b3d7"
+          }
+        },
+        {
+          "client_id": "894351161163-1spjl3agf1suok9r2agcd561aon93l20.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.application.grocertaxi",
+            "certificate_hash": "45d52a9ead49c281faa4408a97c0a56044e15aec"
+          }
+        },
+        {
           "client_id": "894351161163-h1o3crrdsgevu7bb24shudqu44lmda5m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -52,11 +68,27 @@
       },
       "oauth_client": [
         {
+          "client_id": "894351161163-4e7d62g6ponna1dc3ieeb64hrelk4qik.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.application.grocertaxistore",
+            "certificate_hash": "516d2035bbf73fd98f74155a2cfb52277b883f2a"
+          }
+        },
+        {
           "client_id": "894351161163-alpjs3gvun1k0b3jlh2ctsaludloh8d9.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.application.grocertaxistore",
             "certificate_hash": "5e148e12ca5d88bc23bf1a6d396eef11e7193a8b"
+          }
+        },
+        {
+          "client_id": "894351161163-rhtcsvnt4j5fncn1jbflck9e1e66qd4f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.application.grocertaxistore",
+            "certificate_hash": "ef11c0028229057241bcc1cb819e124067547090"
           }
         },
         {
