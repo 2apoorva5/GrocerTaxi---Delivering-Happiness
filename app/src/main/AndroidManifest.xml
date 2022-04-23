@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.application.grocertaxi"
-    android:versionCode="3"
-    android:versionName="1.1.2"
+    android:versionCode="4"
+    android:versionName="1.1.3"
     tools:ignore="GradleOverrides">
 
     <supports-screens
@@ -151,7 +151,8 @@
         <activity
             android:name=".SplashScreenActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="stateHidden"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

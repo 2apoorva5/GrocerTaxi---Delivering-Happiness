@@ -25,9 +25,9 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 
 import de.mateware.snacky.Snacky;
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class LocationPermissionActivity extends AppCompatActivity {

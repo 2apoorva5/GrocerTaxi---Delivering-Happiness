@@ -16,15 +16,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.baoyz.widget.PullRefreshLayout
-            android:id="@+id/pull_refresh_layout"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/refresh_layout"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:refreshType="smartisan">
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/nested_scroll_view"
@@ -214,20 +213,75 @@
 
                     </androidx.cardview.widget.CardView>
 
-                    <com.smarteist.autoimageslider.SliderView
+                    <ViewFlipper
                         android:id="@+id/banner_slider"
                         android:layout_width="0dp"
                         android:layout_height="180dp"
                         android:layout_marginTop="20dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:autoStart="true"
+                        android:flipInterval="2000"
+                        android:inAnimation="@anim/slide_in_right"
+                        android:outAnimation="@anim/slide_out_left"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/product_search_btn_container"
-                        app:sliderAnimationDuration="2000"
-                        app:sliderAutoCycleDirection="back_and_forth"
-                        app:sliderAutoCycleEnabled="true"
-                        app:sliderIndicatorEnabled="false"
-                        app:sliderScrollTimeInSec="2"
-                        app:sliderStartAutoCycle="true" />
+                        app:layout_constraintTop_toBottomOf="@id/product_search_btn_container">
+
+                        <com.makeramen.roundedimageview.RoundedImageView
+                            android:id="@+id/banner1"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/app_name"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/banner1"
+                            app:riv_corner_radius="8dp" />
+
+                        <com.makeramen.roundedimageview.RoundedImageView
+                            android:id="@+id/banner2"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/app_name"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/banner2"
+                            app:riv_corner_radius="8dp" />
+
+                        <com.makeramen.roundedimageview.RoundedImageView
+                            android:id="@+id/banner3"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/app_name"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/banner3"
+                            app:riv_corner_radius="8dp" />
+
+                        <com.makeramen.roundedimageview.RoundedImageView
+                            android:id="@+id/banner4"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/app_name"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/banner4"
+                            app:riv_corner_radius="8dp" />
+
+                        <com.makeramen.roundedimageview.RoundedImageView
+                            android:id="@+id/banner5"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/app_name"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/banner5"
+                            app:riv_corner_radius="8dp" />
+
+                        <com.makeramen.roundedimageview.RoundedImageView
+                            android:id="@+id/banner6"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/app_name"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/banner6"
+                            app:riv_corner_radius="8dp" />
+
+                    </ViewFlipper>
 
                     <View
                         android:id="@+id/view1"
@@ -1392,7 +1446,7 @@
 
             </androidx.core.widget.NestedScrollView>
 
-        </com.baoyz.widget.PullRefreshLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="0dp"

@@ -1,6 +1,5 @@
 package com.application.grocertaxi;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -17,6 +16,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,27 +25,22 @@ import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.application.grocertaxi.Helper.LoadingDialog;
 import com.application.grocertaxi.Model.Product;
 import com.application.grocertaxi.Model.Store;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
-import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
-import com.google.android.play.core.install.InstallState;
-import com.google.android.play.core.install.InstallStateUpdatedListener;
 import com.google.android.play.core.install.model.AppUpdateType;
-import com.google.android.play.core.install.model.InstallStatus;
 import com.google.android.play.core.install.model.UpdateAvailability;
-import com.google.android.play.core.tasks.OnSuccessListener;
-import com.google.android.play.core.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
@@ -57,16 +52,12 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
-import com.smarteist.autoimageslider.SliderAnimations;
-import com.smarteist.autoimageslider.SliderView;
-import com.smarteist.autoimageslider.SliderViewAdapter;
 import com.tapadoo.alerter.Alerter;
 
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dmax.dialog.SpotsDialog;
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class MainActivity extends AppCompatActivity {
@@ -75,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private RoundedImageView exploreAllProductsBtn, safeDeliveryBanner;
     private TextView userLocation, greetings, viewAllStoresBtn, viewAllFruitsBtn, viewAllVegBtn, viewAllFoodGrainsBtn, viewAllPCareBtn;
     private CircleImageView userProfilePic;
-    private SliderView bannerSlider;
+    private ViewFlipper bannerSlider;
     private RecyclerView recyclerStores, recyclerFruits, recyclerVegetables, recyclerFoodGrains, recyclerPCare;
     private ConstraintLayout layoutContent, layoutEmpty, layoutNoInternet, retryBtn,
             productSearchBtn, categoryFruits, categoryVegetables, categoryFoodGrains,
@@ -83,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             layoutFruits, layoutVegetables, layoutFoodGrains, layoutPCare, changeLocationBtn;
     private BottomNavigationView bottomBar;
     private FloatingActionButton cartBtn;
-    private PullRefreshLayout pullRefreshLayout;
+    private SwipeRefreshLayout refreshLayout;
 
     private CollectionReference userRef, storesRef, cartRef, fruitsRef, vegetablesRef, foodGrainsRef, pCareRef;
     private FirestoreRecyclerAdapter<Store, StoreViewHolder> storeAdapter;
@@ -92,13 +83,9 @@ public class MainActivity extends AppCompatActivity {
     private FirestoreRecyclerAdapter<Product, FoodGrainViewHolder> foodGrainAdapter;
     private FirestoreRecyclerAdapter<Product, PersonalCareViewHolder> personalCareAdapter;
 
-    int[] banners = {R.drawable.banner1, R.drawable.banner2, R.drawable.banner3,
-            R.drawable.banner4, R.drawable.banner5, R.drawable.banner6};
-    private BannerSliderAdapter bannerSliderAdapter;
-
     private String cart_location;
     private PreferenceManager preferenceManager;
-    private AlertDialog progressDialog;
+    private LoadingDialog loadingDialog;
 
     private AppUpdateManager appUpdateManager;
     private static final int RC_APP_UPDATE = 123;
@@ -135,11 +122,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        progressDialog = new SpotsDialog.Builder().setContext(MainActivity.this)
-                .setMessage("Adding item to cart..")
-                .setCancelable(false)
-                .setTheme(R.style.SpotsDialog)
-                .build();
+        loadingDialog = new LoadingDialog(MainActivity.this);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -165,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
         layoutNoInternet = findViewById(R.id.layout_no_internet);
         retryBtn = findViewById(R.id.retry_btn);
 
-        pullRefreshLayout = findViewById(R.id.pull_refresh_layout);
+        refreshLayout = findViewById(R.id.refresh_layout);
 
         userLocation = findViewById(R.id.user_location);
         editLocationBtn = findViewById(R.id.edit_location_btn);
@@ -225,8 +208,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == RC_APP_UPDATE) {
-            if(resultCode != RESULT_OK) {
+        if (requestCode == RC_APP_UPDATE) {
+            if (resultCode != RESULT_OK) {
                 Toast.makeText(MainActivity.this, "App Update Cancelled!", Toast.LENGTH_SHORT).show();
             }
         }
@@ -320,13 +303,9 @@ public class MainActivity extends AppCompatActivity {
         layoutNoInternet.setVisibility(View.GONE);
         layoutContent.setVisibility(View.VISIBLE);
         layoutEmpty.setVisibility(View.GONE);
-        pullRefreshLayout.setRefreshing(false);
 
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
-        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
-        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorBackground));
-        pullRefreshLayout.setOnRefreshListener(this::checkNetworkConnection);
+        refreshLayout.setRefreshing(false);
+        refreshLayout.setOnRefreshListener(this::checkNetworkConnection);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -383,10 +362,31 @@ public class MainActivity extends AppCompatActivity {
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        bannerSliderAdapter = new BannerSliderAdapter(banners);
-        bannerSlider.setSliderAdapter(bannerSliderAdapter);
-        bannerSlider.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
-        bannerSlider.startAutoCycle();
+        bannerSlider.setOnClickListener(view -> {
+            switch (view.getId()) {
+                case R.id.banner1:
+                    preferenceManager.putString(Constants.KEY_CATEGORY, "Vegetables");
+                    startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
+                    CustomIntent.customType(MainActivity.this, "left-to-right");
+                    break;
+                case R.id.banner2:
+                    preferenceManager.putString(Constants.KEY_CATEGORY, "Fruits");
+                    startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
+                    CustomIntent.customType(MainActivity.this, "left-to-right");
+                    break;
+                case R.id.banner3:
+                    preferenceManager.putString(Constants.KEY_CATEGORY, "");
+                    startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
+                    CustomIntent.customType(MainActivity.this, "left-to-right");
+                    break;
+                case R.id.banner4:
+                    break;
+                case R.id.banner5:
+                    break;
+                case R.id.banner6:
+                    break;
+            }
+        });
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -606,65 +606,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /////////////////////////////////// Load Banners Adapter ///////////////////////////////////////
-
-    public class BannerSliderAdapter extends SliderViewAdapter<BannerSliderAdapter.Holder> {
-
-        int[] banners;
-
-        public BannerSliderAdapter(int[] banners) {
-            this.banners = banners;
-        }
-
-        @Override
-        public BannerSliderAdapter.Holder onCreateViewHolder(ViewGroup parent) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.layout_banner, parent, false);
-            return new BannerSliderAdapter.Holder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(BannerSliderAdapter.Holder viewHolder, int position) {
-            viewHolder.bannerImage.setImageResource(banners[position]);
-            viewHolder.itemView.setOnClickListener(v -> {
-                if (position == 0) {
-                    preferenceManager.putString(Constants.KEY_CATEGORY, "Vegetables");
-                    startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
-                    CustomIntent.customType(MainActivity.this, "left-to-right");
-                } else if (position == 1) {
-                    preferenceManager.putString(Constants.KEY_CATEGORY, "Fruits");
-                    startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
-                    CustomIntent.customType(MainActivity.this, "left-to-right");
-                } else if (position == 2) {
-                    preferenceManager.putString(Constants.KEY_CATEGORY, "");
-                    startActivity(new Intent(MainActivity.this, ProductsListActivity.class));
-                    CustomIntent.customType(MainActivity.this, "left-to-right");
-                } else if (position == 3) {
-                    return;
-                } else if (position == 4) {
-                    return;
-                } else if (position == 5) {
-                    return;
-                }
-            });
-        }
-
-        @Override
-        public int getCount() {
-            return banners.length;
-        }
-
-        public class Holder extends SliderViewAdapter.ViewHolder {
-
-            RoundedImageView bannerImage;
-
-            public Holder(View itemView) {
-                super(itemView);
-                bannerImage = itemView.findViewById(R.id.banner_image);
-            }
-        }
-    }
-
     ///////////////////////////////////////// LoadStores ///////////////////////////////////////////
 
     private void loadStores() {
@@ -717,7 +658,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChanged() {
                 super.onDataChanged();
 
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
 
                 if (getItemCount() == 0) {
                     layoutEmpty.setVisibility(View.VISIBLE);
@@ -748,7 +689,7 @@ public class MainActivity extends AppCompatActivity {
             public void onError(@NonNull FirebaseFirestoreException e) {
                 super.onError(e);
 
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
                 Alerter.create(MainActivity.this)
                         .setText("Whoa! Something Broke. Try again!")
                         .setTextAppearance(R.style.AlertText)
@@ -853,7 +794,7 @@ public class MainActivity extends AppCompatActivity {
                             showConnectToInternetDialog();
                             return;
                         } else {
-                            progressDialog.show();
+                            loadingDialog.startDialog();
 
                             String[] split = model.getProductID().split("-", 2);
                             String cart_id = "ITEM-" + split[1];
@@ -878,7 +819,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (queryDocumentSnapshots1.getDocuments().size() == 0) {
                                     cartRef.document(cart_id).set(newCartItem)
                                             .addOnSuccessListener(aVoid -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Success! Your cart just got updated.")
                                                         .setTextAppearance(R.style.AlertText)
@@ -893,7 +834,7 @@ public class MainActivity extends AppCompatActivity {
                                                         .show();
                                             })
                                             .addOnFailureListener(e -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Whoa! Something Broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -911,7 +852,7 @@ public class MainActivity extends AppCompatActivity {
                                     cartRef.whereEqualTo(Constants.KEY_CART_ITEM_PRODUCT_STORE_ID, model.getProductStoreID())
                                             .get().addOnSuccessListener(queryDocumentSnapshots2 -> {
                                         if (queryDocumentSnapshots2.getDocuments().size() == 0) {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
                                                     .setMessage("Your cart has already been setup for another store this item does not belong to. You must clear your cart first before proceeding with this item.")
@@ -934,7 +875,7 @@ public class MainActivity extends AppCompatActivity {
                                                                             .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
                                                                                     Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
                                                                             .addOnSuccessListener(aVoid -> {
-                                                                                progressDialog.dismiss();
+                                                                                loadingDialog.dismissDialog();
                                                                                 Alerter.create(MainActivity.this)
                                                                                         .setText("Success! Your cart just got updated.")
                                                                                         .setTextAppearance(R.style.AlertText)
@@ -948,7 +889,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                                                         .show();
                                                                             }).addOnFailureListener(e -> {
-                                                                        progressDialog.dismiss();
+                                                                        loadingDialog.dismissDialog();
                                                                         Alerter.create(MainActivity.this)
                                                                                 .setText("Whoa! Something Broke. Try again!")
                                                                                 .setTextAppearance(R.style.AlertText)
@@ -963,7 +904,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                 .show();
                                                                     });
                                                                 } else {
-                                                                    progressDialog.dismiss();
+                                                                    loadingDialog.dismissDialog();
                                                                     MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                                             .setTitle("Item cannot be added to your cart!")
                                                                             .setMessage("The store doesn't have more of this product than the quantity you already have in your cart.")
@@ -975,7 +916,7 @@ public class MainActivity extends AppCompatActivity {
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
                                                                         .addOnSuccessListener(aVoid -> {
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
                                                                             Alerter.create(MainActivity.this)
                                                                                     .setText("Success! Your cart just got updated.")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -990,7 +931,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .show();
                                                                         })
                                                                         .addOnFailureListener(e -> {
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
                                                                             Alerter.create(MainActivity.this)
                                                                                     .setText("Whoa! Something Broke. Try again!")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -1006,7 +947,7 @@ public class MainActivity extends AppCompatActivity {
                                                                         });
                                                             }
                                                         } else {
-                                                            progressDialog.dismiss();
+                                                            loadingDialog.dismissDialog();
                                                             Alerter.create(MainActivity.this)
                                                                     .setText("Whoa! Something Broke. Try again!")
                                                                     .setTextAppearance(R.style.AlertText)
@@ -1021,7 +962,7 @@ public class MainActivity extends AppCompatActivity {
                                                                     .show();
                                                         }
                                                     }).addOnFailureListener(e -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Whoa! Something Broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -1037,7 +978,7 @@ public class MainActivity extends AppCompatActivity {
                                             });
                                         }
                                     }).addOnFailureListener(e -> {
-                                        progressDialog.dismiss();
+                                        loadingDialog.dismissDialog();
                                         Alerter.create(MainActivity.this)
                                                 .setText("Whoa! Something Broke. Try again!")
                                                 .setTextAppearance(R.style.AlertText)
@@ -1053,7 +994,7 @@ public class MainActivity extends AppCompatActivity {
                                     });
                                 }
                             }).addOnFailureListener(e -> {
-                                progressDialog.dismiss();
+                                loadingDialog.dismissDialog();
                                 Alerter.create(MainActivity.this)
                                         .setText("Whoa! Something Broke. Try again!")
                                         .setTextAppearance(R.style.AlertText)
@@ -1087,7 +1028,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChanged() {
                 super.onDataChanged();
 
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
 
                 if (getItemCount() == 0) {
                     layoutFruits.setVisibility(View.GONE);
@@ -1100,7 +1041,7 @@ public class MainActivity extends AppCompatActivity {
             public void onError(@NonNull FirebaseFirestoreException e) {
                 super.onError(e);
 
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
                 Alerter.create(MainActivity.this)
                         .setText("Whoa! Something Broke. Try again!")
                         .setTextAppearance(R.style.AlertText)
@@ -1210,7 +1151,7 @@ public class MainActivity extends AppCompatActivity {
                             showConnectToInternetDialog();
                             return;
                         } else {
-                            progressDialog.show();
+                            loadingDialog.startDialog();
 
                             String[] split = model.getProductID().split("-", 2);
                             String cart_id = "ITEM-" + split[1];
@@ -1235,7 +1176,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (queryDocumentSnapshots1.getDocuments().size() == 0) {
                                     cartRef.document(cart_id).set(newCartItem)
                                             .addOnSuccessListener(aVoid -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Success! Your cart just got updated.")
                                                         .setTextAppearance(R.style.AlertText)
@@ -1250,7 +1191,7 @@ public class MainActivity extends AppCompatActivity {
                                                         .show();
                                             })
                                             .addOnFailureListener(e -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Whoa! Something Broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -1268,7 +1209,7 @@ public class MainActivity extends AppCompatActivity {
                                     cartRef.whereEqualTo(Constants.KEY_CART_ITEM_PRODUCT_STORE_ID, model.getProductStoreID())
                                             .get().addOnSuccessListener(queryDocumentSnapshots2 -> {
                                         if (queryDocumentSnapshots2.getDocuments().size() == 0) {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
                                                     .setMessage("Your cart has already been setup for another store this item does not belong to. You must clear your cart first before proceeding with this item.")
@@ -1291,7 +1232,7 @@ public class MainActivity extends AppCompatActivity {
                                                                             .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
                                                                                     Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
                                                                             .addOnSuccessListener(aVoid -> {
-                                                                                progressDialog.dismiss();
+                                                                                loadingDialog.dismissDialog();
                                                                                 Alerter.create(MainActivity.this)
                                                                                         .setText("Success! Your cart just got updated.")
                                                                                         .setTextAppearance(R.style.AlertText)
@@ -1305,7 +1246,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                                                         .show();
                                                                             }).addOnFailureListener(e -> {
-                                                                        progressDialog.dismiss();
+                                                                        loadingDialog.dismissDialog();
                                                                         Alerter.create(MainActivity.this)
                                                                                 .setText("Whoa! Something Broke. Try again!")
                                                                                 .setTextAppearance(R.style.AlertText)
@@ -1320,7 +1261,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                 .show();
                                                                     });
                                                                 } else {
-                                                                    progressDialog.dismiss();
+                                                                    loadingDialog.dismissDialog();
                                                                     MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                                             .setTitle("Item cannot be added to your cart!")
                                                                             .setMessage("The store doesn't have more of this product than the quantity you already have in your cart.")
@@ -1332,7 +1273,7 @@ public class MainActivity extends AppCompatActivity {
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
                                                                         .addOnSuccessListener(aVoid -> {
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
                                                                             Alerter.create(MainActivity.this)
                                                                                     .setText("Success! Your cart just got updated.")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -1347,7 +1288,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .show();
                                                                         })
                                                                         .addOnFailureListener(e -> {
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
                                                                             Alerter.create(MainActivity.this)
                                                                                     .setText("Whoa! Something Broke. Try again!")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -1363,7 +1304,7 @@ public class MainActivity extends AppCompatActivity {
                                                                         });
                                                             }
                                                         } else {
-                                                            progressDialog.dismiss();
+                                                            loadingDialog.dismissDialog();
                                                             Alerter.create(MainActivity.this)
                                                                     .setText("Whoa! Something Broke. Try again!")
                                                                     .setTextAppearance(R.style.AlertText)
@@ -1378,7 +1319,7 @@ public class MainActivity extends AppCompatActivity {
                                                                     .show();
                                                         }
                                                     }).addOnFailureListener(e -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Whoa! Something Broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -1394,7 +1335,7 @@ public class MainActivity extends AppCompatActivity {
                                             });
                                         }
                                     }).addOnFailureListener(e -> {
-                                        progressDialog.dismiss();
+                                        loadingDialog.dismissDialog();
                                         Alerter.create(MainActivity.this)
                                                 .setText("Whoa! Something Broke. Try again!")
                                                 .setTextAppearance(R.style.AlertText)
@@ -1410,7 +1351,7 @@ public class MainActivity extends AppCompatActivity {
                                     });
                                 }
                             }).addOnFailureListener(e -> {
-                                progressDialog.dismiss();
+                                loadingDialog.dismissDialog();
                                 Alerter.create(MainActivity.this)
                                         .setText("Whoa! Something Broke. Try again!")
                                         .setTextAppearance(R.style.AlertText)
@@ -1444,7 +1385,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChanged() {
                 super.onDataChanged();
 
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
 
                 if (getItemCount() == 0) {
                     layoutVegetables.setVisibility(View.GONE);
@@ -1457,7 +1398,7 @@ public class MainActivity extends AppCompatActivity {
             public void onError(@NonNull FirebaseFirestoreException e) {
                 super.onError(e);
 
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
                 Alerter.create(MainActivity.this)
                         .setText("Whoa! Something Broke. Try again!")
                         .setTextAppearance(R.style.AlertText)
@@ -1567,7 +1508,7 @@ public class MainActivity extends AppCompatActivity {
                             showConnectToInternetDialog();
                             return;
                         } else {
-                            progressDialog.show();
+                            loadingDialog.startDialog();
 
                             String[] split = model.getProductID().split("-", 2);
                             String cart_id = "ITEM-" + split[1];
@@ -1592,7 +1533,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (queryDocumentSnapshots1.getDocuments().size() == 0) {
                                     cartRef.document(cart_id).set(newCartItem)
                                             .addOnSuccessListener(aVoid -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Success! Your cart just got updated.")
                                                         .setTextAppearance(R.style.AlertText)
@@ -1607,7 +1548,7 @@ public class MainActivity extends AppCompatActivity {
                                                         .show();
                                             })
                                             .addOnFailureListener(e -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Whoa! Something Broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -1625,7 +1566,7 @@ public class MainActivity extends AppCompatActivity {
                                     cartRef.whereEqualTo(Constants.KEY_CART_ITEM_PRODUCT_STORE_ID, model.getProductStoreID())
                                             .get().addOnSuccessListener(queryDocumentSnapshots2 -> {
                                         if (queryDocumentSnapshots2.getDocuments().size() == 0) {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
                                                     .setMessage("Your cart has already been setup for another store this item does not belong to. You must clear your cart first before proceeding with this item.")
@@ -1648,7 +1589,7 @@ public class MainActivity extends AppCompatActivity {
                                                                             .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
                                                                                     Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
                                                                             .addOnSuccessListener(aVoid -> {
-                                                                                progressDialog.dismiss();
+                                                                                loadingDialog.dismissDialog();
                                                                                 Alerter.create(MainActivity.this)
                                                                                         .setText("Success! Your cart just got updated.")
                                                                                         .setTextAppearance(R.style.AlertText)
@@ -1662,7 +1603,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                                                         .show();
                                                                             }).addOnFailureListener(e -> {
-                                                                        progressDialog.dismiss();
+                                                                        loadingDialog.dismissDialog();
                                                                         Alerter.create(MainActivity.this)
                                                                                 .setText("Whoa! Something Broke. Try again!")
                                                                                 .setTextAppearance(R.style.AlertText)
@@ -1677,7 +1618,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                 .show();
                                                                     });
                                                                 } else {
-                                                                    progressDialog.dismiss();
+                                                                    loadingDialog.dismissDialog();
                                                                     MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                                             .setTitle("Item cannot be added to your cart!")
                                                                             .setMessage("The store doesn't have more of this product than the quantity you already have in your cart.")
@@ -1689,7 +1630,7 @@ public class MainActivity extends AppCompatActivity {
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
                                                                         .addOnSuccessListener(aVoid -> {
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
                                                                             Alerter.create(MainActivity.this)
                                                                                     .setText("Success! Your cart just got updated.")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -1704,7 +1645,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .show();
                                                                         })
                                                                         .addOnFailureListener(e -> {
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
                                                                             Alerter.create(MainActivity.this)
                                                                                     .setText("Whoa! Something Broke. Try again!")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -1720,7 +1661,7 @@ public class MainActivity extends AppCompatActivity {
                                                                         });
                                                             }
                                                         } else {
-                                                            progressDialog.dismiss();
+                                                            loadingDialog.dismissDialog();
                                                             Alerter.create(MainActivity.this)
                                                                     .setText("Whoa! Something Broke. Try again!")
                                                                     .setTextAppearance(R.style.AlertText)
@@ -1735,7 +1676,7 @@ public class MainActivity extends AppCompatActivity {
                                                                     .show();
                                                         }
                                                     }).addOnFailureListener(e -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Whoa! Something Broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -1751,7 +1692,7 @@ public class MainActivity extends AppCompatActivity {
                                             });
                                         }
                                     }).addOnFailureListener(e -> {
-                                        progressDialog.dismiss();
+                                        loadingDialog.dismissDialog();
                                         Alerter.create(MainActivity.this)
                                                 .setText("Whoa! Something Broke. Try again!")
                                                 .setTextAppearance(R.style.AlertText)
@@ -1767,7 +1708,7 @@ public class MainActivity extends AppCompatActivity {
                                     });
                                 }
                             }).addOnFailureListener(e -> {
-                                progressDialog.dismiss();
+                                loadingDialog.dismissDialog();
                                 Alerter.create(MainActivity.this)
                                         .setText("Whoa! Something Broke. Try again!")
                                         .setTextAppearance(R.style.AlertText)
@@ -1801,7 +1742,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChanged() {
                 super.onDataChanged();
 
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
 
                 if (getItemCount() == 0) {
                     layoutFoodGrains.setVisibility(View.GONE);
@@ -1814,7 +1755,7 @@ public class MainActivity extends AppCompatActivity {
             public void onError(@NonNull FirebaseFirestoreException e) {
                 super.onError(e);
 
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
                 Alerter.create(MainActivity.this)
                         .setText("Whoa! Something Broke. Try again!")
                         .setTextAppearance(R.style.AlertText)
@@ -1924,7 +1865,7 @@ public class MainActivity extends AppCompatActivity {
                             showConnectToInternetDialog();
                             return;
                         } else {
-                            progressDialog.show();
+                            loadingDialog.startDialog();
 
                             String[] split = model.getProductID().split("-", 2);
                             String cart_id = "ITEM-" + split[1];
@@ -1949,7 +1890,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (queryDocumentSnapshots1.getDocuments().size() == 0) {
                                     cartRef.document(cart_id).set(newCartItem)
                                             .addOnSuccessListener(aVoid -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Success! Your cart just got updated.")
                                                         .setTextAppearance(R.style.AlertText)
@@ -1964,7 +1905,7 @@ public class MainActivity extends AppCompatActivity {
                                                         .show();
                                             })
                                             .addOnFailureListener(e -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Whoa! Something Broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -1982,7 +1923,7 @@ public class MainActivity extends AppCompatActivity {
                                     cartRef.whereEqualTo(Constants.KEY_CART_ITEM_PRODUCT_STORE_ID, model.getProductStoreID())
                                             .get().addOnSuccessListener(queryDocumentSnapshots2 -> {
                                         if (queryDocumentSnapshots2.getDocuments().size() == 0) {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
                                                     .setMessage("Your cart has already been setup for another store this item does not belong to. You must clear your cart first before proceeding with this item.")
@@ -2005,7 +1946,7 @@ public class MainActivity extends AppCompatActivity {
                                                                             .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
                                                                                     Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
                                                                             .addOnSuccessListener(aVoid -> {
-                                                                                progressDialog.dismiss();
+                                                                                loadingDialog.dismissDialog();
                                                                                 Alerter.create(MainActivity.this)
                                                                                         .setText("Success! Your cart just got updated.")
                                                                                         .setTextAppearance(R.style.AlertText)
@@ -2019,7 +1960,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                                                         .show();
                                                                             }).addOnFailureListener(e -> {
-                                                                        progressDialog.dismiss();
+                                                                        loadingDialog.dismissDialog();
                                                                         Alerter.create(MainActivity.this)
                                                                                 .setText("Whoa! Something Broke. Try again!")
                                                                                 .setTextAppearance(R.style.AlertText)
@@ -2034,7 +1975,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                 .show();
                                                                     });
                                                                 } else {
-                                                                    progressDialog.dismiss();
+                                                                    loadingDialog.dismissDialog();
                                                                     MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.this)
                                                                             .setTitle("Item cannot be added to your cart!")
                                                                             .setMessage("The store doesn't have more of this product than the quantity you already have in your cart.")
@@ -2046,7 +1987,7 @@ public class MainActivity extends AppCompatActivity {
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
                                                                         .addOnSuccessListener(aVoid -> {
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
                                                                             Alerter.create(MainActivity.this)
                                                                                     .setText("Success! Your cart just got updated.")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -2061,7 +2002,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                     .show();
                                                                         })
                                                                         .addOnFailureListener(e -> {
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
                                                                             Alerter.create(MainActivity.this)
                                                                                     .setText("Whoa! Something Broke. Try again!")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -2077,7 +2018,7 @@ public class MainActivity extends AppCompatActivity {
                                                                         });
                                                             }
                                                         } else {
-                                                            progressDialog.dismiss();
+                                                            loadingDialog.dismissDialog();
                                                             Alerter.create(MainActivity.this)
                                                                     .setText("Whoa! Something Broke. Try again!")
                                                                     .setTextAppearance(R.style.AlertText)
@@ -2092,7 +2033,7 @@ public class MainActivity extends AppCompatActivity {
                                                                     .show();
                                                         }
                                                     }).addOnFailureListener(e -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(MainActivity.this)
                                                         .setText("Whoa! Something Broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -2108,7 +2049,7 @@ public class MainActivity extends AppCompatActivity {
                                             });
                                         }
                                     }).addOnFailureListener(e -> {
-                                        progressDialog.dismiss();
+                                        loadingDialog.dismissDialog();
                                         Alerter.create(MainActivity.this)
                                                 .setText("Whoa! Something Broke. Try again!")
                                                 .setTextAppearance(R.style.AlertText)
@@ -2124,7 +2065,7 @@ public class MainActivity extends AppCompatActivity {
                                     });
                                 }
                             }).addOnFailureListener(e -> {
-                                progressDialog.dismiss();
+                                loadingDialog.dismissDialog();
                                 Alerter.create(MainActivity.this)
                                         .setText("Whoa! Something Broke. Try again!")
                                         .setTextAppearance(R.style.AlertText)
@@ -2158,7 +2099,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChanged() {
                 super.onDataChanged();
 
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
 
                 if (getItemCount() == 0) {
                     layoutPCare.setVisibility(View.GONE);
@@ -2171,7 +2112,7 @@ public class MainActivity extends AppCompatActivity {
             public void onError(@NonNull FirebaseFirestoreException e) {
                 super.onError(e);
 
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
                 Alerter.create(MainActivity.this)
                         .setText("Whoa! Something Broke. Try again!")
                         .setTextAppearance(R.style.AlertText)

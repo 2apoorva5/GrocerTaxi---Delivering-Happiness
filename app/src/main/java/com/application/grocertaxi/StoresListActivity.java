@@ -1,5 +1,6 @@
 package com.application.grocertaxi;
 
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -26,19 +27,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.paging.PagedList;
+import androidx.paging.LoadState;
+import androidx.paging.PagingConfig;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.application.grocertaxi.Model.Store;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
-import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
-import com.firebase.ui.firestore.paging.LoadingState;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -65,7 +66,7 @@ public class StoresListActivity extends AppCompatActivity {
     private BottomNavigationView bottomBar;
     private FloatingActionButton cartBtn;
     private ConstraintLayout layoutContent, layoutEmpty, layoutNoInternet, retryBtn, sortBtn;
-    private PullRefreshLayout pullRefreshLayout;
+    private SwipeRefreshLayout refreshLayout;
     private ShimmerFrameLayout shimmerLayout;
 
     private CollectionReference storesRef;
@@ -113,7 +114,7 @@ public class StoresListActivity extends AppCompatActivity {
         layoutNoInternet = findViewById(R.id.layout_no_internet);
         retryBtn = findViewById(R.id.retry_btn);
 
-        pullRefreshLayout = findViewById(R.id.pull_refresh_layout);
+        refreshLayout = findViewById(R.id.refresh_layout);
 
         speechToText = findViewById(R.id.speech_to_text);
         sortBtn = findViewById(R.id.sort_btn);
@@ -155,13 +156,8 @@ public class StoresListActivity extends AppCompatActivity {
         layoutNoInternet.setVisibility(View.GONE);
         layoutContent.setVisibility(View.VISIBLE);
         layoutEmpty.setVisibility(View.GONE);
-        pullRefreshLayout.setRefreshing(false);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
-        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
-        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorBackground));
-        pullRefreshLayout.setOnRefreshListener(this::checkNetworkConnection);
+        refreshLayout.setRefreshing(false);
+        refreshLayout.setOnRefreshListener(this::checkNetworkConnection);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -220,10 +216,7 @@ public class StoresListActivity extends AppCompatActivity {
                             .startAt(s.toString().toLowerCase().trim()).endAt(s.toString().toLowerCase().trim() + "\uf8ff");
                 }
 
-                PagedList.Config updatedConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig updatedConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Store> updatedOptions = new FirestorePagingOptions.Builder<Store>()
                         .setQuery(updatedQuery, updatedConfig, Store.class)
                         .build();
@@ -244,10 +237,7 @@ public class StoresListActivity extends AppCompatActivity {
                                     .startAt(s.toString().toLowerCase().trim()).endAt(s.toString().toLowerCase().trim() + "\uf8ff");
                         }
 
-                        PagedList.Config updatedConfig = new PagedList.Config.Builder()
-                                .setInitialLoadSizeHint(4)
-                                .setPageSize(4)
-                                .build();
+                        PagingConfig updatedConfig = new PagingConfig(4, 4, false);
                         FirestorePagingOptions<Store> updatedOptions = new FirestorePagingOptions.Builder<Store>()
                                 .setLifecycleOwner(StoresListActivity.this)
                                 .setQuery(updatedQuery, updatedConfig, Store.class)
@@ -280,10 +270,7 @@ public class StoresListActivity extends AppCompatActivity {
 
             relevance.setOnClickListener(v13 -> {
                 Query sortQuery = storesRef;
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Store> sortOptions = new FirestorePagingOptions.Builder<Store>()
                         .setLifecycleOwner(StoresListActivity.this)
                         .setQuery(sortQuery, sortConfig, Store.class)
@@ -296,10 +283,7 @@ public class StoresListActivity extends AppCompatActivity {
 
             newestFirst.setOnClickListener(v12 -> {
                 Query sortQuery = storesRef.orderBy(Constants.KEY_STORE_TIMESTAMP, Query.Direction.DESCENDING);
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Store> sortOptions = new FirestorePagingOptions.Builder<Store>()
                         .setLifecycleOwner(StoresListActivity.this)
                         .setQuery(sortQuery, sortConfig, Store.class)
@@ -312,10 +296,7 @@ public class StoresListActivity extends AppCompatActivity {
 
             nameAZ.setOnClickListener(v15 -> {
                 Query sortQuery = storesRef.orderBy(Constants.KEY_STORE_NAME, Query.Direction.ASCENDING);
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Store> sortOptions = new FirestorePagingOptions.Builder<Store>()
                         .setLifecycleOwner(StoresListActivity.this)
                         .setQuery(sortQuery, sortConfig, Store.class)
@@ -328,10 +309,7 @@ public class StoresListActivity extends AppCompatActivity {
 
             nameZA.setOnClickListener(v14 -> {
                 Query sortQuery = storesRef.orderBy(Constants.KEY_STORE_NAME, Query.Direction.DESCENDING);
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Store> sortOptions = new FirestorePagingOptions.Builder<Store>()
                         .setLifecycleOwner(StoresListActivity.this)
                         .setQuery(sortQuery, sortConfig, Store.class)
@@ -344,10 +322,7 @@ public class StoresListActivity extends AppCompatActivity {
 
             customerRating.setOnClickListener(v16 -> {
                 Query sortQuery = storesRef.orderBy(Constants.KEY_STORE_AVERAGE_RATING, Query.Direction.DESCENDING);
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Store> sortOptions = new FirestorePagingOptions.Builder<Store>()
                         .setLifecycleOwner(StoresListActivity.this)
                         .setQuery(sortQuery, sortConfig, Store.class)
@@ -360,10 +335,7 @@ public class StoresListActivity extends AppCompatActivity {
 
             openOnly.setOnClickListener(v17 -> {
                 Query sortQuery = storesRef.whereEqualTo(Constants.KEY_STORE_STATUS, true);
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Store> sortOptions = new FirestorePagingOptions.Builder<Store>()
                         .setLifecycleOwner(StoresListActivity.this)
                         .setQuery(sortQuery, sortConfig, Store.class)
@@ -459,15 +431,13 @@ public class StoresListActivity extends AppCompatActivity {
 
     //////////////////////////////////////// Load Stores ///////////////////////////////////////////
 
+    @SuppressLint("NotifyDataSetChanged")
     private void loadStores() {
         shimmerLayout.setVisibility(View.VISIBLE);
         shimmerLayout.startShimmer();
 
         Query query = storesRef;
-        PagedList.Config config = new PagedList.Config.Builder()
-                .setInitialLoadSizeHint(4)
-                .setPageSize(4)
-                .build();
+        PagingConfig config = new PagingConfig(4, 4, false);
         FirestorePagingOptions<Store> options = new FirestorePagingOptions.Builder<Store>()
                 .setLifecycleOwner(StoresListActivity.this)
                 .setQuery(query, config, Store.class)
@@ -544,49 +514,62 @@ public class StoresListActivity extends AppCompatActivity {
                     LAST_POSITION = position;
                 }
             }
-
-            @Override
-            protected void onLoadingStateChanged(@NonNull LoadingState state) {
-                super.onLoadingStateChanged(state);
-                switch (state) {
-                    case LOADING_INITIAL:
-                    case LOADING_MORE:
-                        layoutEmpty.setVisibility(View.GONE);
-                        break;
-                    case LOADED:
-                    case FINISHED:
-                        pullRefreshLayout.setRefreshing(false);
-                        shimmerLayout.stopShimmer();
-                        shimmerLayout.setVisibility(View.GONE);
-
-                        if (getItemCount() == 0) {
-                            layoutEmpty.setVisibility(View.VISIBLE);
-                        } else {
-                            layoutEmpty.setVisibility(View.GONE);
-                        }
-                        break;
-                    case ERROR:
-                        pullRefreshLayout.setRefreshing(false);
-                        shimmerLayout.stopShimmer();
-                        shimmerLayout.setVisibility(View.GONE);
-                        Alerter.create(StoresListActivity.this)
-                                .setText("Whoa! Something Broke. Try again!")
-                                .setTextAppearance(R.style.AlertText)
-                                .setBackgroundColorRes(R.color.errorColor)
-                                .setIcon(R.drawable.ic_error)
-                                .setDuration(3000)
-                                .enableIconPulse(true)
-                                .enableVibration(true)
-                                .disableOutsideTouch()
-                                .enableProgress(true)
-                                .setProgressColorInt(getColor(android.R.color.white))
-                                .show();
-                        break;
-                }
-            }
         };
 
         storeAdapter.notifyDataSetChanged();
+
+        storeAdapter.addLoadStateListener(states -> {
+            LoadState refresh = states.getRefresh();
+            LoadState append = states.getAppend();
+
+            if (refresh instanceof LoadState.Error || append instanceof LoadState.Error) {
+                refreshLayout.setRefreshing(false);
+                shimmerLayout.stopShimmer();
+                shimmerLayout.setVisibility(View.GONE);
+                Alerter.create(StoresListActivity.this)
+                        .setText("Whoa! Something Broke. Try again!")
+                        .setTextAppearance(R.style.AlertText)
+                        .setBackgroundColorRes(R.color.errorColor)
+                        .setIcon(R.drawable.ic_error)
+                        .setDuration(3000)
+                        .enableIconPulse(true)
+                        .enableVibration(true)
+                        .disableOutsideTouch()
+                        .enableProgress(true)
+                        .setProgressColorInt(getColor(android.R.color.white))
+                        .show();
+            }
+
+            if (refresh instanceof LoadState.Loading) {
+
+            }
+
+            if (append instanceof LoadState.Loading) {
+                layoutEmpty.setVisibility(View.GONE);
+            }
+
+            if (append instanceof LoadState.NotLoading) {
+                LoadState.NotLoading notLoading = (LoadState.NotLoading) append;
+                if (notLoading.getEndOfPaginationReached()) {
+                    refreshLayout.setRefreshing(false);
+                    shimmerLayout.stopShimmer();
+                    shimmerLayout.setVisibility(View.GONE);
+
+                    if (storeAdapter.getItemCount() == 0) {
+                        layoutEmpty.setVisibility(View.VISIBLE);
+                    } else {
+                        layoutEmpty.setVisibility(View.GONE);
+                    }
+                    return null;
+                }
+
+                if (refresh instanceof LoadState.NotLoading) {
+                    return null;
+                }
+            }
+
+            return null;
+        });
 
         recyclerStores.setHasFixedSize(true);
         recyclerStores.setLayoutManager(new LinearLayoutManager(StoresListActivity.this));

@@ -1,5 +1,6 @@
 package com.application.grocertaxi;
 
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +28,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.paging.PagedList;
+import androidx.paging.LoadState;
+import androidx.paging.PagingConfig;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,7 +38,6 @@ import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
-import com.firebase.ui.firestore.paging.LoadingState;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -207,11 +208,9 @@ public class ChooseLocalityActivity extends AppCompatActivity {
                             .startAt(s.toString().toLowerCase().trim()).endAt(s.toString().toLowerCase().trim() + "\uf8ff");
                 }
 
-                PagedList.Config updatedConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig updatedConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Locality> updatedOptions = new FirestorePagingOptions.Builder<Locality>()
+                        .setLifecycleOwner(ChooseLocalityActivity.this)
                         .setQuery(updatedQuery, updatedConfig, Locality.class)
                         .build();
 
@@ -231,11 +230,9 @@ public class ChooseLocalityActivity extends AppCompatActivity {
                                     .startAt(s.toString().toLowerCase().trim()).endAt(s.toString().toLowerCase().trim() + "\uf8ff");
                         }
 
-                        PagedList.Config updatedConfig = new PagedList.Config.Builder()
-                                .setInitialLoadSizeHint(4)
-                                .setPageSize(4)
-                                .build();
+                        PagingConfig updatedConfig = new PagingConfig(4, 4, false);
                         FirestorePagingOptions<Locality> updatedOptions = new FirestorePagingOptions.Builder<Locality>()
+                                .setLifecycleOwner(ChooseLocalityActivity.this)
                                 .setQuery(updatedQuery, updatedConfig, Locality.class)
                                 .build();
 
@@ -265,12 +262,10 @@ public class ChooseLocalityActivity extends AppCompatActivity {
 
     /////////////////////////////////////// LoadLocalities /////////////////////////////////////////
 
+    @SuppressLint("NotifyDataSetChanged")
     private void loadLocalities() {
         Query query = localitiesRef.orderBy("name", Query.Direction.ASCENDING);
-        PagedList.Config config = new PagedList.Config.Builder()
-                .setInitialLoadSizeHint(4)
-                .setPageSize(4)
-                .build();
+        PagingConfig config = new PagingConfig(4, 4, false);
         FirestorePagingOptions<Locality> options = new FirestorePagingOptions.Builder<Locality>()
                 .setLifecycleOwner(ChooseLocalityActivity.this)
                 .setQuery(query, config, Locality.class)
@@ -336,39 +331,52 @@ public class ChooseLocalityActivity extends AppCompatActivity {
                     LAST_POSITION = position;
                 }
             }
-
-            @Override
-            protected void onLoadingStateChanged(@NonNull LoadingState state) {
-                super.onLoadingStateChanged(state);
-                switch (state) {
-                    case LOADING_INITIAL:
-                    case LOADING_MORE:
-                        progressBar.setVisibility(View.VISIBLE);
-                        break;
-                    case LOADED:
-                    case FINISHED:
-                        progressBar.setVisibility(View.GONE);
-                        break;
-                    case ERROR:
-                        progressBar.setVisibility(View.GONE);
-                        Alerter.create(ChooseLocalityActivity.this)
-                                .setText("Whoa! Something Broke. Try again!")
-                                .setTextAppearance(R.style.AlertText)
-                                .setBackgroundColorRes(R.color.errorColor)
-                                .setIcon(R.drawable.ic_error)
-                                .setDuration(3000)
-                                .enableIconPulse(true)
-                                .enableVibration(true)
-                                .disableOutsideTouch()
-                                .enableProgress(true)
-                                .setProgressColorInt(getColor(android.R.color.white))
-                                .show();
-                        break;
-                }
-            }
         };
 
         localityAdapter.notifyDataSetChanged();
+
+        localityAdapter.addLoadStateListener(states -> {
+            LoadState refresh = states.getRefresh();
+            LoadState append = states.getAppend();
+
+            if (refresh instanceof LoadState.Error || append instanceof LoadState.Error) {
+                progressBar.setVisibility(View.GONE);
+                Alerter.create(ChooseLocalityActivity.this)
+                        .setText("Whoa! Something Broke. Try again!")
+                        .setTextAppearance(R.style.AlertText)
+                        .setBackgroundColorRes(R.color.errorColor)
+                        .setIcon(R.drawable.ic_error)
+                        .setDuration(3000)
+                        .enableIconPulse(true)
+                        .enableVibration(true)
+                        .disableOutsideTouch()
+                        .enableProgress(true)
+                        .setProgressColorInt(getColor(android.R.color.white))
+                        .show();
+            }
+
+            if (refresh instanceof LoadState.Loading) {
+
+            }
+
+            if (append instanceof LoadState.Loading) {
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
+            if (append instanceof LoadState.NotLoading) {
+                LoadState.NotLoading notLoading = (LoadState.NotLoading) append;
+                if (notLoading.getEndOfPaginationReached()) {
+                    progressBar.setVisibility(View.GONE);
+                    return null;
+                }
+
+                if (refresh instanceof LoadState.NotLoading) {
+                    return null;
+                }
+            }
+
+            return null;
+        });
 
         recyclerLocality.setHasFixedSize(true);
         recyclerLocality.setLayoutManager(new LinearLayoutManager(ChooseLocalityActivity.this));

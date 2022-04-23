@@ -1,5 +1,6 @@
 package com.application.grocertaxi.Fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -21,11 +22,11 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.paging.PagedList;
+import androidx.paging.LoadState;
+import androidx.paging.PagingConfig;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.application.grocertaxi.MainActivity;
 import com.application.grocertaxi.Model.Order;
 import com.application.grocertaxi.R;
 import com.application.grocertaxi.TrackOrderActivity;
@@ -33,13 +34,12 @@ import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
-import com.firebase.ui.firestore.paging.LoadingState;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class PendingOrdersFragment extends Fragment {
@@ -84,12 +84,10 @@ public class PendingOrdersFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void loadPendingOrders() {
         Query query = userPendingOrdersRef.orderBy(Constants.KEY_ORDER_TIMESTAMP, Query.Direction.DESCENDING);
-        PagedList.Config config = new PagedList.Config.Builder()
-                .setInitialLoadSizeHint(4)
-                .setPageSize(4)
-                .build();
+        PagingConfig config = new PagingConfig(4, 4, false);
         FirestorePagingOptions<Order> options = new FirestorePagingOptions.Builder<Order>()
                 .setLifecycleOwner(getActivity())
                 .setQuery(query, config, Order.class)
@@ -145,55 +143,61 @@ public class PendingOrdersFragment extends Fragment {
                     LAST_POSITION = position;
                 }
             }
-
-            @Override
-            protected void onLoadingStateChanged(@NonNull LoadingState state) {
-                super.onLoadingStateChanged(state);
-                switch (state) {
-                    case LOADING_INITIAL:
-                    case LOADING_MORE:
-                        progressBar.setVisibility(View.VISIBLE);
-                        illustrationEmpty.setVisibility(View.GONE);
-                        textEmpty.setVisibility(View.GONE);
-                        orderBtnContainer.setVisibility(View.GONE);
-                        break;
-                    case LOADED:
-                    case FINISHED:
-                        progressBar.setVisibility(View.GONE);
-
-                        if (getItemCount() == 0) {
-                            illustrationEmpty.setVisibility(View.VISIBLE);
-                            textEmpty.setVisibility(View.VISIBLE);
-                            orderBtnContainer.setVisibility(View.VISIBLE);
-                            orderBtn.setOnClickListener(v -> {
-                                startActivity(new Intent(getActivity(), MainActivity.class));
-                                CustomIntent.customType(getActivity(), "right-to-left");
-                            });
-                        } else {
-                            illustrationEmpty.setVisibility(View.GONE);
-                            textEmpty.setVisibility(View.GONE);
-                            orderBtnContainer.setVisibility(View.GONE);
-                        }
-                        break;
-                    case ERROR:
-                        Alerter.create(getActivity())
-                                .setText("Whoa! Something Broke. Try again!")
-                                .setTextAppearance(R.style.AlertText)
-                                .setBackgroundColorRes(R.color.errorColor)
-                                .setIcon(R.drawable.ic_error)
-                                .setDuration(3000)
-                                .enableIconPulse(true)
-                                .enableVibration(true)
-                                .disableOutsideTouch()
-                                .enableProgress(true)
-                                .setProgressColorInt(getActivity().getColor(android.R.color.white))
-                                .show();
-                        break;
-                }
-            }
         };
 
         pendingOrderAdapter.notifyDataSetChanged();
+
+        pendingOrderAdapter.addLoadStateListener(states -> {
+            LoadState refresh = states.getRefresh();
+            LoadState append = states.getAppend();
+
+            if (refresh instanceof LoadState.Error || append instanceof LoadState.Error) {
+                Alerter.create(getActivity())
+                        .setText("Whoa! Something Broke. Try again!")
+                        .setTextAppearance(R.style.AlertText)
+                        .setBackgroundColorRes(R.color.errorColor)
+                        .setIcon(R.drawable.ic_error)
+                        .setDuration(3000)
+                        .enableIconPulse(true)
+                        .enableVibration(true)
+                        .disableOutsideTouch()
+                        .enableProgress(true)
+                        .setProgressColorInt(getActivity().getColor(android.R.color.white))
+                        .show();
+            }
+
+            if (refresh instanceof LoadState.Loading) {
+
+            }
+
+            if (append instanceof LoadState.Loading) {
+                progressBar.setVisibility(View.VISIBLE);
+                illustrationEmpty.setVisibility(View.GONE);
+                textEmpty.setVisibility(View.GONE);
+            }
+
+            if (append instanceof LoadState.NotLoading) {
+                LoadState.NotLoading notLoading = (LoadState.NotLoading) append;
+                if (notLoading.getEndOfPaginationReached()) {
+                    progressBar.setVisibility(View.GONE);
+
+                    if (pendingOrderAdapter.getItemCount() == 0) {
+                        illustrationEmpty.setVisibility(View.VISIBLE);
+                        textEmpty.setVisibility(View.VISIBLE);
+                    } else {
+                        illustrationEmpty.setVisibility(View.GONE);
+                        textEmpty.setVisibility(View.GONE);
+                    }
+                    return null;
+                }
+
+                if (refresh instanceof LoadState.NotLoading) {
+                    return null;
+                }
+            }
+
+            return null;
+        });
 
         recyclerPendingOrders.setHasFixedSize(true);
         recyclerPendingOrders.setLayoutManager(new LinearLayoutManager(getActivity()));

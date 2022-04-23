@@ -1,6 +1,5 @@
 package com.application.grocertaxi;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -30,6 +29,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.application.grocertaxi.Helper.LoadingDialog;
 import com.application.grocertaxi.Model.CartItem;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
@@ -45,12 +45,11 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 import com.tomergoldst.tooltips.ToolTip;
 import com.tomergoldst.tooltips.ToolTipsManager;
 
-import dmax.dialog.SpotsDialog;
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 import maes.tech.intentanim.CustomIntent;
 
@@ -69,7 +68,7 @@ public class CartActivity extends AppCompatActivity {
 
     private String cart_location;
     private PreferenceManager preferenceManager;
-    private AlertDialog progressDialog;
+    private LoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,11 +102,7 @@ public class CartActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        progressDialog = new SpotsDialog.Builder().setContext(CartActivity.this)
-                .setMessage("Hold on..")
-                .setCancelable(false)
-                .setTheme(R.style.SpotsDialog)
-                .build();
+        loadingDialog = new LoadingDialog(CartActivity.this);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -232,7 +227,7 @@ public class CartActivity extends AppCompatActivity {
                         showConnectToInternetDialog();
                         return;
                     } else {
-                        progressDialog.show();
+                        loadingDialog.startDialog();
                         cartAdapter.deleteItem(viewHolder.getAdapterPosition());
                         recyclerCart.getAdapter().notifyDataSetChanged();
                     }
@@ -338,18 +333,18 @@ public class CartActivity extends AppCompatActivity {
                                             showConnectToInternetDialog();
                                             return;
                                         } else {
-                                            progressDialog.show();
+                                            loadingDialog.startDialog();
                                             cartRef.document(model.getCartItemID())
                                                     .update(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, model.getCartItemProductQuantity() - 1)
                                                     .addOnSuccessListener(aVoid -> {
                                                         if (model.getCartItemProductQuantity() == 0) {
                                                             deleteItem(holder.getAdapterPosition());
                                                         } else {
-                                                            progressDialog.dismiss();
+                                                            loadingDialog.dismissDialog();
                                                             holder.cartProductQuantity.setText(String.valueOf(model.getCartItemProductQuantity()));
                                                         }
                                                     }).addOnFailureListener(e -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(CartActivity.this)
                                                         .setText("Whoa! Something Broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -374,15 +369,15 @@ public class CartActivity extends AppCompatActivity {
                                             showConnectToInternetDialog();
                                             return;
                                         } else {
-                                            progressDialog.show();
+                                            loadingDialog.startDialog();
                                             if (model.getCartItemProductQuantity() <= count) {
                                                 cartRef.document(model.getCartItemID())
                                                         .update(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, model.getCartItemProductQuantity() + 1)
                                                         .addOnSuccessListener(aVoid -> {
-                                                            progressDialog.dismiss();
+                                                            loadingDialog.dismissDialog();
                                                             holder.cartProductQuantity.setText(String.valueOf(model.getCartItemProductQuantity()));
                                                         }).addOnFailureListener(e -> {
-                                                    progressDialog.dismiss();
+                                                    loadingDialog.dismissDialog();
                                                     Alerter.create(CartActivity.this)
                                                             .setText("Whoa! Something Broke. Try again!")
                                                             .setTextAppearance(R.style.AlertText)
@@ -397,7 +392,7 @@ public class CartActivity extends AppCompatActivity {
                                                             .show();
                                                 });
                                             } else {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 MaterialDialog materialDialog = new MaterialDialog.Builder(CartActivity.this)
                                                         .setTitle("Item can't be further added to your cart!")
                                                         .setMessage("The store doesn't have more of this product than the quantity you already have in your cart.")
@@ -574,11 +569,11 @@ public class CartActivity extends AppCompatActivity {
                                 .setCancelable(false)
                                 .setPositiveButton("Remove", R.drawable.ic_dialog_remove, (dialogInterface, which) -> {
                                     dialogInterface.dismiss();
-                                    progressDialog.show();
+                                    loadingDialog.startDialog();
                                     for (int i = 0; i < getItemCount(); i++) {
                                         getSnapshots().getSnapshot(i).getReference().delete()
                                                 .addOnSuccessListener(aVoid -> {
-                                                    progressDialog.dismiss();
+                                                    loadingDialog.dismissDialog();
                                                     Alerter.create(CartActivity.this)
                                                             .setText("Your cart has been cleared!")
                                                             .setTextAppearance(R.style.AlertText)
@@ -592,7 +587,7 @@ public class CartActivity extends AppCompatActivity {
                                                             .setProgressColorInt(getColor(android.R.color.white))
                                                             .show();
                                                 }).addOnFailureListener(e -> {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
                                             Alerter.create(CartActivity.this)
                                                     .setText("Whoa! Something Broke. Try again!")
                                                     .setTextAppearance(R.style.AlertText)
@@ -786,14 +781,14 @@ public class CartActivity extends AppCompatActivity {
                         showConnectToInternetDialog();
                         return;
                     } else {
-                        progressDialog.show();
+                        loadingDialog.startDialog();
 
                         storeRef.document(getItem(0).getCartItemProductStoreID()).get()
                                 .addOnCompleteListener(task -> {
                                     if (task.isSuccessful()) {
                                         DocumentSnapshot documentSnapshot = task.getResult();
                                         if (documentSnapshot.exists()) {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
                                             if (Double.parseDouble(preferenceManager.getString(Constants.KEY_ORDER_TOTAL_RETAIL_PRICE))
                                                     >= documentSnapshot.getDouble(Constants.KEY_STORE_MINIMUM_ORDER_VALUE)) {
 
@@ -855,7 +850,7 @@ public class CartActivity extends AppCompatActivity {
                                                 materialDialog.show();
                                             }
                                         } else {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
                                             Alerter.create(CartActivity.this)
                                                     .setText("Whoa! Something broke. Try again!")
                                                     .setTextAppearance(R.style.AlertText)
@@ -870,7 +865,7 @@ public class CartActivity extends AppCompatActivity {
                                                     .show();
                                         }
                                     } else {
-                                        progressDialog.dismiss();
+                                        loadingDialog.dismissDialog();
                                         Alerter.create(CartActivity.this)
                                                 .setText("Whoa! Something broke. Try again!")
                                                 .setTextAppearance(R.style.AlertText)
@@ -910,7 +905,7 @@ public class CartActivity extends AppCompatActivity {
         public void deleteItem(int position) {
             getSnapshots().getSnapshot(position).getReference().delete()
                     .addOnSuccessListener(aVoid -> {
-                        progressDialog.dismiss();
+                        loadingDialog.dismissDialog();
                         Alerter.create(CartActivity.this)
                                 .setText("Ahan! An item has been removed from your cart.")
                                 .setTextAppearance(R.style.AlertText)
@@ -924,7 +919,7 @@ public class CartActivity extends AppCompatActivity {
                                 .setProgressColorInt(getColor(android.R.color.white))
                                 .show();
                     }).addOnFailureListener(e -> {
-                progressDialog.dismiss();
+                loadingDialog.dismissDialog();
                 Alerter.create(CartActivity.this)
                         .setText("Whoa! Something Broke. Try again!")
                         .setTextAppearance(R.style.AlertText)

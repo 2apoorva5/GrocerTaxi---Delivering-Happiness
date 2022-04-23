@@ -22,7 +22,6 @@ import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.razorpay.Checkout;
 import com.razorpay.PaymentResultListener;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 import com.tomergoldst.tooltips.ToolTip;
 import com.tomergoldst.tooltips.ToolTipsManager;
@@ -30,6 +29,7 @@ import com.tomergoldst.tooltips.ToolTipsManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class OrderSummaryActivity extends AppCompatActivity implements PaymentResultListener {
@@ -254,10 +254,10 @@ public class OrderSummaryActivity extends AppCompatActivity implements PaymentRe
         ////////////////////////////////////////////////////////////////////////////////////////////
 
         readPolicyBtn.setOnClickListener(v -> {
-                    String privacyPolicyUrl = "https://grocertaxi.wixsite.com/refund-policy";
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl));
-                    startActivity(browserIntent);
-                });
+            String privacyPolicyUrl = "https://grocertaxi.wixsite.com/refund-policy";
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl));
+            startActivity(browserIntent);
+        });
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 

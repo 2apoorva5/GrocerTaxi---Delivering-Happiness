@@ -1,6 +1,6 @@
 package com.application.grocertaxi;
 
-import android.app.AlertDialog;
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -30,19 +30,20 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.paging.PagedList;
+import androidx.paging.LoadState;
+import androidx.paging.PagingConfig;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.application.grocertaxi.Helper.LoadingDialog;
 import com.application.grocertaxi.Model.Product;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
-import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
-import com.firebase.ui.firestore.paging.LoadingState;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FieldValue;
@@ -50,7 +51,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -60,7 +60,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
-import dmax.dialog.SpotsDialog;
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class ProductsListActivity extends AppCompatActivity {
@@ -70,7 +70,7 @@ public class ProductsListActivity extends AppCompatActivity {
     private RecyclerView recyclerProducts;
     private TextView title, cartInfo;
     private ConstraintLayout layoutContent, layoutEmpty, layoutCartInfo, cartBtn, layoutNoInternet, retryBtn, sortBtn;
-    private PullRefreshLayout pullRefreshLayout;
+    private SwipeRefreshLayout refreshLayout;
     private ShimmerFrameLayout shimmerLayout;
 
     private CollectionReference productsRef, cartRef;
@@ -79,7 +79,7 @@ public class ProductsListActivity extends AppCompatActivity {
     private String cart_location;
     private PreferenceManager preferenceManager;
     private static int LAST_POSITION = -1;
-    private AlertDialog progressDialog;
+    private LoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,11 +113,7 @@ public class ProductsListActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        progressDialog = new SpotsDialog.Builder().setContext(ProductsListActivity.this)
-                .setMessage("Adding item to cart..")
-                .setCancelable(false)
-                .setTheme(R.style.SpotsDialog)
-                .build();
+        loadingDialog = new LoadingDialog(ProductsListActivity.this);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -131,7 +127,7 @@ public class ProductsListActivity extends AppCompatActivity {
         speechToText = findViewById(R.id.speech_to_text);
         inputProductSearch = findViewById(R.id.input_product_search_field);
         recyclerProducts = findViewById(R.id.recycler_products);
-        pullRefreshLayout = findViewById(R.id.pull_refresh_layout);
+        refreshLayout = findViewById(R.id.refresh_layout);
         shimmerLayout = findViewById(R.id.shimmer_layout);
         layoutContent = findViewById(R.id.layout_content);
         layoutEmpty = findViewById(R.id.layout_empty);
@@ -190,13 +186,8 @@ public class ProductsListActivity extends AppCompatActivity {
         layoutEmpty.setVisibility(View.GONE);
         layoutCartInfo.setVisibility(View.GONE);
 
-        pullRefreshLayout.setRefreshing(false);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
-        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
-        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorBackground));
-        pullRefreshLayout.setOnRefreshListener(this::checkNetworkConnection);
+        refreshLayout.setRefreshing(false);
+        refreshLayout.setOnRefreshListener(this::checkNetworkConnection);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -272,10 +263,7 @@ public class ProductsListActivity extends AppCompatActivity {
                             .startAt(s.toString().toLowerCase().trim()).endAt(s.toString().toLowerCase().trim() + "\uf8ff");
                 }
 
-                PagedList.Config updatedConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig updatedConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Product> updatedOptions = new FirestorePagingOptions.Builder<Product>()
                         .setLifecycleOwner(ProductsListActivity.this)
                         .setQuery(updatedQuery, updatedConfig, Product.class)
@@ -297,10 +285,7 @@ public class ProductsListActivity extends AppCompatActivity {
                                     .startAt(s.toString().toLowerCase().trim()).endAt(s.toString().toLowerCase().trim() + "\uf8ff");
                         }
 
-                        PagedList.Config updatedConfig = new PagedList.Config.Builder()
-                                .setInitialLoadSizeHint(4)
-                                .setPageSize(4)
-                                .build();
+                        PagingConfig updatedConfig = new PagingConfig(4, 4, false);
                         FirestorePagingOptions<Product> updatedOptions = new FirestorePagingOptions.Builder<Product>()
                                 .setLifecycleOwner(ProductsListActivity.this)
                                 .setQuery(updatedQuery, updatedConfig, Product.class)
@@ -335,10 +320,7 @@ public class ProductsListActivity extends AppCompatActivity {
 
             relevance.setOnClickListener(v12 -> {
                 Query sortQuery = productsRef;
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Product> sortOptions = new FirestorePagingOptions.Builder<Product>()
                         .setLifecycleOwner(ProductsListActivity.this)
                         .setQuery(sortQuery, sortConfig, Product.class)
@@ -351,10 +333,7 @@ public class ProductsListActivity extends AppCompatActivity {
 
             newestFirst.setOnClickListener(v13 -> {
                 Query sortQuery = productsRef.orderBy(Constants.KEY_PRODUCT_TIMESTAMP, Query.Direction.DESCENDING);
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Product> sortOptions = new FirestorePagingOptions.Builder<Product>()
                         .setLifecycleOwner(ProductsListActivity.this)
                         .setQuery(sortQuery, sortConfig, Product.class)
@@ -367,10 +346,7 @@ public class ProductsListActivity extends AppCompatActivity {
 
             nameAZ.setOnClickListener(v18 -> {
                 Query sortQuery = productsRef.orderBy(Constants.KEY_PRODUCT_NAME, Query.Direction.ASCENDING);
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Product> sortOptions = new FirestorePagingOptions.Builder<Product>()
                         .setLifecycleOwner(ProductsListActivity.this)
                         .setQuery(sortQuery, sortConfig, Product.class)
@@ -383,10 +359,7 @@ public class ProductsListActivity extends AppCompatActivity {
 
             nameZA.setOnClickListener(v17 -> {
                 Query sortQuery = productsRef.orderBy(Constants.KEY_PRODUCT_NAME, Query.Direction.DESCENDING);
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Product> sortOptions = new FirestorePagingOptions.Builder<Product>()
                         .setLifecycleOwner(ProductsListActivity.this)
                         .setQuery(sortQuery, sortConfig, Product.class)
@@ -399,10 +372,7 @@ public class ProductsListActivity extends AppCompatActivity {
 
             offer.setOnClickListener(v17 -> {
                 Query sortQuery = productsRef.orderBy(Constants.KEY_PRODUCT_OFFER, Query.Direction.DESCENDING);
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Product> sortOptions = new FirestorePagingOptions.Builder<Product>()
                         .setLifecycleOwner(ProductsListActivity.this)
                         .setQuery(sortQuery, sortConfig, Product.class)
@@ -415,10 +385,7 @@ public class ProductsListActivity extends AppCompatActivity {
 
             priceLowHigh.setOnClickListener(v16 -> {
                 Query sortQuery = productsRef.orderBy(Constants.KEY_PRODUCT_RETAIL_PRICE, Query.Direction.ASCENDING);
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Product> sortOptions = new FirestorePagingOptions.Builder<Product>()
                         .setLifecycleOwner(ProductsListActivity.this)
                         .setQuery(sortQuery, sortConfig, Product.class)
@@ -431,10 +398,7 @@ public class ProductsListActivity extends AppCompatActivity {
 
             priceHighLow.setOnClickListener(v15 -> {
                 Query sortQuery = productsRef.orderBy(Constants.KEY_PRODUCT_RETAIL_PRICE, Query.Direction.DESCENDING);
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Product> sortOptions = new FirestorePagingOptions.Builder<Product>()
                         .setLifecycleOwner(ProductsListActivity.this)
                         .setQuery(sortQuery, sortConfig, Product.class)
@@ -447,10 +411,7 @@ public class ProductsListActivity extends AppCompatActivity {
 
             excludeOutOfStock.setOnClickListener(v14 -> {
                 Query sortQuery = productsRef.whereEqualTo(Constants.KEY_PRODUCT_IN_STOCK, true);
-                PagedList.Config sortConfig = new PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(4)
-                        .setPageSize(4)
-                        .build();
+                PagingConfig sortConfig = new PagingConfig(4, 4, false);
                 FirestorePagingOptions<Product> sortOptions = new FirestorePagingOptions.Builder<Product>()
                         .setLifecycleOwner(ProductsListActivity.this)
                         .setQuery(sortQuery, sortConfig, Product.class)
@@ -468,7 +429,7 @@ public class ProductsListActivity extends AppCompatActivity {
 
         cartRef.addSnapshotListener((queryDocumentSnapshots, error) -> {
             if (error != null) {
-                progressDialog.dismiss();
+                loadingDialog.dismissDialog();
                 Alerter.create(ProductsListActivity.this)
                         .setText("Whoa! Something broke. Try again!")
                         .setTextAppearance(R.style.AlertText)
@@ -559,15 +520,13 @@ public class ProductsListActivity extends AppCompatActivity {
 
     //////////////////////////////////////// Load Products /////////////////////////////////////////
 
+    @SuppressLint("NotifyDataSetChanged")
     private void loadProducts() {
         shimmerLayout.setVisibility(View.VISIBLE);
         shimmerLayout.startShimmer();
 
         Query query = productsRef;
-        PagedList.Config config = new PagedList.Config.Builder()
-                .setInitialLoadSizeHint(4)
-                .setPageSize(4)
-                .build();
+        PagingConfig config = new PagingConfig(4, 4, false);
         FirestorePagingOptions<Product> options = new FirestorePagingOptions.Builder<Product>()
                 .setLifecycleOwner(ProductsListActivity.this)
                 .setQuery(query, config, Product.class)
@@ -655,7 +614,7 @@ public class ProductsListActivity extends AppCompatActivity {
                             showConnectToInternetDialog();
                             return;
                         } else {
-                            progressDialog.show();
+                            loadingDialog.startDialog();
 
                             String[] split = model.getProductID().split("-", 2);
                             String cart_id = "ITEM-" + split[1];
@@ -680,7 +639,7 @@ public class ProductsListActivity extends AppCompatActivity {
                                 if (queryDocumentSnapshots1.getDocuments().size() == 0) {
                                     cartRef.document(cart_id).set(newCartItem)
                                             .addOnSuccessListener(aVoid -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(ProductsListActivity.this)
                                                         .setText("Success! Your cart just got updated.")
                                                         .setTextAppearance(R.style.AlertText)
@@ -695,7 +654,7 @@ public class ProductsListActivity extends AppCompatActivity {
                                                         .show();
                                             })
                                             .addOnFailureListener(e -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(ProductsListActivity.this)
                                                         .setText("Whoa! Something Broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -713,7 +672,7 @@ public class ProductsListActivity extends AppCompatActivity {
                                     cartRef.whereEqualTo(Constants.KEY_CART_ITEM_PRODUCT_STORE_ID, model.getProductStoreID())
                                             .get().addOnSuccessListener(queryDocumentSnapshots2 -> {
                                         if (queryDocumentSnapshots2.getDocuments().size() == 0) {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(ProductsListActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
                                                     .setMessage("Your cart has already been setup for another store this item does not belong to. You must clear your cart first before proceeding with this item.")
@@ -736,7 +695,7 @@ public class ProductsListActivity extends AppCompatActivity {
                                                                             .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
                                                                                     Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
                                                                             .addOnSuccessListener(aVoid -> {
-                                                                                progressDialog.dismiss();
+                                                                                loadingDialog.dismissDialog();
                                                                                 Alerter.create(ProductsListActivity.this)
                                                                                         .setText("Success! Your cart just got updated.")
                                                                                         .setTextAppearance(R.style.AlertText)
@@ -750,7 +709,7 @@ public class ProductsListActivity extends AppCompatActivity {
                                                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                                                         .show();
                                                                             }).addOnFailureListener(e -> {
-                                                                        progressDialog.dismiss();
+                                                                        loadingDialog.dismissDialog();
                                                                         Alerter.create(ProductsListActivity.this)
                                                                                 .setText("Whoa! Something Broke. Try again!")
                                                                                 .setTextAppearance(R.style.AlertText)
@@ -765,7 +724,7 @@ public class ProductsListActivity extends AppCompatActivity {
                                                                                 .show();
                                                                     });
                                                                 } else {
-                                                                    progressDialog.dismiss();
+                                                                    loadingDialog.dismissDialog();
                                                                     MaterialDialog materialDialog = new MaterialDialog.Builder(ProductsListActivity.this)
                                                                             .setTitle("Item can't be further added to your cart!")
                                                                             .setMessage("The store doesn't have more of this product than the quantity you already have in your cart.")
@@ -777,7 +736,7 @@ public class ProductsListActivity extends AppCompatActivity {
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
                                                                         .addOnSuccessListener(aVoid -> {
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
                                                                             Alerter.create(ProductsListActivity.this)
                                                                                     .setText("Success! Your cart just got updated.")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -792,7 +751,7 @@ public class ProductsListActivity extends AppCompatActivity {
                                                                                     .show();
                                                                         })
                                                                         .addOnFailureListener(e -> {
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
                                                                             Alerter.create(ProductsListActivity.this)
                                                                                     .setText("Whoa! Something Broke. Try again!")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -808,7 +767,7 @@ public class ProductsListActivity extends AppCompatActivity {
                                                                         });
                                                             }
                                                         } else {
-                                                            progressDialog.dismiss();
+                                                            loadingDialog.dismissDialog();
                                                             Alerter.create(ProductsListActivity.this)
                                                                     .setText("Whoa! Something Broke. Try again!")
                                                                     .setTextAppearance(R.style.AlertText)
@@ -823,7 +782,7 @@ public class ProductsListActivity extends AppCompatActivity {
                                                                     .show();
                                                         }
                                                     }).addOnFailureListener(e -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(ProductsListActivity.this)
                                                         .setText("Whoa! Something Broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -839,7 +798,7 @@ public class ProductsListActivity extends AppCompatActivity {
                                             });
                                         }
                                     }).addOnFailureListener(e -> {
-                                        progressDialog.dismiss();
+                                        loadingDialog.dismissDialog();
                                         Alerter.create(ProductsListActivity.this)
                                                 .setText("Whoa! Something Broke. Try again!")
                                                 .setTextAppearance(R.style.AlertText)
@@ -855,7 +814,7 @@ public class ProductsListActivity extends AppCompatActivity {
                                     });
                                 }
                             }).addOnFailureListener(e -> {
-                                progressDialog.dismiss();
+                                loadingDialog.dismissDialog();
                                 Alerter.create(ProductsListActivity.this)
                                         .setText("Whoa! Something Broke. Try again!")
                                         .setTextAppearance(R.style.AlertText)
@@ -902,49 +861,62 @@ public class ProductsListActivity extends AppCompatActivity {
                     LAST_POSITION = position;
                 }
             }
-
-            @Override
-            protected void onLoadingStateChanged(@NonNull LoadingState state) {
-                super.onLoadingStateChanged(state);
-                switch (state) {
-                    case LOADING_INITIAL:
-                    case LOADING_MORE:
-                        pullRefreshLayout.setRefreshing(false);
-                        break;
-                    case LOADED:
-                    case FINISHED:
-                        pullRefreshLayout.setRefreshing(false);
-                        shimmerLayout.stopShimmer();
-                        shimmerLayout.setVisibility(View.GONE);
-
-                        if (getItemCount() == 0) {
-                            layoutEmpty.setVisibility(View.VISIBLE);
-                        } else {
-                            layoutEmpty.setVisibility(View.GONE);
-                        }
-                        break;
-                    case ERROR:
-                        pullRefreshLayout.setRefreshing(false);
-                        shimmerLayout.stopShimmer();
-                        shimmerLayout.setVisibility(View.GONE);
-                        Alerter.create(ProductsListActivity.this)
-                                .setText("Whoa! Something Broke. Try again!")
-                                .setTextAppearance(R.style.AlertText)
-                                .setBackgroundColorRes(R.color.errorColor)
-                                .setIcon(R.drawable.ic_error)
-                                .setDuration(3000)
-                                .enableIconPulse(true)
-                                .enableVibration(true)
-                                .disableOutsideTouch()
-                                .enableProgress(true)
-                                .setProgressColorInt(getColor(android.R.color.white))
-                                .show();
-                        break;
-                }
-            }
         };
 
         productAdapter.notifyDataSetChanged();
+
+        productAdapter.addLoadStateListener(states -> {
+            LoadState refresh = states.getRefresh();
+            LoadState append = states.getAppend();
+
+            if (refresh instanceof LoadState.Error || append instanceof LoadState.Error) {
+                refreshLayout.setRefreshing(false);
+                shimmerLayout.stopShimmer();
+                shimmerLayout.setVisibility(View.GONE);
+                Alerter.create(ProductsListActivity.this)
+                        .setText("Whoa! Something Broke. Try again!")
+                        .setTextAppearance(R.style.AlertText)
+                        .setBackgroundColorRes(R.color.errorColor)
+                        .setIcon(R.drawable.ic_error)
+                        .setDuration(3000)
+                        .enableIconPulse(true)
+                        .enableVibration(true)
+                        .disableOutsideTouch()
+                        .enableProgress(true)
+                        .setProgressColorInt(getColor(android.R.color.white))
+                        .show();
+            }
+
+            if (refresh instanceof LoadState.Loading) {
+
+            }
+
+            if (append instanceof LoadState.Loading) {
+                refreshLayout.setRefreshing(false);
+            }
+
+            if (append instanceof LoadState.NotLoading) {
+                LoadState.NotLoading notLoading = (LoadState.NotLoading) append;
+                if (notLoading.getEndOfPaginationReached()) {
+                    refreshLayout.setRefreshing(false);
+                    shimmerLayout.stopShimmer();
+                    shimmerLayout.setVisibility(View.GONE);
+
+                    if (productAdapter.getItemCount() == 0) {
+                        layoutEmpty.setVisibility(View.VISIBLE);
+                    } else {
+                        layoutEmpty.setVisibility(View.GONE);
+                    }
+                    return null;
+                }
+
+                if (refresh instanceof LoadState.NotLoading) {
+                    return null;
+                }
+            }
+
+            return null;
+        });
 
         recyclerProducts.setHasFixedSize(true);
         recyclerProducts.setLayoutManager(new LinearLayoutManager(ProductsListActivity.this));

@@ -1,5 +1,6 @@
 package com.application.grocertaxi;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -15,18 +16,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.paging.PagedList;
+import androidx.paging.LoadState;
+import androidx.paging.PagingConfig;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.application.grocertaxi.Model.Review;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
-import com.baoyz.widget.PullRefreshLayout;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
-import com.firebase.ui.firestore.paging.LoadingState;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -40,7 +41,7 @@ public class StoreReviewsActivity extends AppCompatActivity {
     private ImageView closeBtn;
     private RecyclerView recyclerReviews;
     private ConstraintLayout layoutContent, layoutEmpty, layoutNoInternet, retryBtn;
-    private PullRefreshLayout pullRefreshLayout;
+    private SwipeRefreshLayout refreshLayout;
     private ShimmerFrameLayout shimmerLayout;
 
     private CollectionReference reviewsRef;
@@ -84,7 +85,7 @@ public class StoreReviewsActivity extends AppCompatActivity {
 
         closeBtn = findViewById(R.id.close_btn);
         recyclerReviews = findViewById(R.id.recycler_reviews);
-        pullRefreshLayout = findViewById(R.id.pull_refresh_layout);
+        refreshLayout = findViewById(R.id.refresh_layout);
         shimmerLayout = findViewById(R.id.shimmer_layout);
         layoutContent = findViewById(R.id.layout_content);
         layoutEmpty = findViewById(R.id.layout_empty);
@@ -126,13 +127,8 @@ public class StoreReviewsActivity extends AppCompatActivity {
         layoutContent.setVisibility(View.VISIBLE);
         layoutEmpty.setVisibility(View.GONE);
 
-        pullRefreshLayout.setRefreshing(false);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
-        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
-        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorBackground));
-        pullRefreshLayout.setOnRefreshListener(this::checkNetworkConnection);
+        refreshLayout.setRefreshing(false);
+        refreshLayout.setOnRefreshListener(this::checkNetworkConnection);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -146,15 +142,13 @@ public class StoreReviewsActivity extends AppCompatActivity {
         loadReviews();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void loadReviews() {
         shimmerLayout.setVisibility(View.VISIBLE);
         shimmerLayout.startShimmer();
 
         Query query = reviewsRef;
-        PagedList.Config config = new PagedList.Config.Builder()
-                .setInitialLoadSizeHint(4)
-                .setPageSize(4)
-                .build();
+        PagingConfig config = new PagingConfig(4, 4, false);
         FirestorePagingOptions<Review> options = new FirestorePagingOptions.Builder<Review>()
                 .setLifecycleOwner(StoreReviewsActivity.this)
                 .setQuery(query, config, Review.class)
@@ -176,49 +170,62 @@ public class StoreReviewsActivity extends AppCompatActivity {
                 holder.ratingBar.setRating((float) model.getRating());
                 holder.comment.setText(model.getComment());
             }
-
-            @Override
-            protected void onLoadingStateChanged(@NonNull LoadingState state) {
-                super.onLoadingStateChanged(state);
-                switch (state) {
-                    case LOADING_INITIAL:
-                    case LOADING_MORE:
-                        pullRefreshLayout.setRefreshing(false);
-                        break;
-                    case LOADED:
-                    case FINISHED:
-                        pullRefreshLayout.setRefreshing(false);
-                        shimmerLayout.stopShimmer();
-                        shimmerLayout.setVisibility(View.GONE);
-
-                        if (getItemCount() == 0) {
-                            layoutEmpty.setVisibility(View.VISIBLE);
-                        } else {
-                            layoutEmpty.setVisibility(View.GONE);
-                        }
-                        break;
-                    case ERROR:
-                        pullRefreshLayout.setRefreshing(false);
-                        shimmerLayout.stopShimmer();
-                        shimmerLayout.setVisibility(View.GONE);
-                        Alerter.create(StoreReviewsActivity.this)
-                                .setText("Whoa! Something Broke. Try again!")
-                                .setTextAppearance(R.style.AlertText)
-                                .setBackgroundColorRes(R.color.errorColor)
-                                .setIcon(R.drawable.ic_error)
-                                .setDuration(3000)
-                                .enableIconPulse(true)
-                                .enableVibration(true)
-                                .disableOutsideTouch()
-                                .enableProgress(true)
-                                .setProgressColorInt(getColor(android.R.color.white))
-                                .show();
-                        break;
-                }
-            }
         };
 
         reviewAdapter.notifyDataSetChanged();
+
+        reviewAdapter.addLoadStateListener(states -> {
+            LoadState refresh = states.getRefresh();
+            LoadState append = states.getAppend();
+
+            if (refresh instanceof LoadState.Error || append instanceof LoadState.Error) {
+                refreshLayout.setRefreshing(false);
+                shimmerLayout.stopShimmer();
+                shimmerLayout.setVisibility(View.GONE);
+                Alerter.create(StoreReviewsActivity.this)
+                        .setText("Whoa! Something Broke. Try again!")
+                        .setTextAppearance(R.style.AlertText)
+                        .setBackgroundColorRes(R.color.errorColor)
+                        .setIcon(R.drawable.ic_error)
+                        .setDuration(3000)
+                        .enableIconPulse(true)
+                        .enableVibration(true)
+                        .disableOutsideTouch()
+                        .enableProgress(true)
+                        .setProgressColorInt(getColor(android.R.color.white))
+                        .show();
+            }
+
+            if (refresh instanceof LoadState.Loading) {
+
+            }
+
+            if (append instanceof LoadState.Loading) {
+                refreshLayout.setRefreshing(false);
+            }
+
+            if (append instanceof LoadState.NotLoading) {
+                LoadState.NotLoading notLoading = (LoadState.NotLoading) append;
+                if (notLoading.getEndOfPaginationReached()) {
+                    refreshLayout.setRefreshing(false);
+                    shimmerLayout.stopShimmer();
+                    shimmerLayout.setVisibility(View.GONE);
+
+                    if (reviewAdapter.getItemCount() == 0) {
+                        layoutEmpty.setVisibility(View.VISIBLE);
+                    } else {
+                        layoutEmpty.setVisibility(View.GONE);
+                    }
+                    return null;
+                }
+
+                if (refresh instanceof LoadState.NotLoading) {
+                    return null;
+                }
+            }
+
+            return null;
+        });
 
         recyclerReviews.setHasFixedSize(true);
         recyclerReviews.setLayoutManager(new LinearLayoutManager(StoreReviewsActivity.this));

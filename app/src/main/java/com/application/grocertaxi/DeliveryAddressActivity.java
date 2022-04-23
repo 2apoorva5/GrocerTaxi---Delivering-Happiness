@@ -54,7 +54,6 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.skyfishjy.library.RippleBackground;
 import com.tapadoo.alerter.Alerter;
 
@@ -64,6 +63,7 @@ import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 import java.io.IOException;
 import java.util.List;
 
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class DeliveryAddressActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener {

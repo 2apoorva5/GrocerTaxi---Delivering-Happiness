@@ -28,11 +28,11 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.application.grocertaxi.Model.Category;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
-import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
@@ -51,7 +51,6 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -59,6 +58,7 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import java.util.HashMap;
 
 import de.mateware.snacky.Snacky;
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import maes.tech.intentanim.CustomIntent;
 import per.wsj.library.AndRatingBar;
 
@@ -74,7 +74,7 @@ public class StoreDetailsActivity extends AppCompatActivity {
     private CardView storeStatusContainer, cartIndicator, saveBtnContainer;
     private ConstraintLayout layoutContent, layoutNoInternet, retryBtn, saveBtn;
     private ProgressBar progressBar, rateProgressBar;
-    private PullRefreshLayout pullRefreshLayout;
+    private SwipeRefreshLayout refreshLayout;
 
     private CollectionReference storeRef, categoriesRef, cartRef;
     private FirestoreRecyclerAdapter<Category, CategoryViewHolder> categoryAdapter;
@@ -124,7 +124,7 @@ public class StoreDetailsActivity extends AppCompatActivity {
         layoutNoInternet = findViewById(R.id.layout_no_internet);
         retryBtn = findViewById(R.id.retry_btn);
 
-        pullRefreshLayout = findViewById(R.id.pull_refresh_layout);
+        refreshLayout = findViewById(R.id.refresh_layout);
 
         closeBtn = findViewById(R.id.close_btn);
         cartBtn = findViewById(R.id.cart_btn);
@@ -200,13 +200,8 @@ public class StoreDetailsActivity extends AppCompatActivity {
         layoutNoInternet.setVisibility(View.GONE);
         layoutContent.setVisibility(View.VISIBLE);
 
-        pullRefreshLayout.setRefreshing(false);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
-        pullRefreshLayout.setColor(getColor(R.color.colorIconLight));
-        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorAccent));
-        pullRefreshLayout.setOnRefreshListener(this::checkNetworkConnection);
+        refreshLayout.setRefreshing(false);
+        refreshLayout.setOnRefreshListener(this::checkNetworkConnection);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -609,7 +604,7 @@ public class StoreDetailsActivity extends AppCompatActivity {
         productDocumentRef.addSnapshotListener((documentSnapshot, error) -> {
             if (error != null) {
                 progressBar.setVisibility(View.GONE);
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
                 Alerter.create(StoreDetailsActivity.this)
                         .setText("Whoa! Something broke. Try again!")
                         .setTextAppearance(R.style.AlertText)
@@ -624,7 +619,7 @@ public class StoreDetailsActivity extends AppCompatActivity {
                         .show();
             } else {
                 progressBar.setVisibility(View.GONE);
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
                 if (documentSnapshot != null && documentSnapshot.exists()) {
                     Uri store_img = Uri.parse(documentSnapshot.getString(Constants.KEY_STORE_IMAGE));
                     boolean store_status = documentSnapshot.getBoolean(Constants.KEY_STORE_STATUS);
@@ -913,7 +908,7 @@ public class StoreDetailsActivity extends AppCompatActivity {
             public void onDataChanged() {
                 super.onDataChanged();
 
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
 
                 if (getItemCount() == 0) {
                     recyclerCategories.setAdapter(null);
@@ -930,7 +925,7 @@ public class StoreDetailsActivity extends AppCompatActivity {
             @Override
             public void onError(@NonNull FirebaseFirestoreException e) {
                 super.onError(e);
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
                 Alerter.create(StoreDetailsActivity.this)
                         .setText("Whoa! Something Broke. Try again!")
                         .setTextAppearance(R.style.AlertText)

@@ -1,6 +1,6 @@
 package com.application.grocertaxi;
 
-import android.app.AlertDialog;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -19,11 +19,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.application.grocertaxi.Helper.LoadingDialog;
 import com.application.grocertaxi.Model.Coupon;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
-import com.baoyz.widget.PullRefreshLayout;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -32,10 +33,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
-import dmax.dialog.SpotsDialog;
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class CouponsListActivity extends AppCompatActivity {
@@ -43,14 +43,14 @@ public class CouponsListActivity extends AppCompatActivity {
     private ImageView closeBtn;
     private RecyclerView recyclerCoupons;
     private ConstraintLayout layoutContent, layoutEmpty, layoutNoInternet, retryBtn;
-    private PullRefreshLayout pullRefreshLayout;
+    private SwipeRefreshLayout refreshLayout;
     private ShimmerFrameLayout shimmerLayout;
 
     private CollectionReference couponsRef;
     private FirestoreRecyclerAdapter<Coupon, CouponViewHolder> couponAdapter;
 
     private PreferenceManager preferenceManager;
-    private AlertDialog progressDialog;
+    private LoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,17 +84,13 @@ public class CouponsListActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        progressDialog = new SpotsDialog.Builder().setContext(CouponsListActivity.this)
-                .setMessage("Hold on..")
-                .setCancelable(false)
-                .setTheme(R.style.SpotsDialog)
-                .build();
+        loadingDialog = new LoadingDialog(CouponsListActivity.this);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
         closeBtn = findViewById(R.id.close_btn);
         recyclerCoupons = findViewById(R.id.recycler_coupons);
-        pullRefreshLayout = findViewById(R.id.pull_refresh_layout);
+        refreshLayout = findViewById(R.id.refresh_layout);
         shimmerLayout = findViewById(R.id.shimmer_layout);
         layoutContent = findViewById(R.id.layout_content);
         layoutEmpty = findViewById(R.id.layout_empty);
@@ -129,13 +125,8 @@ public class CouponsListActivity extends AppCompatActivity {
         layoutContent.setVisibility(View.VISIBLE);
         layoutEmpty.setVisibility(View.GONE);
 
-        pullRefreshLayout.setRefreshing(false);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
-        pullRefreshLayout.setColor(getColor(R.color.colorAccent));
-        pullRefreshLayout.setBackgroundColor(getColor(R.color.colorBackground));
-        pullRefreshLayout.setOnRefreshListener(this::checkNetworkConnection);
+        refreshLayout.setRefreshing(false);
+        refreshLayout.setOnRefreshListener(this::checkNetworkConnection);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -151,6 +142,7 @@ public class CouponsListActivity extends AppCompatActivity {
 
     //////////////////////////////////////// Load Coupons /////////////////////////////////////////
 
+    @SuppressLint("NotifyDataSetChanged")
     private void loadCoupons() {
         shimmerLayout.setVisibility(View.VISIBLE);
         shimmerLayout.startShimmer();
@@ -180,7 +172,7 @@ public class CouponsListActivity extends AppCompatActivity {
                         return;
                     } else {
                         if (model.getCode().equals("GTNEW10")) {
-                            progressDialog.show();
+                            loadingDialog.startDialog();
 
                             FirebaseFirestore.getInstance().collection(Constants.KEY_COLLECTION_USERS)
                                     .document(preferenceManager.getString(Constants.KEY_USER_ID))
@@ -191,14 +183,14 @@ public class CouponsListActivity extends AppCompatActivity {
                                         boolean first_order = documentSnapshot.getBoolean(Constants.KEY_USER_FIRST_ORDER);
 
                                         if (first_order) {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
 
                                             preferenceManager.putString(Constants.KEY_COUPON, model.getCode());
                                             preferenceManager.putString(Constants.KEY_COUPON_DISCOUNT_PERCENT, String.valueOf(model.getDiscountPercent()));
 
                                             onBackPressed();
                                         } else {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(CouponsListActivity.this)
                                                     .setTitle("You can't use this coupon!")
                                                     .setMessage("This coupon is only valid for your first order. Since this is not your first order, we're sorry you can't use this.")
@@ -208,7 +200,7 @@ public class CouponsListActivity extends AppCompatActivity {
                                             materialDialog.show();
                                         }
                                     } else {
-                                        progressDialog.dismiss();
+                                        loadingDialog.dismissDialog();
 
                                         Alerter.create(CouponsListActivity.this)
                                                 .setText("Whoa! Something broke. Try again!")
@@ -224,7 +216,7 @@ public class CouponsListActivity extends AppCompatActivity {
                                                 .show();
                                     }
                                 } else {
-                                    progressDialog.dismiss();
+                                    loadingDialog.dismissDialog();
 
                                     Alerter.create(CouponsListActivity.this)
                                             .setText("Whoa! Something broke. Try again!")
@@ -254,7 +246,7 @@ public class CouponsListActivity extends AppCompatActivity {
             public void onDataChanged() {
                 super.onDataChanged();
 
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
                 shimmerLayout.stopShimmer();
                 shimmerLayout.setVisibility(View.GONE);
 
@@ -269,7 +261,7 @@ public class CouponsListActivity extends AppCompatActivity {
             public void onError(@NonNull FirebaseFirestoreException e) {
                 super.onError(e);
 
-                pullRefreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
                 shimmerLayout.stopShimmer();
                 shimmerLayout.setVisibility(View.GONE);
                 Alerter.create(CouponsListActivity.this)

@@ -1,7 +1,6 @@
 package com.application.grocertaxi;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.application.grocertaxi.Model.Product;
+import com.application.grocertaxi.Helper.LoadingDialog;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.bumptech.glide.Glide;
@@ -36,13 +35,12 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import dmax.dialog.SpotsDialog;
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -63,7 +61,7 @@ public class ProfileActivity extends AppCompatActivity {
     private StorageReference storageReference;
 
     private String cart_location;
-    private AlertDialog progressDialog1, progressDialog2;
+    private LoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,17 +95,7 @@ public class ProfileActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        progressDialog1 = new SpotsDialog.Builder().setContext(ProfileActivity.this)
-                .setMessage("Logging you out..")
-                .setCancelable(false)
-                .setTheme(R.style.SpotsDialog)
-                .build();
-
-        progressDialog2 = new SpotsDialog.Builder().setContext(ProfileActivity.this)
-                .setMessage("Hold on..")
-                .setCancelable(false)
-                .setTheme(R.style.SpotsDialog)
-                .build();
+        loadingDialog = new LoadingDialog(ProfileActivity.this);
 
         cart_location = String.format("%s, %s", preferenceManager.getString(Constants.KEY_USER_LOCALITY), preferenceManager.getString(Constants.KEY_USER_CITY));
 
@@ -216,12 +204,12 @@ public class ProfileActivity extends AppCompatActivity {
                             profilePicUri = null;
                             userProfilePic.setImageResource(R.drawable.illustration_user_avatar);
 
-                            progressDialog2.show();
+                            loadingDialog.startDialog();
 
                             userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
                                     .update(Constants.KEY_USER_IMAGE, "")
                                     .addOnSuccessListener(aVoid -> {
-                                        progressDialog2.dismiss();
+                                        loadingDialog.dismissDialog();
 
                                         preferenceManager.putString(Constants.KEY_USER_IMAGE, "");
                                         Alerter.create(ProfileActivity.this)
@@ -238,7 +226,7 @@ public class ProfileActivity extends AppCompatActivity {
                                                 .show();
                                     })
                                     .addOnFailureListener(e -> {
-                                        progressDialog2.dismiss();
+                                        loadingDialog.dismissDialog();
                                         Alerter.create(ProfileActivity.this)
                                                 .setText("Whoa! Something broke. Try again!")
                                                 .setTextAppearance(R.style.AlertText)
@@ -492,7 +480,7 @@ public class ProfileActivity extends AppCompatActivity {
             profilePicUri = data.getData();
             Glide.with(ProfileActivity.this).load(profilePicUri).centerCrop().into(userProfilePic);
 
-            progressDialog2.show();
+            loadingDialog.startDialog();
 
             if (profilePicUri != null) {
                 final StorageReference fileRef = storageReference.child(preferenceManager.getString(Constants.KEY_USER_ID) + ".img");
@@ -505,7 +493,7 @@ public class ProfileActivity extends AppCompatActivity {
                                     userRef.document(preferenceManager.getString(Constants.KEY_USER_ID))
                                             .update(Constants.KEY_USER_IMAGE, imageValue)
                                             .addOnSuccessListener(aVoid -> {
-                                                progressDialog2.dismiss();
+                                                loadingDialog.dismissDialog();
 
                                                 preferenceManager.putString(Constants.KEY_USER_IMAGE, imageValue);
                                                 Alerter.create(ProfileActivity.this)
@@ -522,7 +510,7 @@ public class ProfileActivity extends AppCompatActivity {
                                                         .show();
                                             })
                                             .addOnFailureListener(e -> {
-                                                progressDialog2.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(ProfileActivity.this)
                                                         .setText("Whoa! Something broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -538,7 +526,7 @@ public class ProfileActivity extends AppCompatActivity {
                                             });
                                 })
                                 .addOnFailureListener(e -> {
-                                    progressDialog2.dismiss();
+                                    loadingDialog.dismissDialog();
                                     Alerter.create(ProfileActivity.this)
                                             .setText("Whoa! Something broke. Try again!")
                                             .setTextAppearance(R.style.AlertText)
@@ -553,7 +541,7 @@ public class ProfileActivity extends AppCompatActivity {
                                             .show();
                                 }))
                         .addOnFailureListener(e -> {
-                            progressDialog2.dismiss();
+                            loadingDialog.dismissDialog();
                             Alerter.create(ProfileActivity.this)
                                     .setText("Whoa! Something broke. Try again!")
                                     .setTextAppearance(R.style.AlertText)
@@ -593,14 +581,14 @@ public class ProfileActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("Yes", R.drawable.ic_dialog_okay, (dialogInterface, which) -> {
                     dialogInterface.dismiss();
-                    progressDialog1.show();
+                    loadingDialog.startDialog();
                     DocumentReference documentReference = userRef.document(preferenceManager.getString(Constants.KEY_USER_ID));
 
                     HashMap<String, Object> updates = new HashMap<>();
                     updates.put(Constants.KEY_USER_TOKEN, FieldValue.delete());
                     documentReference.update(updates)
                             .addOnSuccessListener(aVoid -> {
-                                progressDialog1.dismiss();
+                                loadingDialog.dismissDialog();
                                 firebaseAuth.signOut();
                                 preferenceManager.clearPreferences();
                                 Toast.makeText(ProfileActivity.this, "Logged Out!", Toast.LENGTH_SHORT).show();
@@ -609,7 +597,7 @@ public class ProfileActivity extends AppCompatActivity {
                                 finish();
                             })
                             .addOnFailureListener(e -> {
-                                progressDialog1.dismiss();
+                                loadingDialog.dismissDialog();
 
                                 Alerter.create(ProfileActivity.this)
                                         .setText("Whoa! Unable to log out. Try Again!")

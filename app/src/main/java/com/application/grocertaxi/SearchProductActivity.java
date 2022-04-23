@@ -1,6 +1,6 @@
 package com.application.grocertaxi;
 
-import android.app.AlertDialog;
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -30,17 +30,18 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.paging.PagedList;
+import androidx.paging.LoadState;
+import androidx.paging.PagingConfig;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.application.grocertaxi.Helper.LoadingDialog;
 import com.application.grocertaxi.Model.Product;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
-import com.firebase.ui.firestore.paging.LoadingState;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -48,7 +49,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -59,7 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import dmax.dialog.SpotsDialog;
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class SearchProductActivity extends AppCompatActivity {
@@ -77,7 +77,7 @@ public class SearchProductActivity extends AppCompatActivity {
     private String cart_location;
     private PreferenceManager preferenceManager;
     private static int LAST_POSITION = -1;
-    private AlertDialog progressDialog;
+    private LoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,11 +111,7 @@ public class SearchProductActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorSearch));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        progressDialog = new SpotsDialog.Builder().setContext(SearchProductActivity.this)
-                .setMessage("Adding item to cart..")
-                .setCancelable(false)
-                .setTheme(R.style.SpotsDialog)
-                .build();
+        loadingDialog = new LoadingDialog(SearchProductActivity.this);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -280,10 +276,7 @@ public class SearchProductActivity extends AppCompatActivity {
                             .startAt(inputProductSearch.getText().toString().toLowerCase().trim())
                             .endAt(inputProductSearch.getText().toString().toLowerCase().trim() + "\uf8ff");
 
-                    PagedList.Config config = new PagedList.Config.Builder()
-                            .setInitialLoadSizeHint(4)
-                            .setPageSize(4)
-                            .build();
+                    PagingConfig config = new PagingConfig(4, 4, false);
 
                     FirestorePagingOptions<Product> options = new FirestorePagingOptions.Builder<Product>()
                             .setLifecycleOwner(SearchProductActivity.this)
@@ -342,10 +335,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                 .startAt(inputProductSearch.getText().toString().toLowerCase().trim())
                                 .endAt(inputProductSearch.getText().toString().toLowerCase().trim() + "\uf8ff");
 
-                        PagedList.Config config = new PagedList.Config.Builder()
-                                .setInitialLoadSizeHint(4)
-                                .setPageSize(4)
-                                .build();
+                        PagingConfig config = new PagingConfig(4, 4, false);
 
                         FirestorePagingOptions<Product> options = new FirestorePagingOptions.Builder<Product>()
                                 .setLifecycleOwner(SearchProductActivity.this)
@@ -361,6 +351,7 @@ public class SearchProductActivity extends AppCompatActivity {
 
     ///////////////////////////////////////// Load Products ////////////////////////////////////////
 
+    @SuppressLint("NotifyDataSetChanged")
     private void loadProducts(FirestorePagingOptions<Product> options) {
         productAdapter = new FirestorePagingAdapter<Product, ProductViewHolder>(options) {
 
@@ -444,7 +435,7 @@ public class SearchProductActivity extends AppCompatActivity {
                             showConnectToInternetDialog();
                             return;
                         } else {
-                            progressDialog.show();
+                            loadingDialog.startDialog();
 
                             String[] split = model.getProductID().split("-", 2);
                             String cart_id = "ITEM-" + split[1];
@@ -469,7 +460,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                 if (queryDocumentSnapshots1.getDocuments().size() == 0) {
                                     cartRef.document(cart_id).set(newCartItem)
                                             .addOnSuccessListener(aVoid -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(SearchProductActivity.this)
                                                         .setText("Success! Your cart just got updated.")
                                                         .setTextAppearance(R.style.AlertText)
@@ -484,7 +475,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                                         .show();
                                             })
                                             .addOnFailureListener(e -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(SearchProductActivity.this)
                                                         .setText("Whoa! Something Broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -502,7 +493,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                     cartRef.whereEqualTo(Constants.KEY_CART_ITEM_PRODUCT_STORE_ID, model.getProductStoreID())
                                             .get().addOnSuccessListener(queryDocumentSnapshots2 -> {
                                         if (queryDocumentSnapshots2.getDocuments().size() == 0) {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
                                             MaterialDialog materialDialog = new MaterialDialog.Builder(SearchProductActivity.this)
                                                     .setTitle("Item cannot be added to your cart!")
                                                     .setMessage("Your cart has already been setup for another store this item does not belong to. You must clear your cart first before proceeding with this item.")
@@ -525,7 +516,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                                                             .update(Constants.KEY_CART_ITEM_TIMESTAMP, FieldValue.serverTimestamp(),
                                                                                     Constants.KEY_CART_ITEM_PRODUCT_QUANTITY, task.getResult().getLong(Constants.KEY_CART_ITEM_PRODUCT_QUANTITY) + 1)
                                                                             .addOnSuccessListener(aVoid -> {
-                                                                                progressDialog.dismiss();
+                                                                                loadingDialog.dismissDialog();
                                                                                 Alerter.create(SearchProductActivity.this)
                                                                                         .setText("Success! Your cart just got updated.")
                                                                                         .setTextAppearance(R.style.AlertText)
@@ -539,7 +530,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                                                                         .setProgressColorInt(getColor(android.R.color.white))
                                                                                         .show();
                                                                             }).addOnFailureListener(e -> {
-                                                                        progressDialog.dismiss();
+                                                                        loadingDialog.dismissDialog();
                                                                         Alerter.create(SearchProductActivity.this)
                                                                                 .setText("Whoa! Something Broke. Try again!")
                                                                                 .setTextAppearance(R.style.AlertText)
@@ -554,7 +545,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                                                                 .show();
                                                                     });
                                                                 } else {
-                                                                    progressDialog.dismiss();
+                                                                    loadingDialog.dismissDialog();
                                                                     MaterialDialog materialDialog = new MaterialDialog.Builder(SearchProductActivity.this)
                                                                             .setTitle("Item can't be further added to your cart!")
                                                                             .setMessage("The store doesn't have more of this product than the quantity you already have in your cart.")
@@ -566,7 +557,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                                             } else {
                                                                 cartRef.document(cart_id).set(newCartItem)
                                                                         .addOnSuccessListener(aVoid -> {
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
                                                                             Alerter.create(SearchProductActivity.this)
                                                                                     .setText("Success! Your cart just got updated.")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -581,7 +572,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                                                                     .show();
                                                                         })
                                                                         .addOnFailureListener(e -> {
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
                                                                             Alerter.create(SearchProductActivity.this)
                                                                                     .setText("Whoa! Something Broke. Try again!")
                                                                                     .setTextAppearance(R.style.AlertText)
@@ -597,7 +588,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                                                         });
                                                             }
                                                         } else {
-                                                            progressDialog.dismiss();
+                                                            loadingDialog.dismissDialog();
                                                             Alerter.create(SearchProductActivity.this)
                                                                     .setText("Whoa! Something Broke. Try again!")
                                                                     .setTextAppearance(R.style.AlertText)
@@ -612,7 +603,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                                                     .show();
                                                         }
                                                     }).addOnFailureListener(e -> {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
                                                 Alerter.create(SearchProductActivity.this)
                                                         .setText("Whoa! Something Broke. Try again!")
                                                         .setTextAppearance(R.style.AlertText)
@@ -628,7 +619,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                             });
                                         }
                                     }).addOnFailureListener(e -> {
-                                        progressDialog.dismiss();
+                                        loadingDialog.dismissDialog();
                                         Alerter.create(SearchProductActivity.this)
                                                 .setText("Whoa! Something Broke. Try again!")
                                                 .setTextAppearance(R.style.AlertText)
@@ -644,7 +635,7 @@ public class SearchProductActivity extends AppCompatActivity {
                                     });
                                 }
                             }).addOnFailureListener(e -> {
-                                progressDialog.dismiss();
+                                loadingDialog.dismissDialog();
                                 Alerter.create(SearchProductActivity.this)
                                         .setText("Whoa! Something Broke. Try again!")
                                         .setTextAppearance(R.style.AlertText)
@@ -691,51 +682,64 @@ public class SearchProductActivity extends AppCompatActivity {
                     LAST_POSITION = position;
                 }
             }
-
-            @Override
-            protected void onLoadingStateChanged(@NonNull LoadingState state) {
-                super.onLoadingStateChanged(state);
-                switch (state) {
-                    case LOADING_INITIAL:
-                    case LOADING_MORE:
-                        progressBar.setVisibility(View.VISIBLE);
-                        layoutSearch.setVisibility(View.GONE);
-                        layoutEmpty.setVisibility(View.GONE);
-                        break;
-                    case LOADED:
-                    case FINISHED:
-                        progressBar.setVisibility(View.GONE);
-
-                        if (getItemCount() == 0) {
-                            layoutSearch.setVisibility(View.GONE);
-                            layoutEmpty.setVisibility(View.VISIBLE);
-                        } else {
-                            layoutSearch.setVisibility(View.GONE);
-                            layoutEmpty.setVisibility(View.GONE);
-                        }
-                        break;
-                    case ERROR:
-                        progressBar.setVisibility(View.GONE);
-                        layoutSearch.setVisibility(View.GONE);
-                        layoutEmpty.setVisibility(View.GONE);
-                        Alerter.create(SearchProductActivity.this)
-                                .setText("Whoa! Something Broke. Try again!")
-                                .setTextAppearance(R.style.AlertText)
-                                .setBackgroundColorRes(R.color.errorColor)
-                                .setIcon(R.drawable.ic_error)
-                                .setDuration(3000)
-                                .enableIconPulse(true)
-                                .enableVibration(true)
-                                .disableOutsideTouch()
-                                .enableProgress(true)
-                                .setProgressColorInt(getColor(android.R.color.white))
-                                .show();
-                        break;
-                }
-            }
         };
 
         productAdapter.notifyDataSetChanged();
+
+        productAdapter.addLoadStateListener(states -> {
+            LoadState refresh = states.getRefresh();
+            LoadState append = states.getAppend();
+
+            if (refresh instanceof LoadState.Error || append instanceof LoadState.Error) {
+                progressBar.setVisibility(View.GONE);
+                layoutSearch.setVisibility(View.GONE);
+                layoutEmpty.setVisibility(View.GONE);
+                Alerter.create(SearchProductActivity.this)
+                        .setText("Whoa! Something Broke. Try again!")
+                        .setTextAppearance(R.style.AlertText)
+                        .setBackgroundColorRes(R.color.errorColor)
+                        .setIcon(R.drawable.ic_error)
+                        .setDuration(3000)
+                        .enableIconPulse(true)
+                        .enableVibration(true)
+                        .disableOutsideTouch()
+                        .enableProgress(true)
+                        .setProgressColorInt(getColor(android.R.color.white))
+                        .show();
+            }
+
+            if (refresh instanceof LoadState.Loading) {
+
+            }
+
+            if (append instanceof LoadState.Loading) {
+                progressBar.setVisibility(View.VISIBLE);
+                layoutSearch.setVisibility(View.GONE);
+                layoutEmpty.setVisibility(View.GONE);
+            }
+
+            if (append instanceof LoadState.NotLoading) {
+                LoadState.NotLoading notLoading = (LoadState.NotLoading) append;
+                if (notLoading.getEndOfPaginationReached()) {
+                    progressBar.setVisibility(View.GONE);
+
+                    if (productAdapter.getItemCount() == 0) {
+                        layoutSearch.setVisibility(View.GONE);
+                        layoutEmpty.setVisibility(View.VISIBLE);
+                    } else {
+                        layoutSearch.setVisibility(View.GONE);
+                        layoutEmpty.setVisibility(View.GONE);
+                    }
+                    return null;
+                }
+
+                if (refresh instanceof LoadState.NotLoading) {
+                    return null;
+                }
+            }
+
+            return null;
+        });
 
         recyclerProducts.setHasFixedSize(true);
         recyclerProducts.setLayoutManager(new LinearLayoutManager(SearchProductActivity.this));

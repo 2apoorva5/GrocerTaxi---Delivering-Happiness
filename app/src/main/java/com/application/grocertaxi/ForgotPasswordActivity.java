@@ -1,6 +1,5 @@
 package com.application.grocertaxi;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -16,19 +15,19 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.application.grocertaxi.Helper.LoadingDialog;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
-import dmax.dialog.SpotsDialog;
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
@@ -40,7 +39,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
 
     private PreferenceManager preferenceManager;
-    private AlertDialog progressDialog;
+    private LoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +60,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        progressDialog = new SpotsDialog.Builder().setContext(ForgotPasswordActivity.this)
-                .setMessage("Hold on..")
-                .setCancelable(false)
-                .setTheme(R.style.SpotsDialog)
-                .build();
+        loadingDialog = new LoadingDialog(ForgotPasswordActivity.this);
 
         initViews();
         initFirebase();
@@ -103,7 +98,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     showConnectToInternetDialog();
                     return;
                 } else {
-                    progressDialog.show();
+                    loadingDialog.startDialog();
 
                     firebaseAuth.fetchSignInMethodsForEmail(email)
                             .addOnCompleteListener(task -> {
@@ -112,14 +107,14 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                                             task.getResult().getSignInMethods().size() != 0) {
                                         firebaseAuth.sendPasswordResetEmail(email)
                                                 .addOnSuccessListener(aVoid -> {
-                                                    progressDialog.dismiss();
+                                                    loadingDialog.dismissDialog();
 
                                                     Toast.makeText(ForgotPasswordActivity.this, "Check your email for password reset link", Toast.LENGTH_LONG).show();
 
                                                     onBackPressed();
                                                     finish();
                                                 }).addOnFailureListener(e -> {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
 
                                             Alerter.create(ForgotPasswordActivity.this)
                                                     .setText("Whoa! Something broke. Try again!")
@@ -135,7 +130,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                                                     .show();
                                         });
                                     } else {
-                                        progressDialog.dismiss();
+                                        loadingDialog.dismissDialog();
 
                                         YoYo.with(Techniques.Shake).duration(700).repeat(0).playOn(emailField);
                                         Alerter.create(ForgotPasswordActivity.this)
@@ -152,7 +147,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                                                 .show();
                                     }
                                 } else {
-                                    progressDialog.dismiss();
+                                    loadingDialog.dismissDialog();
 
                                     Alerter.create(ForgotPasswordActivity.this)
                                             .setText("Whoa! Something broke. Try again!")

@@ -1,6 +1,5 @@
 package com.application.grocertaxi;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
@@ -23,6 +22,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.application.grocertaxi.Helper.LoadingDialog;
 import com.application.grocertaxi.Model.OrderItem;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
@@ -36,7 +36,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
 import java.text.SimpleDateFormat;
@@ -44,7 +43,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Random;
 
-import dmax.dialog.SpotsDialog;
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class TrackOrderActivity extends AppCompatActivity {
@@ -62,7 +61,7 @@ public class TrackOrderActivity extends AppCompatActivity {
     private FirestoreRecyclerAdapter<OrderItem, OrderItemViewHolder> orderItemAdapter;
 
     private PreferenceManager preferenceManager;
-    private AlertDialog progressDialog;
+    private LoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,11 +95,7 @@ public class TrackOrderActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        progressDialog = new SpotsDialog.Builder().setContext(TrackOrderActivity.this)
-                .setMessage("Hold on..")
-                .setCancelable(false)
-                .setTheme(R.style.SpotsDialog)
-                .build();
+        loadingDialog = new LoadingDialog(TrackOrderActivity.this);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -348,7 +343,7 @@ public class TrackOrderActivity extends AppCompatActivity {
                                 return;
                             } else {
                                 if (order_status.equals("Out for Delivery")) {
-                                    progressDialog.dismiss();
+                                    loadingDialog.dismissDialog();
                                     MaterialDialog materialDialog = new MaterialDialog.Builder(TrackOrderActivity.this)
                                             .setTitle("Can't proceed!")
                                             .setMessage("This order can't be cancelled since it is already out for delivery already.")
@@ -362,7 +357,7 @@ public class TrackOrderActivity extends AppCompatActivity {
                                             .setCancelable(false)
                                             .setPositiveButton("Yes", R.drawable.ic_dialog_okay, (dialogInterface, which) -> {
                                                 dialogInterface.dismiss();
-                                                progressDialog.show();
+                                                loadingDialog.startDialog();
 
                                                 Random random = new Random();
                                                 int number1 = random.nextInt(9000) + 1000;
@@ -404,7 +399,7 @@ public class TrackOrderActivity extends AppCompatActivity {
                                                                             .addOnCompleteListener(task1 -> {
                                                                                 if (task1.isSuccessful()) {
                                                                                     if (!task1.getResult().getDocuments().isEmpty() || task1.getResult().getDocuments().size() != 0) {
-                                                                                        progressDialog.dismiss();
+                                                                                        loadingDialog.dismissDialog();
                                                                                         MaterialDialog materialDialog = new MaterialDialog.Builder(TrackOrderActivity.this)
                                                                                                 .setTitle("Already requested!")
                                                                                                 .setMessage("You've already requested for cancellation of this order. You'll get the response from the store soon!")
@@ -424,7 +419,7 @@ public class TrackOrderActivity extends AppCompatActivity {
                                                                                                 .document(request_id)
                                                                                                 .set(newCancelRequest)
                                                                                                 .addOnSuccessListener(aVoid -> {
-                                                                                                    progressDialog.dismiss();
+                                                                                                    loadingDialog.dismissDialog();
                                                                                                     Alerter.create(TrackOrderActivity.this)
                                                                                                             .setText("Success! Cancellation request submitted.")
                                                                                                             .setTextAppearance(R.style.AlertText)
@@ -438,7 +433,7 @@ public class TrackOrderActivity extends AppCompatActivity {
                                                                                                             .setProgressColorInt(getColor(android.R.color.white))
                                                                                                             .show();
                                                                                                 }).addOnFailureListener(e -> {
-                                                                                            progressDialog.dismiss();
+                                                                                            loadingDialog.dismissDialog();
                                                                                             Alerter.create(TrackOrderActivity.this)
                                                                                                     .setText("Whoa! Something Broke. Try again!")
                                                                                                     .setTextAppearance(R.style.AlertText)
@@ -454,7 +449,7 @@ public class TrackOrderActivity extends AppCompatActivity {
                                                                                         });
                                                                                     }
                                                                                 } else {
-                                                                                    progressDialog.dismiss();
+                                                                                    loadingDialog.dismissDialog();
                                                                                     Alerter.create(TrackOrderActivity.this)
                                                                                             .setText("Whoa! Something Broke. Try again!")
                                                                                             .setTextAppearance(R.style.AlertText)
@@ -470,7 +465,7 @@ public class TrackOrderActivity extends AppCompatActivity {
                                                                                 }
                                                                             });
                                                                 } else {
-                                                                    progressDialog.dismiss();
+                                                                    loadingDialog.dismissDialog();
                                                                     MaterialDialog materialDialog2 = new MaterialDialog.Builder(TrackOrderActivity.this)
                                                                             .setTitle("Can't proceed!")
                                                                             .setMessage("You've to be in the same location where the store is to proceed with the request for cancellation.")
@@ -480,7 +475,7 @@ public class TrackOrderActivity extends AppCompatActivity {
                                                                     materialDialog2.show();
                                                                 }
                                                             } else {
-                                                                progressDialog.dismiss();
+                                                                loadingDialog.dismissDialog();
                                                                 Alerter.create(TrackOrderActivity.this)
                                                                         .setText("Whoa! Something Broke. Try again!")
                                                                         .setTextAppearance(R.style.AlertText)

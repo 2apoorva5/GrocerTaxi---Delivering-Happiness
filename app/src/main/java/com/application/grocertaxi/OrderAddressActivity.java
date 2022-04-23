@@ -1,6 +1,5 @@
 package com.application.grocertaxi;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -17,6 +16,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.application.grocertaxi.Helper.LoadingDialog;
 import com.application.grocertaxi.Utilities.Constants;
 import com.application.grocertaxi.Utilities.PreferenceManager;
 import com.daimajia.androidanimations.library.Techniques;
@@ -27,7 +27,6 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.shreyaspatil.MaterialDialog.MaterialDialog;
 import com.tapadoo.alerter.Alerter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -35,7 +34,7 @@ import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import java.util.Random;
 
-import dmax.dialog.SpotsDialog;
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import maes.tech.intentanim.CustomIntent;
 
 public class OrderAddressActivity extends AppCompatActivity {
@@ -49,7 +48,7 @@ public class OrderAddressActivity extends AppCompatActivity {
     private CollectionReference userRef, storeRef;
 
     private PreferenceManager preferenceManager;
-    private AlertDialog progressDialog;
+    private LoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,11 +82,7 @@ public class OrderAddressActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getColor(R.color.colorBackground));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        progressDialog = new SpotsDialog.Builder().setContext(OrderAddressActivity.this)
-                .setMessage("Hold on..")
-                .setCancelable(false)
-                .setTheme(R.style.SpotsDialog)
-                .build();
+        loadingDialog = new LoadingDialog(OrderAddressActivity.this);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -211,10 +206,10 @@ public class OrderAddressActivity extends AppCompatActivity {
         ////////////////////////////////////////////////////////////////////////////////////////////
 
         readPolicyBtn.setOnClickListener(v -> {
-                    String privacyPolicyUrl = "https://grocertaxi.wixsite.com/refund-policy";
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl));
-                    startActivity(browserIntent);
-                });
+            String privacyPolicyUrl = "https://grocertaxi.wixsite.com/refund-policy";
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl));
+            startActivity(browserIntent);
+        });
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -251,7 +246,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                             showConnectToInternetDialog();
                             return;
                         } else {
-                            progressDialog.show();
+                            loadingDialog.startDialog();
 
                             storeRef.document(preferenceManager.getString(Constants.KEY_ORDER_FROM_STOREID))
                                     .get()
@@ -299,7 +294,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                                             preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
                                                                             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
 
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
 
                                                                             startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
                                                                             CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
@@ -330,14 +325,14 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                                             preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(convenience_fee));
                                                                             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
 
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
 
                                                                             startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
                                                                             CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
                                                                             finish();
                                                                         }
                                                                     } else {
-                                                                        progressDialog.dismiss();
+                                                                        loadingDialog.dismissDialog();
 
                                                                         Alerter.create(OrderAddressActivity.this)
                                                                                 .setText("Whoa! Something broke. Try again!")
@@ -353,7 +348,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                                                 .show();
                                                                     }
                                                                 } else {
-                                                                    progressDialog.dismiss();
+                                                                    loadingDialog.dismissDialog();
 
                                                                     Alerter.create(OrderAddressActivity.this)
                                                                             .setText("Whoa! Something broke. Try again!")
@@ -370,7 +365,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                                 }
                                                             });
                                                 } else {
-                                                    progressDialog.dismiss();
+                                                    loadingDialog.dismissDialog();
                                                     MaterialDialog materialDialog = new MaterialDialog.Builder(OrderAddressActivity.this)
                                                             .setTitle("Ahan! Can't proceed!")
                                                             .setMessage("The delivery address should be in a distance of 5 kilometres from the store.")
@@ -382,7 +377,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                     materialDialog.show();
                                                 }
                                             } else {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
 
                                                 Alerter.create(OrderAddressActivity.this)
                                                         .setText("Whoa! Something broke. Try again!")
@@ -398,7 +393,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                         .show();
                                             }
                                         } else {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
 
                                             Alerter.create(OrderAddressActivity.this)
                                                     .setText("Whoa! Something broke. Try again!")
@@ -420,7 +415,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                             showConnectToInternetDialog();
                             return;
                         } else {
-                            progressDialog.show();
+                            loadingDialog.startDialog();
 
                             storeRef.document(preferenceManager.getString(Constants.KEY_ORDER_FROM_STOREID))
                                     .get()
@@ -468,7 +463,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                                             preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
                                                                             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
 
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
 
                                                                             startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
                                                                             CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
@@ -494,14 +489,14 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                                             preferenceManager.putString(Constants.KEY_ORDER_CONVENIENCE_FEE, String.valueOf(0));
                                                                             preferenceManager.putString(Constants.KEY_ORDER_TOTAL_PAYABLE, String.valueOf(total_payable));
 
-                                                                            progressDialog.dismiss();
+                                                                            loadingDialog.dismissDialog();
 
                                                                             startActivity(new Intent(OrderAddressActivity.this, OrderSummaryActivity.class));
                                                                             CustomIntent.customType(OrderAddressActivity.this, "left-to-right");
                                                                             finish();
                                                                         }
                                                                     } else {
-                                                                        progressDialog.dismiss();
+                                                                        loadingDialog.dismissDialog();
 
                                                                         Alerter.create(OrderAddressActivity.this)
                                                                                 .setText("Whoa! Something broke. Try again!")
@@ -517,7 +512,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                                                 .show();
                                                                     }
                                                                 } else {
-                                                                    progressDialog.dismiss();
+                                                                    loadingDialog.dismissDialog();
 
                                                                     Alerter.create(OrderAddressActivity.this)
                                                                             .setText("Whoa! Something broke. Try again!")
@@ -534,7 +529,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                                 }
                                                             });
                                                 } else {
-                                                    progressDialog.dismiss();
+                                                    loadingDialog.dismissDialog();
                                                     MaterialDialog materialDialog = new MaterialDialog.Builder(OrderAddressActivity.this)
                                                             .setTitle("Ahan! Can't proceed!")
                                                             .setMessage("The delivery address should be in a distance of 5 kilometres from the store.")
@@ -546,7 +541,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                     materialDialog.show();
                                                 }
                                             } else {
-                                                progressDialog.dismiss();
+                                                loadingDialog.dismissDialog();
 
                                                 Alerter.create(OrderAddressActivity.this)
                                                         .setText("Whoa! Something broke. Try again!")
@@ -562,7 +557,7 @@ public class OrderAddressActivity extends AppCompatActivity {
                                                         .show();
                                             }
                                         } else {
-                                            progressDialog.dismiss();
+                                            loadingDialog.dismissDialog();
 
                                             Alerter.create(OrderAddressActivity.this)
                                                     .setText("Whoa! Something broke. Try again!")
