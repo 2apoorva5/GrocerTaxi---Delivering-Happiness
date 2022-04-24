@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="8dp"
                 android:layout_marginStart="8dp"
-                app:SpinKit_Color="@color/colorPrimary"
+                app:SpinKit_Color="@color/colorAccent"
                 app:SpinKit_Style="WanderingCubes"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
