@@ -2,6 +2,8 @@
 buildscript {
     repositories {
         google()
+        //noinspection JcenterRepositoryObsolete
+        jcenter()
         mavenCentral()
         maven {
             url 'https://maven.fabric.io/public'
@@ -21,6 +23,8 @@ buildscript {
 allprojects {
     repositories {
         google()
+        //noinspection JcenterRepositoryObsolete
+        jcenter()
         mavenCentral()
         flatDir {
             dirs 'libs'
